@@ -71,6 +71,8 @@ export function createApp({ db, env = process.env, now = () => new Date(), fetch
     if (p === '/healthz') return { status: 200, type: 'text/plain', body: 'ok' };
     const lm = /^\/static\/logos\/([a-z-]+\.(?:png|jpg))$/.exec(p);
     if (lm && (lm[1] === GCG_LOGO.file || LOGOS.some((l) => l.file === lm[1]))) return { status: 200, type: lm[1].endsWith('.jpg') ? 'image/jpeg' : 'image/png', headers: { 'Cache-Control': 'public, max-age=86400' }, body: readFileSync(join(PUBLIC, 'logos', lm[1])) };
+    const fm = /^\/static\/fonts\/(instrument-serif-400(?:-italic)?\.woff2)$/.exec(p);
+    if (fm) return { status: 200, type: 'font/woff2', headers: { 'Cache-Control': 'public, max-age=31536000, immutable' }, body: readFileSync(join(PUBLIC, 'fonts', fm[1])) };
     if (STATIC[p]) return { status: 200, type: STATIC[p][0], headers: { 'Cache-Control': 'public, max-age=3600' }, body: readFileSync(join(PUBLIC, STATIC[p][1])) };
 
     // ---------- admin + stage ----------
@@ -125,7 +127,9 @@ export function createApp({ db, env = process.env, now = () => new Date(), fetch
       const pt = S.lookupByToken(db, url.searchParams.get('t'));
       if (!pt) return html(P.messagePage('Link not found', 'Please check the link in your email.'), 404);
       const pending = !!pt.email && !!db.prepare("SELECT 1 FROM outbox WHERE participant_id=? AND status='unsent'").get(pt.id);
-      return html(P.donePage({ participant: pt, existing: url.searchParams.get('existing') === '1', emailQueued: pending, nextPlay: url.searchParams.get('next') === 'play' ? (playOpen(db) && !!latestDeck(db) ? 'open' : 'wait') : null, lang: lang() }));
+      const start = S.timings(db, env).eventStartsAt ? new Date(S.timings(db, env).eventStartsAt) : null;
+      const comeBack = start && now() < start ? start.toLocaleDateString('en-GB', { weekday: 'long', timeZone: 'UTC' }) : null;
+      return html(P.donePage({ participant: pt, comeBack, existing: url.searchParams.get('existing') === '1', emailQueued: pending, nextPlay: url.searchParams.get('next') === 'play' ? (playOpen(db) && !!latestDeck(db) ? 'open' : 'wait') : null, lang: lang() }));
     }
 
     // ---------- welcome game (phone/tablet, portrait) ----------

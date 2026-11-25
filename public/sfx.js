@@ -21,6 +21,8 @@
     toggle: function () { this.set(!on); return on; },
     tick: function () { tone(880, 0, 0.06, 'triangle', 0.07); },
     rise: function () { for (var i = 0; i < 9; i++) tone(260 + i * 55, i * 0.075, 0.1, 'triangle', 0.05); },
+    lock: function () { tone(196, 0, 0.09, 'sine', 0.1); tone(392, 0.04, 0.12, 'triangle', 0.05); },
+    cliff: function () { tone(110, 0, 1.2, 'sine', 0.14); tone(165, 0.1, 1.0, 'sine', 0.08); tone(220, 0.9, 1.4, 'sine', 0.09); },
     chime: function () { [523, 659, 784, 1047].forEach(function (f, i) { tone(f, i * 0.085, 0.3, 'sine', 0.13); }); },
     miss: function () { tone(196, 0, 0.2, 'sine', 0.12); tone(147, 0.15, 0.34, 'sine', 0.1); },
     boom: function () { tone(70, 0, 0.55, 'sine', 0.3); tone(140, 0, 0.22, 'triangle', 0.1); }

@@ -40,19 +40,28 @@ test('the older say/stage fields still work (no-JS and existing clients)', async
   c.close();
 });
 
-test('logos: first page is CCA only, game screens are clean, closing screens carry the full row (CCA first)', async () => {
+test('logos: first page is CCA only, game screens are clean, and the ending breathes (no logo row, GCG mark bottom-right)', async () => {
   const c = await boot();
   const landing = await (await c.call('/')).text();
   assert.match(landing, /class="logos hero"/); assert.equal((landing.match(/static\/logos\/(?!gcg)/g) || []).length, 1);
   assert.ok(landing.includes('creatives-connect-afrika.png'));
   assert.doesNotMatch(landing.replace(/<[^>]*>/g, ' '), /gold coast games/i, 'no written GCG name in the visible text (the logo carries it)');
-  const start = await (await c.call('/start')).text();
-  assert.doesNotMatch(start, /class="logos/);
+  assert.match(landing, /What do you\s+<em>actually<\/em>\s+think\?/, 'the opening is a question, not a registration page');
+  assert.doesNotMatch(await (await c.call('/start')).text(), /class="logos/);
   const loc = (await c.call('/start', { body: reg() })).headers.get('location');
   const done = await (await c.call(loc)).text();
-  const order = [...done.matchAll(/static\/logos\/([a-z-]+)\.png/g)].map((m) => m[1]).filter((n) => n !== 'gcg');
-  assert.deepEqual(order, ['creatives-connect-afrika', 'ghana-arms', 'black-star', 'africa-tourism-partners', 'afcfta']);
+  assert.doesNotMatch(done, /class="logos/, 'the ending has no partner row: it is allowed to breathe');
   assert.ok(done.includes('/static/logos/gcg.png') && done.includes('In partnership with Creatives Connect Afrika'));
+  const text = done.replace(/<[^>]*>/g, ' ').replace(/\s+/g, ' ');
+  for (const line of ['That’s all.', 'For now.', 'You just told us what you think.', 'What does everyone else think?', 'Come back Monday.', 'Keep it.', 'See you Monday.']) assert.ok(text.includes(line.replace('’', '&#39;')) || text.includes(line), `ending says: ${line}`);
+  assert.ok(!/thank you for completing/i.test(text), 'never a thank-you-for-completing page');
+  c.close();
+});
+
+test('the ending adapts if the event has already started', async () => {
+  const c = await boot({ EVENT_STARTS_AT: '2026-11-20T08:00:00Z' });
+  const done = (await (await c.call((await c.call('/start', { body: reg() })).headers.get('location'))).text()).replace(/<[^>]*>/g, ' ');
+  assert.match(done, /See you at the event/); assert.doesNotMatch(done, /Come back/);
   c.close();
 });
 
@@ -67,20 +76,52 @@ test('wizard: statements first; then who (name, surname, country together), sect
   const c = await boot();
   const html = await (await c.call('/start')).text();
   const screens = html.split('<section class="step"').slice(1);
-  assert.equal(screens.length, 23, '15 statement screens + who + sector + why + email + project + values + contact + consent');
+  assert.equal(screens.length, 20, '15 statement screens + who + sector + why + email + consent: nothing else');
   const has = (re) => screens.map((x, i) => (re.test(x) ? i : -1)).filter((i) => i >= 0);
   assert.deepEqual(has(/t_T1_stance/), [0]);
   assert.deepEqual(has(/name="first_name"/), [15]); assert.deepEqual(has(/name="surname"/), [15]); assert.deepEqual(has(/name="country"/), [15], 'name, surname and country on one page');
   assert.deepEqual(has(/name="sector"/), [16]); assert.deepEqual(has(/name="goal"/), [17], '"why you are here" is its own page');
-  assert.deepEqual(has(/name="email"/), [18]); assert.deepEqual(has(/name="project"/), [19]); assert.deepEqual(has(/name="consent_aggregate"/), [22]);
-  // "why you are here" cannot be skipped in the UI (an auto-advancing screen with a required choice and no skip)
-  assert.ok(/data-auto/.test(screens[17]) && !/data-skippable/.test(screens[17]) && /required/.test(screens[17]));
-  // every other screen asks for one thing (the who page has three fields by design)
+  assert.deepEqual(has(/name="email"/), [18]); assert.deepEqual(has(/name="consent_aggregate"/), [19]);
+  for (const gone of ['name="project"', 'name="values"', 'name="contact_opt_in"']) assert.ok(!html.includes(gone), `${gone} is no longer asked`);
+  assert.ok(/data-auto/.test(screens[17]) && !/data-skippable/.test(screens[17]) && /required/.test(screens[17]), '"why" cannot be skipped');
   screens.forEach((x, i) => assert.ok(((x.match(/<input[^>]*type="(text|email)"|<select|<textarea/g) || []).length) <= (i === 15 ? 3 : 1), `screen ${i}`));
-  assert.equal((html.match(/data-auto/g) || []).length, 18, '15 statement taps + sector + why + contact');
-  assert.equal((html.match(/data-optional/g) || []).length, 3 /* email, project, values */);
+  assert.equal((html.match(/data-auto/g) || []).length, 17, '15 statement taps + sector + why');
+  assert.equal((html.match(/data-optional/g) || []).length, 1, 'only email is skippable');
   const door = (await (await c.call('/door')).text()).split('<section class="step"').slice(1);
-  assert.equal(door.length, 20, 'door: 15 + who + sector + why + email + consent');
+  assert.equal(door.length, 20);
+  c.close();
+});
+
+test('statement screens are built like a game: count + ticks, a build-up line, lock-in line, labelled scale', async () => {
+  const c = await boot();
+  const html = await (await c.call('/start')).text();
+  assert.match(html, /<span class="count">01<i> \/ 05<\/i><\/span>/); assert.ok(html.includes('class="ticks"'));
+  for (const line of ['Okay. Let\u2019s start a fight.', 'No fence-sitting.', 'Pick a side.', 'Nearly there.', 'Last one. Make it count.']) assert.ok(html.includes(line), line);
+  for (const ack of ['data-ack="Locked."', 'data-ack="Interesting."', 'data-ack="On to the next."', 'data-ack="That\u2019s all five."']) assert.ok(html.includes(ack), ack);
+  for (const lab of ['Not very', 'A little', 'Pretty sure', 'Very sure', 'fight you on this', 'Keeping that to myself', 'Give me the microphone']) assert.ok(html.includes(lab), lab);
+  assert.doesNotMatch(html, /<p class="kicker">Statement \d of \d/, 'no survey-style "Statement 1 of 5" label');
+  // the measurement is unchanged underneath: strength is still 1..5, level still maps to say-aloud / on-stage
+  assert.ok(html.includes('name="t_T1_strength" value="1"') && html.includes('name="t_T1_strength" value="5"') && html.includes('name="t_T1_level" value="stage"'));
+  c.close();
+});
+
+test('Day 3 uses the same scale and measurement but neutral build-up lines (no hint of earlier answers)', async () => {
+  const c = await boot({ FINAL_CLOSES_AT: '2026-12-02T12:00:00Z' });
+  await c.call('/start', { body: reg() });
+  const p = c.db.prepare('SELECT magic_token t FROM participants').get();
+  const html = await (await c.call(`/final?t=${p.t}`)).text();
+  assert.ok(html.includes('Same five statements.') && !html.includes('start a fight'));
+  assert.ok(html.includes('Pretty sure') && html.includes('Give me the microphone'), 'identical response options');
+  c.close();
+});
+
+test('the display font is self-hosted, cacheable, and declared', async () => {
+  const c = await boot();
+  const f = await c.call('/static/fonts/instrument-serif-400.woff2');
+  assert.equal(f.status, 200); assert.equal(f.headers.get('content-type'), 'font/woff2'); assert.match(f.headers.get('cache-control'), /immutable/);
+  assert.ok((await f.arrayBuffer()).byteLength > 10000);
+  assert.equal((await c.call('/static/fonts/other.woff2')).status, 404);
+  assert.match(await (await c.call('/static/app.css')).text(), /@font-face\{font-family:"Instrument Serif"/);
   c.close();
 });
 

@@ -5,6 +5,16 @@
   function store(k, v) { try { if (v === null) localStorage.removeItem(k); else localStorage.setItem(k, v); } catch (e) {} }
   function load(k) { try { return localStorage.getItem(k); } catch (e) { return null; } }
 
+  var calm = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches, SFX = window.CCASfx;
+  // quiet sound toggle (off by default) on the opening, the questions and the ending
+  if (SFX && doc.querySelector('main.wizard, main.landing, main.cliff')) {
+    var pill = doc.createElement('button'); pill.type = 'button'; pill.className = 'snd';
+    var pillLabel = function () { pill.textContent = SFX.isOn() ? 'Sound on' : 'Sound off'; };
+    pill.addEventListener('click', function () { SFX.toggle(); pillLabel(); }); pillLabel(); doc.body.appendChild(pill);
+  }
+  // the ending: a low note as it starts, one hit as the big question lands
+  if (SFX && doc.querySelector('main.cliff') && !calm) { setTimeout(function () { SFX.cliff(); }, 250); setTimeout(function () { SFX.boom(); }, 2800); }
+
   var form = doc.querySelector('form[data-wizard]');
   if (!form) return;
   root.classList.add('js');
@@ -75,10 +85,9 @@
     cur = Math.max(0, Math.min(i, steps.length - 1));
     steps.forEach(function (s, j) { s.classList.toggle('on', j === cur); });
     progress.hidden = false; nav.hidden = false;
-    progress.innerHTML = '';
-    var sr = doc.createElement('span'); sr.className = 'sr'; sr.textContent = 'Step ' + (cur + 1) + ' of ' + steps.length;
-    var bar = doc.createElement('div'); bar.className = 'bar'; bar.innerHTML = '<i style="width:' + Math.round(100 * (cur + 1) / steps.length) + '%"></i>';
-    progress.appendChild(sr); progress.appendChild(bar);
+    progress.textContent = 'Step ' + (cur + 1) + ' of ' + steps.length; // screen readers only; the visible progress is the count and ticks
+    [].slice.call(steps[cur].querySelectorAll('.fade,.locked')).forEach(function (n) { n.classList.remove('fade', 'locked'); });
+    var ackEl = steps[cur].querySelector('.ack'); if (ackEl) ackEl.textContent = '';
     back.style.visibility = cur === 0 ? 'hidden' : 'visible';
     var last = cur === steps.length - 1, auto = steps[cur].hasAttribute('data-auto'), skippable = steps[cur].hasAttribute('data-skippable');
     next.hidden = last || (auto && !skippable); submit.hidden = !last;
@@ -100,12 +109,19 @@
     e.preventDefault(); if (cur < steps.length - 1) next.click(); else submit.click();
   });
   form.addEventListener('input', refreshSkip); form.addEventListener('change', refreshSkip);
-  // one-tap screens: tapping an answer moves on (click also fires when re-tapping an already chosen answer)
+  // one-tap screens: the choice LOCKS (it fills, the others recede), a line acknowledges it, then it moves on.
+  // click also fires when re-tapping an already chosen answer, so going Back and tapping again still works.
   form.addEventListener('click', function (e) {
     var st = steps[cur];
-    if (!st || !st.hasAttribute('data-auto') || !e.target || e.target.type !== 'radio' || !st.contains(e.target)) return;
-    if (window.CCASfx) window.CCASfx.tick();
-    setTimeout(function () { if (steps[cur] === st && !valid(st)) show(cur + 1); }, 200);
+    if (!st || !st.hasAttribute('data-auto') || !e.target || e.target.type !== 'radio' || !st.contains(e.target) || st.classList.contains('locking')) return;
+    st.classList.add('locking');
+    var chosen = e.target.closest('label');
+    [].slice.call(st.querySelectorAll('label.choice, label.chip')).forEach(function (l) { l.classList.toggle('fade', l !== chosen); });
+    if (chosen) chosen.classList.add('locked');
+    var ack = st.querySelector('.ack'); if (ack) ack.textContent = st.getAttribute('data-ack') || '';
+    if (SFX) SFX.lock();
+    try { if (navigator.vibrate) navigator.vibrate(12); } catch (x) {}
+    setTimeout(function () { st.classList.remove('locking'); if (steps[cur] === st && !valid(st)) show(cur + 1); }, calm ? 160 : 650);
   });
   next.addEventListener('click', function () {
     var bad = valid(steps[cur]);

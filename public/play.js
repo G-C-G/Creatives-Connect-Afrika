@@ -6,7 +6,7 @@
   function store(v) { try { if (v === null) localStorage.removeItem(KEY); else localStorage.setItem(KEY, JSON.stringify(v)); } catch (e) {} }
   function load() { try { return JSON.parse(localStorage.getItem(KEY) || 'null'); } catch (e) { return null; } }
   function el(tag, cls, text) { var n = document.createElement(tag); if (cls) n.className = cls; if (text != null) n.textContent = text; return n; }
-  function mood(m) { document.body.classList.remove('win', 'miss', 'score'); if (m) document.body.classList.add(m); }
+  function mood(m) { document.body.classList.remove('win', 'miss', 'night'); if (m) document.body.classList.add(m); }
   function edge(show) { var l = document.querySelector('.logos.edge'); if (l) l.hidden = !show; }
   function screen(m, showLogos) { mood(m || null); edge(!!showLogos); root.innerHTML = ''; window.scrollTo(0, 0); return root; }
   var SFX = window.CCASfx || { tick: function () {}, rise: function () {}, chime: function () {}, miss: function () {}, toggle: function () { return false; }, isOn: function () { return false; } };
@@ -138,7 +138,7 @@
   function localScore() { var c = 0; deck.rounds.forEach(function (R, i) { if (S.answers[i] === R.answer) c++; }); return c * deck.points; }
 
   function end() {
-    var r = screen('score', true), max = deck.rounds.length * deck.points, pts = localScore();
+    var r = screen('night', true), max = deck.rounds.length * deck.points, pts = localScore();
     var wrap = el('div', 'stage-wrap'), hero = el('div', 'hero'), rest = el('div', 'rest'); wrap.appendChild(hero); wrap.appendChild(rest); r.appendChild(wrap);
     var kk = el('p', 'kicker', 'Your score'); kk.style.color = '#F2A81D'; hero.appendChild(kk);
     var sc = el('p', 'score pop', '0 / ' + max); hero.appendChild(sc); countUp(sc, pts, 1100, '', ' / ' + max, true);

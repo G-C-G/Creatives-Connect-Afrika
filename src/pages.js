@@ -9,15 +9,16 @@ const logoRow = (cls = '') => h`<div class="logos ${cls}">${LOGOS.map((l) => h`<
 const heroLogo = () => h`<div class="logos hero"><img src="/static/logos/${LOGOS[0].file}" alt="${LOGOS[0].alt}"></div>`;
 
 // logos: 'none' (game screens stay clean) | 'hero' (opening page: CCA only) | 'row' (opening/closing: CCA first, then partners)
-export function layout({ title, body, lang = 'en', main = '', script = '', logos = 'none' }) {
+export function layout({ title, body, lang = 'en', main = '', script = '', logos = 'none', bodyClass = '' }) {
   return h`<!doctype html>
 <html lang="${lang}"><head><meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
 <meta name="robots" content="noindex">
 <title>${title}</title>
+<link rel="preload" href="/static/fonts/instrument-serif-400.woff2" as="font" type="font/woff2" crossorigin>
 <link rel="stylesheet" href="/static/app.css">
 <script src="/static/sfx.js" defer></script><script src="/static/app.js" defer></script></head>
-<body>${showLogos ? (logos === 'hero' ? heroLogo() : logos === 'row' ? logoRow() : '') : ''}
+<body class="${bodyClass}">${showLogos ? (logos === 'hero' ? heroLogo() : logos === 'row' ? logoRow() : '') : ''}
 <main class="${main}">${body}</main>${script ? h`<script src="${script}" defer></script>` : ''}
 <footer><span>${t(lang, 'brand.partner')}</span><img class="gcg" src="/static/logos/${GCG_LOGO.file}" alt="${GCG_LOGO.alt}" width="84"></footer></body></html>`;
 }
@@ -42,24 +43,28 @@ const choiceRow = (name, opts, S, { required = true } = {}) => h`<div class="cho
 
 const pick = (name, opts, S, cls = '', required = true) => h`<div class="choices ${cls}" role="radiogroup">${opts.map(([v, lab, sub], i) => h`<label class="choice"><input type="radio" name="${name}" value="${v}" ${S.get(name) === v ? 'checked' : ''} ${required && i === 0 ? 'required' : ''}><span>${lab}${sub ? h`<small>${sub}</small>` : ''}</span></label>`)}</div>`;
 
-// One statement = three screens, one tap each, auto-advancing: stance, strength, how far you would take it.
-function takeSteps(take, n, total, S, lang) {
+// One statement = three screens, one tap each: the statement (agree/disagree), how sure you are, how far you would take it.
+// Tapping locks the choice (the others recede), a line acknowledges it, then it moves on. phase picks the build-up lines.
+function takeSteps(take, n, total, S, lang, phase = 'pre') {
   const k = `t_${take.id}`, kick = t(lang, 'take.label', { n, total });
   const levelNow = S.get(`${k}_level`) || (S.get(`${k}_stage`) === 'y' ? 'stage' : S.get(`${k}_say`) === 'y' ? 'aloud' : S.get(`${k}_say`) === 'n' ? 'quiet' : '');
   const S2 = { get: (name) => (name === `${k}_level` ? levelNow : S.get(name)) };
+  const pad = (x) => String(x).padStart(2, '0');
+  const meta = h`<div class="meta"><span class="count">${pad(n)}<i> / ${pad(total)}</i></span>
+    <span class="ticks" aria-hidden="true">${Array.from({ length: total }, (_, i) => h`<i class="${i < n - 1 ? 'done' : i === n - 1 ? 'now' : ''}"></i>`)}</span></div>`;
+  const opener = t(lang, `opener.${phase}.${n}`);
+  const ackLevel = t(lang, n === total ? 'ack.level.last' : 'ack.level');
   return [
-    h`<section class="step" data-step data-auto data-title="${kick}"><p class="kicker">${kick}</p><h2 class="take">${take.text}</h2>
-      <fieldset><legend class="sr">${take.text}</legend>${pick(`${k}_stance`, [['agree', t(lang, 'take.agree')], ['disagree', t(lang, 'take.disagree')]], S, 'two big')}</fieldset></section>`,
-    h`<section class="step" data-step data-auto data-title="${kick}"><p class="kicker">${kick}</p><p class="echo">${take.text}</p>
-      <h2 class="ask">${t(lang, 'take.how_strong')}</h2>
-      <fieldset><legend class="sr">${t(lang, 'take.how_strong')}</legend>${pick(`${k}_strength`, [1, 2, 3, 4, 5].map((i) => [String(i), String(i)]), S, 'five big')}
-      <p class="ends"><span>${t(lang, 'take.little')}</span><span>${t(lang, 'take.completely')}</span></p></fieldset></section>`,
-    h`<section class="step" data-step data-auto data-title="${kick}"><p class="kicker">${kick}</p><p class="echo">${take.text}</p>
-      <h2 class="ask">${t(lang, 'take.how_far')}</h2>
-      <fieldset><legend class="sr">${t(lang, 'take.how_far')}</legend>${pick(`${k}_level`, [['quiet', t(lang, 'take.quiet')], ['aloud', t(lang, 'take.aloud')], ['stage', t(lang, 'take.stage')]], S2, 'stack big')}</fieldset></section>`,
+    h`<section class="step" data-step data-auto data-ack="${t(lang, 'ack.stance')}" data-title="${kick}">${meta}<p class="opener">${opener}</p><h2 class="take">${take.text}</h2>
+      <fieldset><legend class="sr">${take.text}</legend>${pick(`${k}_stance`, [['agree', t(lang, 'take.agree')], ['disagree', t(lang, 'take.disagree')]], S, 'two big serif')}</fieldset><p class="ack" aria-live="polite"></p></section>`,
+    h`<section class="step" data-step data-auto data-ack="${t(lang, 'ack.strength')}" data-title="${kick}">${meta}<p class="echo">${take.text}</p>
+      <h2 class="ask">${t(lang, 'strength.ask')}</h2>
+      <fieldset><legend class="sr">${t(lang, 'strength.ask')}</legend>${pick(`${k}_strength`, [1, 2, 3, 4, 5].map((i) => [String(i), t(lang, `strength.${i}`)]), S, 'stack words')}</fieldset><p class="ack" aria-live="polite"></p></section>`,
+    h`<section class="step" data-step data-auto data-ack="${ackLevel}" data-title="${kick}">${meta}<p class="echo">${take.text}</p>
+      <h2 class="ask">${t(lang, 'level.ask')}</h2>
+      <fieldset><legend class="sr">${t(lang, 'level.ask')}</legend>${pick(`${k}_level`, [['quiet', t(lang, 'level.quiet')], ['aloud', t(lang, 'level.aloud')], ['stage', t(lang, 'level.stage')]], S2, 'stack words')}</fieldset><p class="ack" aria-live="polite"></p></section>`,
   ];
 }
-
 
 // One question per screen: small label, one big headline, one input, one short line. Back/Continue sit at the bottom.
 function ask({ k, title, hint = '', body, optional = false, auto = false, skip = false }, lang) {
@@ -87,7 +92,7 @@ function wizard({ action, id, steps, hidden = {}, lang, E = {}, extraTop = '' })
   ${Object.entries(hidden).map(([k, v]) => h`<input type="hidden" name="${k}" value="${v}">`)}
   ${extraTop}
   ${nErr ? h`<p class="err summary" role="alert">${t(lang, 'err.summary')}</p>` : ''}
-  <div class="progress" data-progress hidden></div>
+  <div class="progress sr" data-progress></div>
   <p class="err summary" role="alert" data-error hidden></p>
   ${steps}
   <div class="nav" data-nav hidden><button type="button" class="btn ghost" data-back>${t(lang, 'nav.back')}</button>
@@ -103,18 +108,18 @@ const consentStep = (S, E, lang) => h`<section class="step" data-step data-title
   ${fieldErr(E, 'consent_aggregate', lang)}</section>`;
 
 export function landingPage(lang = 'en') {
-  return layout({ lang, logos: 'hero', title: 'Welcome to the game | Creatives Connect Afrika', main: 'narrow landing', body: h`
-  <h1>Welcome to the <mark>game</mark></h1>
-  <p class="lead">${t(lang, 'landing.lead')}</p>
-  <p class="hint">${t(lang, 'landing.share')}</p>
-  <a class="btn big" href="/start">${t(lang, 'landing.start')} &rarr;</a>` });
+  return layout({ lang, logos: 'hero', title: 'What do you actually think? | CCA 2026', main: 'narrow landing', body: h`
+  <p class="eyebrow">${t(lang, 'open.eyebrow')} <span>${t(lang, 'open.before')}</span></p>
+  <h1 class="open">${t(lang, 'open.h1a')} <em>${t(lang, 'open.h1b')}</em> ${t(lang, 'open.h1c')}</h1>
+  <p class="lead">${t(lang, 'open.sub')}</p>
+  <a class="btn big" href="/start">${t(lang, 'open.go')} &rarr;</a>` });
 }
 
 export function preForm({ takes, facts = [], S = new URLSearchParams(), E = {}, short = false, lang = 'en' }) {
   const action = short ? '/door' : '/start';
   const q = [
     // name, surname and country share one page; sector, and "why you are here", each get their own
-    ask({ k: t(lang, 'q.name.k'), title: t(lang, 'q.name.t'), hint: t(lang, 'q.name.h'),
+    ask({ k: t(lang, 'who.k'), title: t(lang, 'q.name.t'), hint: t(lang, 'q.name.h'),
       body: h`${bigInput('first_name', S, E, lang, { required: true, autocomplete: 'given-name', label: t(lang, 'about.first') })}
         ${bigInput('surname', S, E, lang, { required: true, autocomplete: 'family-name', label: t(lang, 'about.surname') })}
         <div class="field"><label for="f_country">${t(lang, 'about.country')}</label>${select('country', COUNTRIES, S, lang, E)}${fieldErr(E, 'country', lang)}</div>` }, lang),
@@ -122,14 +127,7 @@ export function preForm({ takes, facts = [], S = new URLSearchParams(), E = {}, 
     ask({ k: t(lang, 'q.goal.k'), title: t(lang, 'q.goal.t'), hint: t(lang, 'q.goal.h'), auto: true, body: chipPick('goal', GOALS, S, lang, true) }, lang),
     ask({ k: t(lang, 'q.email.k'), title: t(lang, 'q.email.t'), hint: t(lang, 'q.email.h'), optional: true, body: bigInput('email', S, E, lang, { type: 'email', max: 254, autocomplete: 'email', label: t(lang, 'about.email') }) }, lang),
   ];
-  const extras = short ? [] : [
-    ask({ k: t(lang, 'q.project.k'), title: t(lang, 'q.project.t'), hint: t(lang, 'q.project.h'), optional: true, body: bigInput('project', S, E, lang, { max: 140 }) }, lang),
-    ask({ k: t(lang, 'q.values.k'), title: t(lang, 'q.values.t'), hint: t(lang, 'q.values.h'), optional: true,
-      body: h`<fieldset class="field" data-maxcheck="3"><div class="chips">${VALUES.map((v) => h`<label class="chip"><input type="checkbox" name="values" value="${v.id}" ${S.getAll('values').includes(v.id) ? 'checked' : ''}><span>${label(v, lang)}</span></label>`)}</div><p class="hint" data-maxmsg></p>${fieldErr(E, 'values', lang)}</fieldset>` }, lang),
-    ask({ k: t(lang, 'q.contact.k'), title: t(lang, 'q.contact.t'), hint: t(lang, 'q.contact.h'), auto: true, skip: true,
-      body: pick('contact_opt_in', [['1', t(lang, 'q.contact.yes')], ['0', t(lang, 'q.contact.no')]], S, 'two big', false) }, lang),
-  ];
-  const consent = ask({ k: t(lang, 'q.consent.k'), title: t(lang, 'q.consent.t'), body: h`<p class="consent">${t(lang, 'consent.text')}</p>
+  const consent = ask({ k: t(lang, 'consent.k'), title: t(lang, 'consent.t'), body: h`<p class="consent">${t(lang, 'consent.text')}</p>
     <label class="check"><input type="checkbox" name="consent_aggregate" value="1" required ${S.get('consent_aggregate') === '1' ? 'checked' : ''}><span>${t(lang, 'consent.aggregate')}</span></label>${fieldErr(E, 'consent_aggregate', lang)}` }, lang);
   const byId = new Map(facts.map((f) => [f.id, f]));
   const steps = [];
@@ -138,21 +136,34 @@ export function preForm({ takes, facts = [], S = new URLSearchParams(), E = {}, 
     const f = !short && byId.get(FACT_SLOTS[i + 1]);
     if (f) steps.push(factStep(f, S, lang));
   });
-  steps.push(...q, ...extras, consent);
+  steps.push(...q, consent);
   const top = short ? h`<h1>${t(lang, 'door.title')}</h1><p class="lead">${t(lang, 'door.lead')}</p>
     ${facts.length ? h`<div class="cards"><h2>${t(lang, 'door.facts')}</h2>${facts.map((f) => h`<p class="card">${f.text}</p>`)}</div>` : ''}` : '';
   return layout({ lang, title: 'Creatives Connect Afrika | Game', main: 'narrow wizard', body: wizard({ action, id: short ? 'door' : 'pre', steps, lang, E, extraTop: top }) });
 }
 
-export function donePage({ participant, existing = false, emailQueued = false, nextPlay = null, lang = 'en' }) {
-  return layout({ lang, logos: 'row', title: 'Your number', main: 'narrow center', body: h`
-  <h1>${t(lang, 'done.title')}</h1>
-  ${existing ? h`<p class="note">${t(lang, 'done.existing')}</p>` : ''}
-  <p class="kicker">${t(lang, 'done.number')}</p><p class="bignum" aria-label="${t(lang, 'done.number')}">${participant.number}</p>
-  <p class="lead">${t(lang, 'done.screenshot')}</p>
-  <p class="hint">${participant.email ? (emailQueued ? t(lang, 'done.email_pending') : t(lang, 'done.emailed')) : t(lang, 'done.no_email')}</p>
-  ${nextPlay === 'open' ? h`<p><a class="btn" href="/play?t=${participant.magic_token}">Continue to the welcome game</a></p>` : ''}
-  ${nextPlay === 'wait' ? h`<p class="lead">The welcome game opens shortly. Keep this number: it is your code.</p>` : ''}` });
+export function donePage({ participant, existing = false, emailQueued = false, nextPlay = null, comeBack = null, lang = 'en' }) {
+  if (nextPlay) { // at the event: the code, then straight into the game
+    return layout({ lang, logos: 'row', title: 'Your number', main: 'narrow center', body: h`
+    <h1>${t(lang, 'done.title')}</h1>
+    ${existing ? h`<p class="note">${t(lang, 'done.existing')}</p>` : ''}
+    <p class="kicker">${t(lang, 'done.number')}</p><p class="bignum" aria-label="${t(lang, 'done.number')}">${participant.number}</p>
+    <p class="lead">${t(lang, 'done.screenshot')}</p>
+    <p class="hint">${participant.email ? (emailQueued ? t(lang, 'done.email_pending') : t(lang, 'done.emailed')) : t(lang, 'done.no_email')}</p>
+    ${nextPlay === 'open' ? h`<p><a class="btn" href="/play?t=${participant.magic_token}">Continue to the welcome game</a></p>` : ''}
+    ${nextPlay === 'wait' ? h`<p class="lead">The welcome game opens shortly. Keep this number: it is your code.</p>` : ''}` });
+  }
+  const day = comeBack;
+  return layout({ lang, bodyClass: 'night', title: 'Locked in', main: 'narrow cliff', body: h`
+    ${existing ? h`<p class="cl hint c0">${t(lang, 'cliff.existing')}</p>` : ''}
+    <p class="cl c1 display">${t(lang, 'cliff.1a')} <em>${t(lang, 'cliff.1b')}</em></p>
+    <p class="cl c2 lead">${t(lang, 'cliff.2')}</p>
+    <p class="cl c3 lead">${t(lang, 'cliff.3')}</p>
+    <p class="cl c4 display">${t(lang, 'cliff.4')}</p>
+    <p class="cl c5 lead">${day ? t(lang, 'cliff.5', { day }) : t(lang, 'cliff.5.now')}</p>
+    <div class="cl c6 codecard"><p class="kicker">${t(lang, 'cliff.code')}</p><p class="bignum" aria-label="${t(lang, 'cliff.code')}">${participant.number}</p><p class="lead">${t(lang, 'cliff.keep')}</p></div>
+    <p class="cl c7 hint">${participant.email ? (emailQueued ? t(lang, 'done.email_pending') : t(lang, 'cliff.email')) : t(lang, 'done.no_email')}</p>
+    <p class="cl c8 display small">${day ? t(lang, 'cliff.bye', { day }) : t(lang, 'cliff.bye.now')}</p>` });
 }
 
 export function finalIdentityPage({ fails = 0, error = false, lang = 'en', state = 'open' }) {
@@ -174,7 +185,7 @@ export function finalClosedPage(state, lang = 'en') {
 
 export function finalForm({ takes, ticket, postOnly, S = new URLSearchParams(), E = {}, lang = 'en' }) {
   const steps = [];
-  takes.forEach((tk, i) => steps.push(...takeSteps(tk, i + 1, takes.length, S, lang)));
+  takes.forEach((tk, i) => steps.push(...takeSteps(tk, i + 1, takes.length, S, lang, 'final')));
   steps.push(ask({ k: t(lang, 'q.changed.k'), title: t(lang, 'q.changed.t'), body: h`<fieldset class="field" data-nonegroup><div class="chips stack">
     ${takes.map((tk) => h`<label class="chip"><input type="checkbox" name="changed" value="${tk.id}" ${S.getAll('changed').includes(tk.id) ? 'checked' : ''}><span>${tk.text}</span></label>`)}
     <label class="chip"><input type="checkbox" name="changed_none" value="1" ${S.get('changed_none') === '1' ? 'checked' : ''}><span>${t(lang, 'final.changed_none')}</span></label></div>${fieldErr(E, 'changed', lang)}</fieldset>` }, lang));
