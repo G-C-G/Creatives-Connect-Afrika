@@ -6,7 +6,7 @@ import { fileURLToPath } from 'node:url';
 import { LOGOS, GCG_LOGO } from './content.js';
 const SFX = readFileSync(fileURLToPath(new URL('../public/sfx.js', import.meta.url)), 'utf8');
 import { loadData, getSetting } from './db.js';
-import { participation, takeSplit, takeChange, biggestMover, stillSplit, shareLabel, headline, movedStatements } from './metrics.js';
+import { participation, takeSplit, takeChange, biggestMover, stillSplit, shareLabel, headline, movedStatements, flipSummary } from './metrics.js';
 
 const pickStories = (data) => {
   const byId = new Map(data.participants.map((p) => [p.id, p]));
@@ -37,7 +37,7 @@ export function buildStageData(db, kind, now = new Date(), { logos = true } = {}
   const mover = biggestMover(data), split = stillSplit(data);
   const mode = part.matched > 0 ? 'then_now' : 'final_only';
   return {
-    ...base, kind, takenAt, mode, participation: part, moved: movedStatements(data),
+    ...base, kind, takenAt, mode, participation: part, moved: movedStatements(data), flips: flipSummary(data),
     headline: mode === 'then_now' ? headline(data) : 'Day 3 results alone: no matched baseline yet.',
     biggestMoverId: mover?.takeId ?? null, stillSplitId: split?.takeId ?? null,
     takes: data.takes.map((tk) => {
@@ -111,7 +111,7 @@ export function renderStageHtml(d) {
     const m = d.moved;
     const s1 = finalOnly ? '' : h`<section class="slide"><p class="kick">The shift</p>
       <p class="huge">${m.count ? h`The room shifted on <span class="gold"><span data-count="${m.count}">${m.count}</span> of ${m.total}</span>` : 'The room held its ground'}${m.count ? ' statements.' : '.'}</p>
-      <p class="sub">Shifted = the average score moved by ${m.threshold} or more (scale -5 to +5), matched people only.</p></section>`;
+      <p class="sub">${d.flips.matched ? `${d.flips.changedAtLeastOne} of ${d.flips.matched} changed side on at least one statement. ` : ''}Shifted = the average score moved by ${m.threshold} or more (scale -5 to +5), matched people only.</p></section>`;
     const per = ordered.map((tk, i) => h`<section class="slide"><p class="kick">Statement ${i + 1} of ${total}</p>
       <div>${tk.id === d.biggestMoverId ? h`<span class="tag">BIGGEST MOVER</span>` : ''}${tk.id === d.stillSplitId ? h`<span class="tag">STILL SPLIT</span>` : ''}</div>
       <p class="take">${tk.text}</p><div class="drumline">&hellip;</div>

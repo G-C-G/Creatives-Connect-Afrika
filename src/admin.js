@@ -24,6 +24,11 @@ const csrfField = (csrf) => h`<input type="hidden" name="csrf" value="${csrf}">`
 const postBtn = (action, csrf, label, fields = {}, cls = 'btn') => h`<form method="post" action="${action}" style="display:inline">${csrfField(csrf)}
   ${Object.entries(fields).map(([k, v]) => h`<input type="hidden" name="${k}" value="${v}">`)}<button class="${cls}" type="submit">${label}</button></form>`;
 
+function flipLine(d) {
+  const f = M.flipSummary(d);
+  return f.matched ? h`<p><b>Changed side on at least one statement:</b> ${f.changedAtLeastOne} of ${f.matched} matched people (average ${f.meanFlips} statements each). <span class="hint">Descriptive only: some switching is ordinary noise and there is no control group, so this is movement, not persuasion.</span></p>` : '';
+}
+
 function participationTable(part) {
   return h`<table><tr><th>Completed pre-event / door</th><td>${part.preCompleters} (${part.viaPreEvent} pre-event, ${part.viaDoor} door)</td></tr>
   <tr><th>Responded on Day 3</th><td>${part.finalResponders}</td></tr><tr><th>Matched (returned)</th><td>${part.matched}</td></tr>
@@ -62,7 +67,7 @@ function dashboard(ctx, csrf) {
    <button class="btn" type="submit">Save</button></form>
   <h2>Takes</h2><p>${locked ? 'All takes are LOCKED.' : 'Not locked.'} ${locked ? '' : postBtn('/admin/lock-takes', csrf, 'Lock take wording now', {}, 'btn ghost')}</p>
   <h2>Hot facts</h2><p class="hint">Only verified facts are ever shown to anyone. Verify against the source first.</p>
-  <table>${facts.map((f) => h`<tr><td><b>${f.id}</b> ${f.text}<br><span class="hint">${f.reveal_text}</span><br><span class="hint"><b>To verify:</b> ${FACTS.find((x) => x.id === f.id)?.verify ?? ''}</span></td><td>${f.verified ? 'VERIFIED' : 'unverified'}</td>
+  <table>${facts.map((f) => h`<tr><td><b>${f.id}</b> ${f.text}<br><span class="hint">${f.reveal_text}</span><br><span class="hint"><b>To verify:</b> ${FACTS.find((x) => x.id === f.id)?.verify ?? ''}</span>${(FACTS.find((x) => x.id === f.id)?.sources ?? []).map((src) => h`<br><span class="hint"><b>Source:</b> <a href="${src.url}" rel="noopener">${src.name}</a> (${src.date}). \u201c${src.passage}\u201d ${src.note || ''}</span>`)}</td><td>${f.verified ? 'VERIFIED' : 'unverified'}</td>
    <td>${postBtn('/admin/facts/verify', csrf, f.verified ? 'Unverify' : 'Mark verified', { id: f.id, verified: f.verified ? '0' : '1' }, 'btn ghost')}</td></tr>`)}</table>
   <h2>Exports</h2><p><a class="btn ghost" href="/admin/export/aggregate.csv">Aggregate CSV (shareable)</a> <a class="btn ghost" href="/admin/export/all.csv">Private CSV (names + emails: do not share)</a></p>`, csrf);
 }
@@ -88,7 +93,7 @@ function finalView(ctx, csrf) {
   const segTable = (key) => h`<table><tr><th>${key}</th><th>n</th><th>Agree then&rarr;now</th><th>Mean net change</th></tr>
     ${seg(key).map((c) => c.suppressed ? h`<tr><td>${key === 'sector' ? sectorLabel(c.segment) : c.segment}</td><td colspan="3">fewer than ${M.MIN_CELL}: suppressed</td></tr>`
       : h`<tr><td>${key === 'sector' ? sectorLabel(c.segment) : c.segment}</td><td>${c.n}</td><td>${M.shareLabel(c.agreePre, c.n)} → ${M.shareLabel(c.agreeFinal, c.n)}</td><td>${fmt(c.meanNetChange)}</td></tr>`)}</table>`;
-  return page('Final game view', h`<p class="hint">${M.headline(d)}</p>${participationTable(part)}${takeTable(d)}
+  return page('Final game view', h`<p class="hint">${M.headline(d)}</p>${participationTable(part)}${flipLine(d)}${takeTable(d)}
   <p><b>Biggest mover:</b> ${mover ? `${mover.takeId} (mean net change ${mover.meanNetChange}, n=${mover.n})` : '–'} · <b>Still split (Day 3, all responders):</b> ${split ? `${split.takeId} (${split.agree} agree / ${split.disagree} disagree)` : '–'}</p>
   ${mover ? h`<h2>Segments for ${mover.takeId}</h2>${segTable('sector')}${segTable('region')}<p class="hint">Cells under ${M.MIN_CELL} are suppressed. Directional only.</p>` : ''}
   <p><a href="/admin/snapshots">Freeze the final snapshot</a></p>`, csrf);
@@ -161,7 +166,7 @@ function report(ctx) {
   const segs = (key) => mover ? M.segmentTable(d, key, mover.takeId) : [];
   return page('One-page report (print me)', h`<style>@media print{nav,.band,footer{display:none}}</style>
   <p><b>Creatives Connect Afrika 2026: hot takes, measured shift across the event.</b> Prepared by Gold Coast Games.</p>
-  <h2>Participation</h2>${participationTable(part)}
+  <h2>Participation</h2>${participationTable(part)}${flipLine(d)}
   <h2>Then vs now (matched pairs only)</h2>${takeTable(d)}
   <p>${M.headline(d)}</p>
   ${mover ? h`<h2>Segments (biggest mover ${mover.takeId})</h2>${['sector', 'region'].map((k) => h`<p><b>${k}</b>: ${segs(k).map((c) => c.suppressed ? `${c.segment}: suppressed (n<${M.MIN_CELL})` : `${k === 'sector' ? sectorLabel(c.segment) : c.segment}: ${M.shareLabel(c.agreePre, c.n)} → ${M.shareLabel(c.agreeFinal, c.n)}`).join(' · ')}</p>`)}` : ''}

@@ -140,3 +140,17 @@ export function movedStatements(data, threshold = MOVED_THRESHOLD) {
   const ids = rows.filter((r) => Math.abs(r.meanNetChange) >= threshold).map((r) => r.takeId);
   return { count: ids.length, total: data.takes.length, ids, threshold };
 }
+
+// How many matched people changed side on at least one statement, and how many statements each changed on average.
+// Descriptive only: with five statements and no control group, some switching is ordinary noise. Never present it as persuasion.
+export function flipSummary(data) {
+  const per = new Map();
+  for (const t of data.takes) for (const x of pairs(data, t.id)) per.set(x.participantId, (per.get(x.participantId) || 0) + (x.flip ? 1 : 0));
+  const matched = per.size, counts = [...per.values()];
+  return {
+    matched,
+    changedAtLeastOne: counts.filter((c) => c >= 1).length,
+    meanFlips: matched ? Math.round((counts.reduce((a, b) => a + b, 0) / matched) * 100) / 100 : null,
+    changedOnThreeOrMore: counts.filter((c) => c >= 3).length,
+  };
+}

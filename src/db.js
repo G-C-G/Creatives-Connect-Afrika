@@ -44,7 +44,7 @@ CREATE TABLE IF NOT EXISTS final_reflections(
 );
 CREATE TABLE IF NOT EXISTS facts(
   id TEXT PRIMARY KEY, position INTEGER, kind TEXT NOT NULL CHECK (kind IN ('info','true_false')),
-  text TEXT NOT NULL, reveal_text TEXT, answer_bool INTEGER, source_url TEXT, verified INTEGER NOT NULL DEFAULT 0
+  text TEXT NOT NULL, reveal_text TEXT, answer_bool INTEGER, source_url TEXT, verified INTEGER NOT NULL DEFAULT 0, source_json TEXT
 );
 CREATE TABLE IF NOT EXISTS fact_answers(
   participant_id TEXT NOT NULL, fact_id TEXT NOT NULL, answer_bool INTEGER,
@@ -70,6 +70,8 @@ CREATE TABLE IF NOT EXISTS outbox(
 
 // Older databases: snapshots.kind only allowed ('icebreaker','final'). Rebuild the table once to allow 'deck'.
 function migrate(db) {
+  const cols = db.prepare("PRAGMA table_info('facts')").all();
+  if (cols.length && !cols.some((c) => c.name === 'source_json')) db.exec('ALTER TABLE facts ADD COLUMN source_json TEXT');
   const row = db.prepare("SELECT sql FROM sqlite_master WHERE type='table' AND name='snapshots'").get();
   if (!row || row.sql.includes("'deck'")) return;
   db.exec(`ALTER TABLE snapshots RENAME TO snapshots_old;
@@ -107,11 +109,12 @@ export function seedContent(db, { takes = TAKES, facts = FACTS, warn = console.w
     const row = getF.get(f.id);
     const ab = f.answer_bool == null ? null : f.answer_bool ? 1 : 0;
     if (!row) {
-      db.prepare('INSERT INTO facts(id,position,kind,text,reveal_text,answer_bool,source_url,verified) VALUES (?,?,?,?,?,?,?,0)')
-        .run(f.id, f.position, f.kind, f.text, f.reveal_text, ab, f.source_url || '');
-    } else if (row.text !== f.text || row.reveal_text !== f.reveal_text || row.kind !== f.kind || row.answer_bool !== ab) {
-      db.prepare('UPDATE facts SET position=?,kind=?,text=?,reveal_text=?,answer_bool=?,source_url=?,verified=0 WHERE id=?')
-        .run(f.position, f.kind, f.text, f.reveal_text, ab, f.source_url || '', f.id);
+      db.prepare('INSERT INTO facts(id,position,kind,text,reveal_text,answer_bool,source_url,verified,source_json) VALUES (?,?,?,?,?,?,?,0,?)')
+        .run(f.id, f.position, f.kind, f.text, f.reveal_text, ab, f.source_url || '', JSON.stringify(f.sources || []));
+    } else if (row.text !== f.text || row.reveal_text !== f.reveal_text || row.kind !== f.kind || row.answer_bool !== ab || (row.source_json ?? '[]') !== JSON.stringify(f.sources || [])) {
+      // any change to the wording OR the sources means it must be re-checked
+      db.prepare('UPDATE facts SET position=?,kind=?,text=?,reveal_text=?,answer_bool=?,source_url=?,verified=0,source_json=? WHERE id=?')
+        .run(f.position, f.kind, f.text, f.reveal_text, ab, f.source_url || '', JSON.stringify(f.sources || []), f.id);
     }
   }
 }

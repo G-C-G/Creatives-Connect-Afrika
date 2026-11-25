@@ -38,17 +38,19 @@ test('classify thresholds match the colour-card rule', () => {
   assert.equal(classify(0.4), 'disagree'); assert.equal(classify(0.41), 'split'); assert.equal(classify(0.5), 'split');
 });
 
-test('deck: unverified facts are left out; verified ones included; predict rounds use frozen pre-event split', () => {
+test('deck: unverified facts are left out; verified ones included in order; predict rounds last and use the frozen pre-event split', () => {
   const db = openDb(':memory:'); seed(db);
   setSetting(db, 'icebreaker_takes', JSON.stringify(['T2', 'T4']));
   let deck = buildDeck(db);
   assert.deepEqual(deck.rounds.map((r) => r.type), ['predict', 'predict']); // no verified facts yet
   assert.deepEqual(deck.rounds.map((r) => r.answer), ['split', 'agree']);
   assert.equal(deck.rounds[1].agree, 5); assert.equal(deck.rounds[1].n, 6);
-  db.prepare("UPDATE facts SET verified=1 WHERE id IN ('F2','F3')").run();
+  db.prepare("UPDATE facts SET verified=1 WHERE id IN ('F5','F4','F2')").run(); // F2 is an original example: kept out of the game (game:false)
   deck = buildDeck(db);
-  assert.deepEqual(deck.rounds.map((r) => r.type), ['fact', 'predict', 'fact', 'predict']);
-  assert.equal(deck.rounds[0].id, 'F2'); assert.equal(deck.rounds[0].answer, 2);
+  assert.deepEqual(deck.rounds.map((r) => r.type), ['fact', 'fact', 'predict', 'predict']); // story arc: facts in order, predict the room last
+  assert.deepEqual(deck.rounds.map((r) => r.id), ['F4', 'F5', 'T2', 'T4']);
+  assert.equal(deck.rounds[0].answer, 2); assert.match(deck.rounds[0].question, /In 2022/);
+  assert.match(deck.rounds[1].question, /2021 mapping/, 'dated: the UNESCO figures are from 2021, never "currently"');
   assert.ok(!JSON.stringify(deck).includes('VERIFY'));
 });
 

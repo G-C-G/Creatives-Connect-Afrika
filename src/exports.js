@@ -1,5 +1,5 @@
 import { loadData } from './db.js';
-import { participation, takeSplit, takeChange, segmentTable } from './metrics.js';
+import { participation, takeSplit, takeChange, segmentTable, flipSummary } from './metrics.js';
 
 // CSV with formula-injection guard (cells starting = + - @ are prefixed with ').
 export function toCsv(rows, columns) {
@@ -40,6 +40,7 @@ export function aggregateCsv(db) {
   const add = (section, take_id, segment, metric, value) => out.push({ section, take_id, segment, metric, value });
   const part = participation(d);
   for (const [k, v] of Object.entries(part)) add('participation', '', '', k, v == null ? '' : Math.round(v * 1000) / 1000);
+  for (const [k, v] of Object.entries(flipSummary(d))) add('flips', '', '', k, v == null ? '' : v);
   for (const t of d.takes) {
     for (const ph of ['pre', 'final']) {
       const s = takeSplit(d, t.id, ph);

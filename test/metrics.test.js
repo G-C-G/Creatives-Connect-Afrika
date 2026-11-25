@@ -80,3 +80,9 @@ test('headline is non-causal and falls back with no matched data', () => {
   assert.doesNotMatch(M.headline(data), /caused|because of/i);
   assert.match(M.headline({ ...data, responses: data.responses.filter((r) => r.phase === 'pre') }), /Day 3 results alone/);
 });
+
+test('flipSummary: how many matched people changed side on at least one statement (descriptive only)', () => {
+  // fixture: A and C flip on T1, nobody flips on T2 -> 2 of 4 matched changed side, mean 0.5 flips each
+  assert.deepEqual(M.flipSummary(data), { matched: 4, changedAtLeastOne: 2, meanFlips: 0.5, changedOnThreeOrMore: 0 });
+  assert.equal(M.flipSummary({ ...data, responses: data.responses.filter((r) => r.phase === 'pre') }).matched, 0);
+});
