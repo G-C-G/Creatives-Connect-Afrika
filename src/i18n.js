@@ -88,6 +88,7 @@ export const en = {
   'nav.skip': 'Skip',
   'q.name.k': 'You', 'q.name.t': 'Who is playing?', 'q.name.h': 'Your name, and where you are joining from.',
   'q.surname.k': 'Surname', 'q.surname.t': 'And the rest of it?', 'q.surname.h': 'So we can find your code if you lose it.',
+  'q.memory.k': 'Optional', 'q.memory.t': 'Name something from your country\u2019s creative past that the world should know.', 'q.memory.h': 'A song, a film, a look, a festival, a person. One line.', 'about.memory': 'Your answer',
   'q.email.k': 'Email, optional', 'q.email.t': 'Where do we send your code?', 'q.email.h': 'Your code and your Day 3 link. Skip it and screenshot your code instead.',
   'q.country.k': 'Country', 'q.country.t': 'Where are you from?',
   'q.sector.k': 'Sector', 'q.sector.t': 'What do you do?',

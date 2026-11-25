@@ -17,7 +17,7 @@ const toIso = (v) => (v && /^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}/.test(v) ? `${v.slice
 function page(title, body, csrf) {
   return layout({ title: `Admin: ${title}`, main: 'admin', body: h`
   <nav><a href="/admin">Dashboard</a><a href="/admin/icebreaker">Icebreaker</a><a href="/admin/casting">Casting</a><a href="/admin/play">Welcome game</a><a href="/admin/final">Final game</a><a href="/admin/stories">Stories</a>
-  <a href="/admin/volunteers">Volunteers</a><a href="/admin/lookup">Desk lookup</a><a href="/admin/snapshots">Snapshots</a><a href="/admin/report">Report</a></nav>
+  <a href="/admin/volunteers">Volunteers</a><a href="/admin/memories">Memories</a><a href="/admin/lookup">Desk lookup</a><a href="/admin/snapshots">Snapshots</a><a href="/admin/report">Report</a></nav>
   <h1>${title}</h1>${body}` });
 }
 const csrfField = (csrf) => h`<input type="hidden" name="csrf" value="${csrf}">`;
@@ -110,6 +110,15 @@ function stories(ctx, csrf, url) {
     return h`<tr><td>${r.story}<br><span class="hint">${r.story_name_ok ? `May be named: ${p.first_name} ${p.surname}` : 'Anonymous only'} · #${p.number}</span></td>
     <td>${postBtn('/admin/story', csrf, r.vetted ? 'Vetted ✓' : 'Mark vetted', { participant_id: r.participant_id, field: 'vetted', value: r.vetted ? '0' : '1' }, 'btn ghost')}
     ${postBtn('/admin/story', csrf, r.use_in_room ? 'In room ✓' : 'Use in room', { participant_id: r.participant_id, field: 'use_in_room', value: r.use_in_room ? '0' : '1' }, 'btn ghost')}</td></tr>`; })}</table>`, csrf);
+}
+
+// "Name something from your country's creative past": delegates' own answers, grouped by country, with no names.
+// Raw text from delegates: check it before it goes on any screen, and check any claim before you state it as fact.
+function memories(ctx) {
+  const rows = ctx.db.prepare("SELECT country, memory FROM participants WHERE memory IS NOT NULL AND memory <> '' ORDER BY country, id").all();
+  const by = new Map(); for (const r of rows) (by.get(r.country) || by.set(r.country, []).get(r.country)).push(r.memory);
+  return page('Memories: creative past, in delegates\u2019 words', h`<p class="hint">${rows.length} answer(s) from ${by.size} countries. Names are not shown. These are unchecked: read them before any are used on a screen, and verify anything you present as fact.</p>
+  ${[...by].map(([c, list]) => h`<h2>${c} (${list.length})</h2><ul>${list.map((m) => h`<li>${m}</li>`)}</ul>`)}${rows.length ? '' : h`<p>None yet.</p>`}`);
 }
 
 function volunteers(ctx) {
@@ -220,6 +229,7 @@ export async function adminRoute(ctx, req, url, form, csrf) {
     if (p === '/admin/casting') return html(casting(ctx, csrf, url));
     if (p === '/admin/stories') return html(stories(ctx, csrf, url));
     if (p === '/admin/volunteers') return html(volunteers(ctx));
+    if (p === '/admin/memories') return html(memories(ctx));
     if (p === '/admin/lookup') return html(lookup(ctx, url));
     if (p === '/admin/snapshots') return html(snapshots(ctx, csrf));
     if (p === '/admin/report') return html(report(ctx));

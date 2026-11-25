@@ -12,7 +12,7 @@ CREATE TABLE IF NOT EXISTS participants(
   email TEXT,
   country TEXT NOT NULL DEFAULT '',
   sector TEXT NOT NULL DEFAULT '',
-  project TEXT, goal TEXT, values_json TEXT,
+  project TEXT, goal TEXT, values_json TEXT, memory TEXT,
   contact_opt_in INTEGER NOT NULL DEFAULT 0,
   consent_aggregate INTEGER NOT NULL,
   magic_token TEXT UNIQUE,
@@ -74,6 +74,8 @@ CREATE TABLE IF NOT EXISTS outbox(
 
 // Older databases: snapshots.kind only allowed ('icebreaker','final'). Rebuild the table once to allow 'deck'.
 function migrate(db) {
+  const pc = db.prepare("PRAGMA table_info('participants')").all();
+  if (pc.length && !pc.some((c) => c.name === 'memory')) db.exec('ALTER TABLE participants ADD COLUMN memory TEXT');
   const cols = db.prepare("PRAGMA table_info('facts')").all();
   if (cols.length && !cols.some((c) => c.name === 'source_json')) db.exec('ALTER TABLE facts ADD COLUMN source_json TEXT');
   const row = db.prepare("SELECT sql FROM sqlite_master WHERE type='table' AND name='snapshots'").get();

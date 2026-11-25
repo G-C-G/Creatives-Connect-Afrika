@@ -127,6 +127,7 @@ export function preForm({ takes, facts = [], S = new URLSearchParams(), E = {}, 
         <div class="field"><label for="f_country">${t(lang, 'about.country')}</label>${select('country', COUNTRIES, S, lang, E)}${fieldErr(E, 'country', lang)}</div>` }, lang),
     ask({ k: t(lang, 'q.sector.k'), title: t(lang, 'q.sector.t'), auto: true, body: h`${chipPick('sector', SECTORS, S, lang)}${fieldErr(E, 'sector', lang)}` }, lang),
     ask({ k: t(lang, 'q.goal.k'), title: t(lang, 'q.goal.t'), hint: t(lang, 'q.goal.h'), auto: true, body: chipPick('goal', GOALS, S, lang, true) }, lang),
+    ask({ k: t(lang, 'q.memory.k'), title: t(lang, 'q.memory.t'), hint: t(lang, 'q.memory.h'), optional: true, body: bigInput('memory', S, E, lang, { max: 140, label: t(lang, 'about.memory') }) }, lang),
     ask({ k: t(lang, 'q.email.k'), title: t(lang, 'q.email.t'), hint: t(lang, 'q.email.h'), optional: true, body: bigInput('email', S, E, lang, { type: 'email', max: 254, autocomplete: 'email', label: t(lang, 'about.email') }) }, lang),
   ];
   const consent = ask({ k: t(lang, 'consent.k'), title: t(lang, 'consent.t'), body: h`<p class="consent">${t(lang, 'consent.text')}</p>

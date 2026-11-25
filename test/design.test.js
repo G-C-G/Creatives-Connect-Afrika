@@ -75,23 +75,23 @@ test('SHOW_PARTNER_LOGOS=0 hides the partner marks but keeps the GCG mark', asyn
   c.close();
 });
 
-test('wizard: statements first; then who (name, surname, country together), sector, why you are here, email; consent last', async () => {
+test('wizard: statements first; then who (name, surname, country together), sector, why you are here, an optional memory, email; consent last', async () => {
   const c = await boot();
   const html = await (await c.call('/start')).text();
   const screens = html.split('<section class="step"').slice(1);
-  assert.equal(screens.length, 20, '15 statement screens + who + sector + why + email + consent: nothing else');
+  assert.equal(screens.length, 21, '15 statement screens + who + sector + why + memory + email + consent: nothing else');
   const has = (re) => screens.map((x, i) => (re.test(x) ? i : -1)).filter((i) => i >= 0);
   assert.deepEqual(has(/t_T1_stance/), [0]);
   assert.deepEqual(has(/name="first_name"/), [15]); assert.deepEqual(has(/name="surname"/), [15]); assert.deepEqual(has(/name="country"/), [15], 'name, surname and country on one page');
   assert.deepEqual(has(/name="sector"/), [16]); assert.deepEqual(has(/name="goal"/), [17], '"why you are here" is its own page');
-  assert.deepEqual(has(/name="email"/), [18]); assert.deepEqual(has(/name="consent_aggregate"/), [19]);
+  assert.deepEqual(has(/name="memory"/), [18], 'the optional creative-past question'); assert.deepEqual(has(/name="email"/), [19]); assert.deepEqual(has(/name="consent_aggregate"/), [20]);
   for (const gone of ['name="project"', 'name="values"', 'name="contact_opt_in"']) assert.ok(!html.includes(gone), `${gone} is no longer asked`);
   assert.ok(/data-auto/.test(screens[17]) && !/data-skippable/.test(screens[17]) && /required/.test(screens[17]), '"why" cannot be skipped');
   screens.forEach((x, i) => assert.ok(((x.match(/<input[^>]*type="(text|email)"|<select|<textarea/g) || []).length) <= (i === 15 ? 3 : 1), `screen ${i}`));
   assert.equal((html.match(/data-auto/g) || []).length, 17, '15 statement taps + sector + why');
-  assert.equal((html.match(/data-optional/g) || []).length, 1, 'only email is skippable');
+  assert.equal((html.match(/data-optional/g) || []).length, 2, 'only the memory and the email are skippable');
   const door = (await (await c.call('/door')).text()).split('<section class="step"').slice(1);
-  assert.equal(door.length, 20);
+  assert.equal(door.length, 21);
   c.close();
 });
 
@@ -163,5 +163,21 @@ test('stage final: theatre order (smallest shift first, biggest mover last), cou
   assert.ok(html.includes('CCA_SFX_STAGE') && html.includes('AudioContext'));
   assert.ok(html.includes('<svg class="field flow"') && html.includes('class="a-d"'), 'the imagery: dots, with the people who crossed the room');
   assert.ok(!/https?:\/\//.test(html), 'no network references');
+  c.close();
+});
+
+test('the optional "creative past" answer: saved, trimmed to one line of 140, shown to admin by country with no names, never required', async () => {
+  const c = await boot();
+  await c.call('/start', { body: reg({ memory: '  Highlife nights at the old Weija club  ' }) });
+  await c.call('/start', { body: reg({ email: 'b@example.com', first_name: 'Kofi', surname: 'Zed', country: 'Kenya', memory: 'x'.repeat(300) }) });
+  const ok = await c.call('/start', { body: reg({ email: 'c@example.com' }) });
+  assert.equal(ok.status, 303, 'skipping it is fine');
+  const rows = c.db.prepare('SELECT country, memory FROM participants ORDER BY country').all();
+  assert.equal(rows.find((r) => r.country === 'Ghana' && r.memory)?.memory, 'Highlife nights at the old Weija club');
+  assert.equal(rows.find((r) => r.country === 'Kenya').memory.length, 140);
+  const page = await (await c.call('/admin/memories', { auth: true })).text();
+  assert.match(page, /Highlife nights at the old Weija club/); assert.match(page, /Kenya \(1\)/);
+  assert.doesNotMatch(page, /Kofi|Zed|a@example\.com/, 'names and emails are not on the memories page');
+  assert.equal((await c.call('/admin/memories')).status, 401, 'admin only');
   c.close();
 });
