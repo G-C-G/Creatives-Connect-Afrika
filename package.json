@@ -1,0 +1,13 @@
+{
+  "name": "cca-game",
+  "version": "1.0.0",
+  "private": true,
+  "description": "CCA 2026 welcome game + final game: pre-event/Day 3 hot-take instrument and stage reveal.",
+  "type": "module",
+  "engines": { "node": ">=22.13" },
+  "scripts": {
+    "start": "node --disable-warning=ExperimentalWarning src/server.js",
+    "test": "node --disable-warning=ExperimentalWarning --test test/*.test.js",
+    "seed-demo": "node --disable-warning=ExperimentalWarning scripts/seed-demo.js"
+  }
+}

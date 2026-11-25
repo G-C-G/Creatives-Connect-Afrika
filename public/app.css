@@ -1,0 +1,45 @@
+:root{--bg:#fbf7ee;--ink:#1b1b1b;--green:#0b6b3a;--red:#b3261e;--gold:#c99a06;--line:#d9d2bf;--muted:#5b5646}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--ink);font:18px/1.5 system-ui,-apple-system,"Segoe UI",Roboto,sans-serif}
+.band{background:#0a3d22;color:#f4c84a;padding:14px 16px;border-bottom:4px solid var(--gold);letter-spacing:.02em}
+main{padding:20px 16px 40px;max-width:1000px;margin:0 auto}
+main.narrow{max-width:560px}.center{text-align:center}
+footer{padding:20px 16px;text-align:center;color:var(--muted);font-size:14px;border-top:1px solid var(--line)}
+h1{font-size:28px;line-height:1.2;margin:.4em 0}h2{font-size:22px;line-height:1.25}
+h2.take{font-size:26px;margin:.2em 0 .8em}
+.lead{font-size:19px}.hint{color:var(--muted);font-size:15px}.kicker{color:var(--green);font-weight:700;font-size:14px;text-transform:uppercase;letter-spacing:.06em;margin:0}
+.consent,.note,.card{background:#fff;border:1px solid var(--line);border-left:5px solid var(--gold);padding:12px 14px;border-radius:6px;font-size:16px}
+.fact{font-size:22px}.reveal{background:#fff;border-left:5px solid var(--green);padding:10px 14px}
+.how{padding-left:20px}.how li{margin:.3em 0}
+.field{margin:0 0 16px;border:0;padding:0}
+fieldset{border:0;padding:0;margin:0 0 8px;min-width:0}
+label,legend{display:block;font-weight:600;margin:0 0 6px;padding:0}
+input[type=text],input[type=email],input[type=number],input:not([type]),select,textarea{width:100%;min-height:48px;padding:10px 12px;font:inherit;border:2px solid #8a8470;border-radius:6px;background:#fff;color:var(--ink)}
+input:focus,select:focus,textarea:focus,.btn:focus-visible,.choice input:focus-visible+span{outline:3px solid var(--gold);outline-offset:2px}
+.btn{display:inline-block;min-height:48px;padding:12px 22px;background:var(--green);color:#fff;border:2px solid var(--green);border-radius:6px;font:inherit;font-weight:700;text-decoration:none;cursor:pointer}
+.btn.ghost{background:#fff;color:var(--green)}
+.nav{display:flex;gap:12px;justify-content:space-between;margin-top:20px}
+.choices{display:grid;gap:8px;margin-bottom:16px}.choices.two{grid-template-columns:1fr 1fr}.choices.five{grid-template-columns:repeat(5,1fr)}
+.choice{margin:0;font-weight:700}.choice input{position:absolute;opacity:0;width:1px;height:1px}
+.choice span{display:flex;align-items:center;justify-content:center;min-height:52px;padding:8px;border:2px solid #8a8470;border-radius:6px;background:#fff;text-align:center;cursor:pointer}
+.choice input:checked+span{background:var(--green);color:#fff;border-color:var(--green);box-shadow:inset 0 0 0 3px var(--gold)}
+.choice input:checked+span::before{content:"\2713\00a0"}
+.check{display:flex;gap:12px;align-items:flex-start;font-weight:500;margin:12px 0}
+.check input{width:28px;height:28px;flex:none;margin-top:2px}
+.chips{display:flex;flex-wrap:wrap;gap:8px}.chips.stack{flex-direction:column}.chip{margin:0;font-weight:500}
+.chip input{position:absolute;opacity:0;width:1px;height:1px}
+.chip span{display:block;min-height:44px;padding:10px 14px;border:2px solid #8a8470;border-radius:22px;background:#fff;cursor:pointer}
+.chips.stack .chip span{border-radius:8px}
+.chip input:checked+span{background:var(--green);color:#fff;border-color:var(--green)}
+.chip input:checked+span::before{content:"\2713\00a0"}
+.chip input:focus-visible+span{outline:3px solid var(--gold);outline-offset:2px}
+.chip input:disabled+span{opacity:.45}
+.err{color:var(--red);font-weight:700;margin:6px 0}.err::before{content:"\26A0\00a0"}
+.progress{color:var(--muted);font-weight:700;margin:0 0 12px}
+.bar{height:8px;background:var(--line);border-radius:4px;margin-top:6px}.bar i{display:block;height:100%;background:var(--green);border-radius:4px}
+.bignum{font-size:96px;font-weight:800;letter-spacing:.08em;margin:.1em 0;color:var(--green);font-variant-numeric:tabular-nums}
+.sr{position:absolute;left:-9999px}
+.js .step{display:none}.js .step.on{display:block}
+table{border-collapse:collapse;width:100%;font-size:15px}th,td{border-bottom:1px solid var(--line);padding:6px 8px;text-align:left;vertical-align:top}
+.admin nav a{margin-right:14px}
+@media(max-width:420px){.choices.five{gap:4px}.bignum{font-size:72px}}
