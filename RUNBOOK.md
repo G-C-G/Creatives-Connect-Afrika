@@ -19,7 +19,17 @@ Door QR points to `BASE_URL/play`. People self-serve: **has code** = first name 
 5. Close the game with **Close game** when the session ends.
 6. Optional big-screen companion: `/admin/snapshots` > freeze the icebreaker snapshot, open `/stage/icebreaker` (landscape slides for a projector).
 
-## Day 3 (final game)
+## Conference game (the 10-minute stage slot, Day 1, 2 or 3)
+Show the room what the onboarding said, get them to predict it, then find opposites and debate.
+1. Before the slot: `/admin/casting`. Statements are listed most divisive first. Pick one: the page suggests **opposing pairs** (the most willing, then most passionate, on each side: microphone volunteers first, then "out loud"). Quiet people are never suggested. Names are for you only. If a side has nobody, the page says so: ask the floor.
+2. `/admin/snapshots` > **Freeze conference snapshot** (aggregates only: no names). Open `/stage/conference` on the stage laptop (right arrow / space = reveal or next, M mute, F full screen).
+3. On stage, per statement: it appears alone ("Cards up: mostly agree, split, or mostly disagree?"), then the split, then how many would take the microphone and how many said "I'd fight you on this".
+4. "Find your opposite": "Who said Agree? Stand up. Now find someone who said Disagree." To help people remember their answer, switch ON the **My-answers page** (`/me`) on the casting page. It shows each person only their own answers. **Switch it OFF afterwards.**
+5. Call people up. **Ask first, in person:** "You said you'd take the microphone on this: still up for it?" Let anyone decline. Tap **Mark called** so you do not call the same person twice.
+6. Debate: "Ninety seconds each". First press starts the clock, second press moves on. Close with "Hands up again. Did anyone move?"
+7. **Anchoring:** hearing others' views and seeing your own answers can nudge the Day 3 re-ask. That is part of the experience we measure ("how the room moved"), but if you want a cleaner Day 3, keep `/me` off and run this slot after the Day 3 form closes.
+
+## Day 3 (the review game: then vs now)
 1. Form closes automatically at the time you set (1 hour before the slot). Check `/admin` shows it set.
 2. At close: `/admin/final` to review. Check n. If matched is very low, say so openly on stage.
 3. `/admin/stories`: read each story. Mark **Vetted** then **Use in room**. Only vetted + consented stories can reach the screen.

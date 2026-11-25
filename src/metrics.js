@@ -154,3 +154,43 @@ export function flipSummary(data) {
     changedOnThreeOrMore: counts.filter((c) => c >= 3).length,
   };
 }
+
+// ---- Conference game (the 10-minute stage slot) ----
+// level = how far someone said they would take a statement: stage (give me the microphone) > aloud > quiet.
+export const levelOf = (r) => (r.speak_on_stage ? 'stage' : r.say_aloud ? 'aloud' : r.say_aloud === false ? 'quiet' : 'unknown');
+const LEVEL_RANK = { stage: 0, aloud: 1, quiet: 2, unknown: 3 };
+
+// What the room said, per statement, with how far each side would take it. Aggregates only: no names.
+export function conferenceStats(data) {
+  return data.takes.map((t) => {
+    const rs = responsesFor(data, 'pre', t.id), sp = takeSplit(data, t.id, 'pre');
+    const side = (st) => {
+      const x = rs.filter((r) => r.stance === st), levels = { stage: 0, aloud: 0, quiet: 0, unknown: 0 };
+      x.forEach((r) => { levels[levelOf(r)]++; });
+      return { n: x.length, levels, fighters: x.filter((r) => r.strength === 5).length, meanStrength: round(mean(x.map((r) => r.strength))) };
+    };
+    return { takeId: t.id, text: t.text, n: sp.n, agree: sp.agree, disagree: sp.disagree, agreeShare: sp.agreeShare, sides: { agree: side('agree'), disagree: side('disagree') } };
+  });
+}
+
+// Statements ordered most divisive first (agree share closest to 50%): the best ones to debate.
+export const byDivisiveness = (stats) => [...stats].filter((x) => x.n > 0).sort((a, b) => Math.abs(a.agreeShare - 0.5) - Math.abs(b.agreeShare - 0.5) || a.takeId.localeCompare(b.takeId));
+
+// Private casting list for one statement: people on each side, most willing and most passionate first.
+export function castingList(data, takeId) {
+  const byId = new Map(data.participants.map((p) => [p.id, p]));
+  const rows = responsesFor(data, 'pre', takeId).map((r) => {
+    const p = byId.get(r.participant_id);
+    return { participantId: r.participant_id, number: p?.number, name: `${p?.first_name ?? ''} ${p?.surname ?? ''}`.trim(), country: p?.country, sector: p?.sector, stance: r.stance, strength: r.strength, level: levelOf(r) };
+  });
+  const order = (a, b) => LEVEL_RANK[a.level] - LEVEL_RANK[b.level] || b.strength - a.strength || a.number - b.number;
+  return { agree: rows.filter((r) => r.stance === 'agree').sort(order), disagree: rows.filter((r) => r.stance === 'disagree').sort(order) };
+}
+
+// Opposing pairs to call up: most willing first (microphone, then out loud), then most passionate. Skips people already called.
+export function suggestPairs(list, calledIds = new Set(), k = 3) {
+  const pool = (side) => side.filter((r) => !calledIds.has(r.participantId) && (r.level === 'stage' || r.level === 'aloud'));
+  const a = pool(list.agree), d = pool(list.disagree), pairs = [];
+  for (let i = 0; i < Math.min(k, a.length, d.length); i++) pairs.push({ agree: a[i], disagree: d[i] });
+  return pairs;
+}

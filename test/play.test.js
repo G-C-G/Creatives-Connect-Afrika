@@ -164,5 +164,6 @@ test('an older database (snapshots without deck support) upgrades itself and kee
   const db = openDb(path);
   assert.equal(db.prepare('SELECT html FROM snapshots').get().html, '<p>old</p>');
   db.prepare("INSERT INTO snapshots(kind,taken_at,data_json,html) VALUES ('deck','2026-11-30T10:00:00Z','{}','')").run();
-  assert.equal(db.prepare('SELECT COUNT(*) c FROM snapshots').get().c, 2);
+  db.prepare("INSERT INTO snapshots(kind,taken_at,data_json,html) VALUES ('conference','2026-11-30T11:00:00Z','{}','')").run();
+  assert.equal(db.prepare('SELECT COUNT(*) c FROM snapshots').get().c, 3);
 });

@@ -52,7 +52,7 @@ CREATE TABLE IF NOT EXISTS fact_answers(
 );
 CREATE TABLE IF NOT EXISTS settings(key TEXT PRIMARY KEY, value TEXT);
 CREATE TABLE IF NOT EXISTS snapshots(
-  id INTEGER PRIMARY KEY AUTOINCREMENT, kind TEXT NOT NULL CHECK (kind IN ('icebreaker','final','deck')),
+  id INTEGER PRIMARY KEY AUTOINCREMENT, kind TEXT NOT NULL CHECK (kind IN ('icebreaker','final','deck','conference')),
   taken_at TEXT NOT NULL, data_json TEXT NOT NULL, html TEXT NOT NULL
 );
 CREATE TABLE IF NOT EXISTS game_plays(
@@ -61,6 +61,10 @@ CREATE TABLE IF NOT EXISTS game_plays(
   created_at TEXT NOT NULL DEFAULT (strftime('%Y-%m-%dT%H:%M:%fZ','now'))
 );
 CREATE UNIQUE INDEX IF NOT EXISTS game_plays_once ON game_plays(deck_id, participant_id) WHERE participant_id IS NOT NULL;
+CREATE TABLE IF NOT EXISTS casting_calls(
+  id INTEGER PRIMARY KEY AUTOINCREMENT, participant_id TEXT NOT NULL, take_id TEXT NOT NULL,
+  created_at TEXT NOT NULL DEFAULT (strftime('%Y-%m-%dT%H:%M:%fZ','now')), UNIQUE (participant_id, take_id)
+);
 CREATE TABLE IF NOT EXISTS outbox(
   id INTEGER PRIMARY KEY AUTOINCREMENT, participant_id TEXT, to_email TEXT NOT NULL,
   subject TEXT NOT NULL, body TEXT NOT NULL, status TEXT NOT NULL DEFAULT 'unsent', error TEXT,
@@ -73,9 +77,9 @@ function migrate(db) {
   const cols = db.prepare("PRAGMA table_info('facts')").all();
   if (cols.length && !cols.some((c) => c.name === 'source_json')) db.exec('ALTER TABLE facts ADD COLUMN source_json TEXT');
   const row = db.prepare("SELECT sql FROM sqlite_master WHERE type='table' AND name='snapshots'").get();
-  if (!row || row.sql.includes("'deck'")) return;
+  if (!row || row.sql.includes("'conference'")) return;
   db.exec(`ALTER TABLE snapshots RENAME TO snapshots_old;
-    CREATE TABLE snapshots(id INTEGER PRIMARY KEY AUTOINCREMENT, kind TEXT NOT NULL CHECK (kind IN ('icebreaker','final','deck')), taken_at TEXT NOT NULL, data_json TEXT NOT NULL, html TEXT NOT NULL);
+    CREATE TABLE snapshots(id INTEGER PRIMARY KEY AUTOINCREMENT, kind TEXT NOT NULL CHECK (kind IN ('icebreaker','final','deck','conference')), taken_at TEXT NOT NULL, data_json TEXT NOT NULL, html TEXT NOT NULL);
     INSERT INTO snapshots(id,kind,taken_at,data_json,html) SELECT id,kind,taken_at,data_json,html FROM snapshots_old;
     DROP TABLE snapshots_old;`);
 }

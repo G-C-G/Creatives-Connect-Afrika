@@ -6,7 +6,7 @@ import { fileURLToPath } from 'node:url';
 import { LOGOS, GCG_LOGO } from './content.js';
 const SFX = readFileSync(fileURLToPath(new URL('../public/sfx.js', import.meta.url)), 'utf8');
 import { loadData, getSetting } from './db.js';
-import { participation, takeSplit, takeChange, biggestMover, stillSplit, shareLabel, headline, movedStatements, flipSummary } from './metrics.js';
+import { participation, takeSplit, takeChange, biggestMover, stillSplit, shareLabel, headline, movedStatements, flipSummary, conferenceStats, byDivisiveness } from './metrics.js';
 
 const pickStories = (data) => {
   const byId = new Map(data.participants.map((p) => [p.id, p]));
@@ -31,6 +31,16 @@ export function buildStageData(db, kind, now = new Date(), { logos = true } = {}
         return { id, text: tk.text, n: s.n, agree: s.agree, disagree: s.disagree,
           agreeLabel: shareLabel(s.agree, s.n), disagreeLabel: shareLabel(s.disagree, s.n) };
       }),
+    };
+  }
+  if (kind === 'conference') {
+    const stats = byDivisiveness(conferenceStats(data));
+    return {
+      ...base, kind, takenAt, n: participation(data).preCompleters,
+      statements: stats.map((x) => ({
+        id: x.takeId, text: x.text, n: x.n, agree: x.agree, disagree: x.disagree, agreeLabel: shareLabel(x.agree, x.n), disagreeLabel: shareLabel(x.disagree, x.n),
+        micAgree: x.sides.agree.levels.stage, micDisagree: x.sides.disagree.levels.stage, fightAgree: x.sides.agree.fighters, fightDisagree: x.sides.disagree.fighters,
+      })),
     };
   }
   const part = participation(data);
@@ -80,7 +90,8 @@ function counts(root){[].slice.call(root.querySelectorAll('[data-count]')).forEa
 function show(){s.forEach(function(x,j){x.classList.toggle('on',j===i)});document.body.classList.toggle('edge',i===0||i===s.length-1);X.tick();[].slice.call(s[i].querySelectorAll('[data-count]')).filter(function(e){return!e.closest('.rv')}).forEach(count)}
 function reveal(rv){busy=true;var done=function(){rv.classList.add('show');X.boom();counts(rv);busy=false};
 if(rv.classList.contains('now')&&!calm){s[i].classList.add('drum');X.rise();setTimeout(function(){s[i].classList.remove('drum');done()},1000)}else done()}
-function next(){if(busy)return;var rv=s[i].querySelector('.rv:not(.show)');if(rv){reveal(rv);return}if(i<s.length-1){i++;show()}}
+function clock(sl){var secs=+sl.getAttribute('data-timer'),el=sl.querySelector('.clock');function fmt(n){return Math.floor(n/60)+':'+('0'+(n%60)).slice(-2)}el.textContent=fmt(secs);var t=setInterval(function(){secs--;el.textContent=fmt(Math.max(secs,0));if(secs<=0){clearInterval(t);X.boom();el.classList.add('gold')}},1000);X.tick()}
+function next(){if(busy)return;if(s[i].hasAttribute('data-timer')&&!s[i].getAttribute('data-ran')){s[i].setAttribute('data-ran','1');clock(s[i]);return}var rv=s[i].querySelector('.rv:not(.show)');if(rv){reveal(rv);return}if(i<s.length-1){i++;show()}}
 function prev(){if(busy)return;if(i>0){i--;show()}}
 document.addEventListener('keydown',function(e){if(e.key==='ArrowRight'||e.key===' '||e.key==='Enter'||e.key==='PageDown')next();else if(e.key==='ArrowLeft'||e.key==='PageUp')prev();else if(e.key==='f'&&document.documentElement.requestFullscreen)document.documentElement.requestFullscreen();else if(e.key==='m'||e.key==='M'){X.toggle();lab()}});
 document.addEventListener('click',next);show();lab()})();`;
@@ -95,7 +106,22 @@ export function renderStageHtml(d) {
   const logos = d.logos ? LOGOS.map((l) => h`<img src="${raw(logoUri(l.file))}" alt="${l.alt}">`) : '';
   const foot = h`<div class="foot"><span class="lg">${logos}</span><span>Snapshot ${when(d.takenAt)} · In partnership with Creatives Connect Afrika · <span id="snd"></span></span><img class="gcg" src="${raw(logoUri(GCG_LOGO.file))}" alt="${GCG_LOGO.alt}"></div>`;
   let slides;
-  if (d.kind === 'icebreaker') {
+  if (d.kind === 'conference') {
+    const open = h`<section class="slide"><p class="kick">The conference game</p><p class="huge">What did the room say?</p>
+      <p class="sub">${d.n} delegates answered before the event. Predict first. Then we look.</p></section>`;
+    const per = d.statements.map((x, i) => h`<section class="slide"><p class="kick">Statement ${i + 1} of ${d.statements.length}</p><p class="take">${x.text}</p>
+      <p class="sub">Cards up: mostly agree, split, or mostly disagree?</p>
+      <div class="split rv"><div><b>${x.agree}</b>agreed<br><span class="sub">${x.agreeLabel}</span></div><div><b>${x.disagree}</b>disagreed<br><span class="sub">${x.disagreeLabel}</span></div></div>
+      <div class="pair rv"><div><div class="lab">Would take the microphone</div><div class="num">${x.micAgree + x.micDisagree}</div><div class="sm">${x.micAgree} on the agree side · ${x.micDisagree} on the disagree side</div></div>
+        <div><div class="lab">Said “I’d fight you on this”</div><div class="num">${x.fightAgree + x.fightDisagree}</div><div class="sm">${x.fightAgree} agree · ${x.fightDisagree} disagree</div></div></div>
+      <p class="n">n = ${x.n} pre-event responses, self-selected. Directional only.</p></section>`);
+    const opposite = h`<section class="slide"><p class="kick">Find your opposite</p><p class="huge">Who said <span class="gold">Agree</span>?</p>
+      <div class="rv"><p class="mid">Stand up. Now find someone who said <span class="gold">Disagree</span>.</p></div></section>`;
+    const debate = h`<section class="slide" data-timer="90"><p class="kick">On stage</p><p class="huge">Ninety seconds each.</p><p class="big clock">1:30</p>
+      <p class="sub">Agree side first. Press to start the clock.</p></section>`;
+    const after = h`<section class="slide"><p class="kick">After the debate</p><p class="huge">Hands up again.<br><span class="gold">Did anyone move?</span></p></section>`;
+    slides = [open, ...per, opposite, debate, after];
+  } else if (d.kind === 'icebreaker') {
     slides = d.takes.map((tk, i) => h`<section class="slide"><p class="kick">Welcome game · Statement ${i + 1}</p>
       <p class="take">${tk.text}</p><p class="sub">Hands up first. Then we reveal the private split.</p>
       <div class="split rv"><div><b>${tk.agree}</b>agreed<br><span class="sub">${tk.agreeLabel}</span></div><div><b>${tk.disagree}</b>disagreed<br><span class="sub">${tk.disagreeLabel}</span></div></div>

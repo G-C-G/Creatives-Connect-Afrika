@@ -16,7 +16,7 @@ const toIso = (v) => (v && /^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}/.test(v) ? `${v.slice
 
 function page(title, body, csrf) {
   return layout({ title: `Admin: ${title}`, main: 'admin', body: h`
-  <nav><a href="/admin">Dashboard</a><a href="/admin/icebreaker">Icebreaker</a><a href="/admin/play">Welcome game</a><a href="/admin/final">Final game</a><a href="/admin/stories">Stories</a>
+  <nav><a href="/admin">Dashboard</a><a href="/admin/icebreaker">Icebreaker</a><a href="/admin/casting">Casting</a><a href="/admin/play">Welcome game</a><a href="/admin/final">Final game</a><a href="/admin/stories">Stories</a>
   <a href="/admin/volunteers">Volunteers</a><a href="/admin/lookup">Desk lookup</a><a href="/admin/snapshots">Snapshots</a><a href="/admin/report">Report</a></nav>
   <h1>${title}</h1>${body}` });
 }
@@ -139,9 +139,42 @@ function snapshots(ctx, csrf) {
   const rows = ctx.db.prepare('SELECT id,kind,taken_at FROM snapshots ORDER BY id DESC').all();
   const kindRows = (k) => rows.filter((r) => r.kind === k);
   return page('Freeze snapshots', h`<p>The big screen runs from the <b>latest frozen snapshot</b>, never the live DB. Freeze, then open the stage page. Keep a downloaded copy on the stage laptop.</p>
-  ${['icebreaker', 'final'].map((k) => h`<h2>${k}</h2>${postBtn('/admin/snapshot', csrf, `Freeze ${k} snapshot now`, { kind: k })}
+  ${['conference', 'final', 'icebreaker'].map((k) => h`<h2>${k}</h2>${postBtn('/admin/snapshot', csrf, `Freeze ${k} snapshot now`, { kind: k })}
    <p><a href="/stage/${k}">Open big screen (latest)</a> · <a href="/stage/${k}?prev=1">Open previous (fallback)</a></p>
    <table>${kindRows(k).map((r, i) => h`<tr><td>#${r.id}</td><td>${r.taken_at}</td><td>${i === 0 ? 'LATEST' : i === 1 ? 'PREVIOUS' : ''}</td><td><a href="/admin/snapshot/${r.id}.html">download .html</a> · <a href="/admin/snapshot/${r.id}.json">.json</a></td></tr>`)}</table>`)}`, csrf);
+}
+
+const LEVEL_LABEL = { stage: 'Microphone', aloud: 'Out loud', quiet: 'Quiet', unknown: '?' };
+
+// Private: names are for the host only. The big screen never shows them.
+function casting(ctx, csrf, url) {
+  const d = loadData(ctx.db), stats = M.byDivisiveness(M.conferenceStats(d));
+  const callRows = ctx.db.prepare('SELECT participant_id, take_id FROM casting_calls').all();
+  const calledAny = new Set(callRows.map((r) => r.participant_id));
+  const take = url.searchParams.get('take') || stats[0]?.takeId;
+  const cur = stats.find((x) => x.takeId === take);
+  const on = getSetting(ctx.db, 'show_my_answers') === '1';
+  const sel = stats.map((x) => h`<a href="/admin/casting?take=${x.takeId}" ${x.takeId === take ? 'style="font-weight:800;text-decoration:underline"' : ''}>${x.takeId} (${x.agree}/${x.disagree})</a>${' '}`);
+  const header = h`<h2>My-answers page: ${on ? 'ON' : 'off'}</h2>
+    <p class="hint">/me shows people their own earlier answers so they can find someone who said the opposite. It makes them aware of those answers, which can nudge the Day 3 re-ask: switch it on for the slot, off afterwards, and best of all run the conference game after the Day 3 form closes.</p>
+    <p>${postBtn('/admin/me/toggle', csrf, on ? 'Switch OFF' : 'Switch ON', { value: on ? '0' : '1' }, 'btn ghost')}</p>`;
+  if (!cur) return page('Casting (conference game)', h`<p>No pre-event answers yet.</p>${header}`, csrf);
+  const lists = M.castingList(d, take), pairs = M.suggestPairs(lists, calledAny, 4);
+  const person = (r) => h`<b>${r.name}</b> #${r.number} · ${sectorLabel(r.sector)}, ${r.country} · strength ${r.strength} · ${LEVEL_LABEL[r.level]}`;
+  const callBtn = (r) => callRows.some((c) => c.participant_id === r.participantId && c.take_id === take)
+    ? postBtn('/admin/casting/undo', csrf, 'Called \u2713 (undo)', { participant_id: r.participantId, take_id: take }, 'btn ghost')
+    : postBtn('/admin/casting/call', csrf, 'Mark called', { participant_id: r.participantId, take_id: take }, 'btn ghost');
+  const side = (name, rows, st) => h`<h3>${name}: ${cur.sides[st].n} people (${cur.sides[st].levels.stage} would take the microphone, ${cur.sides[st].levels.aloud} out loud, ${cur.sides[st].fighters} \u201cI\u2019d fight you on this\u201d)</h3>
+    ${cur.sides[st].levels.stage + cur.sides[st].levels.aloud === 0 ? h`<p class="err">Nobody on this side offered to speak: you will need to ask for a volunteer from the floor.</p>` : ''}
+    <table>${rows.slice(0, 15).map((r) => h`<tr><td>${person(r)}${calledAny.has(r.participantId) ? ' (already called)' : ''}</td><td>${callBtn(r)}</td></tr>`)}</table>`;
+  return page('Casting (conference game)', h`
+  <p>Statements, most divisive first (agree / disagree): ${sel}</p>
+  <div class="consent"><b>${cur.takeId}:</b> ${cur.text}<br><span class="hint">${cur.agree} agreed, ${cur.disagree} disagreed.</span></div>
+  <h2>Suggested pairs (most willing and most passionate, opposites)</h2>
+  ${pairs.length ? h`<table>${pairs.map((p) => h`<tr><td>${person(p.agree)}</td><td>${callBtn(p.agree)}</td><td>${person(p.disagree)}</td><td>${callBtn(p.disagree)}</td></tr>`)}</table>` : h`<p class="err">No opposing pair where both sides offered to speak. Use the lists below, or ask the floor.</p>`}
+  <h2>Everyone on this statement</h2>${side('AGREE', lists.agree, 'agree')}${side('DISAGREE', lists.disagree, 'disagree')}
+  <h2>Stage deck</h2><p>Freeze the <a href="/admin/snapshots">conference snapshot</a> (aggregates only, no names), then open <a href="/stage/conference">/stage/conference</a>.</p>
+  ${header}`, csrf);
 }
 
 function playAdmin(ctx, csrf) {
@@ -184,6 +217,7 @@ export async function adminRoute(ctx, req, url, form, csrf) {
     if (p === '/admin/icebreaker') return html(icebreaker(ctx, csrf));
     if (p === '/admin/final') return html(finalView(ctx, csrf));
     if (p === '/admin/play') return html(playAdmin(ctx, csrf));
+    if (p === '/admin/casting') return html(casting(ctx, csrf, url));
     if (p === '/admin/stories') return html(stories(ctx, csrf, url));
     if (p === '/admin/volunteers') return html(volunteers(ctx));
     if (p === '/admin/lookup') return html(lookup(ctx, url));
@@ -219,12 +253,19 @@ export async function adminRoute(ctx, req, url, form, csrf) {
     return redirect('/admin/stories');
   }
   if (p === '/admin/snapshot') {
-    const kind = form.get('kind'); if (kind !== 'icebreaker' && kind !== 'final') return { status: 400, type: 'text/plain', body: 'bad kind' };
+    const kind = form.get('kind'); if (kind !== 'icebreaker' && kind !== 'final' && kind !== 'conference') return { status: 400, type: 'text/plain', body: 'bad kind' };
     const data = buildStageData(db, kind, now, { logos: env.SHOW_PARTNER_LOGOS !== '0' });
     db.prepare('INSERT INTO snapshots(kind,taken_at,data_json,html) VALUES (?,?,?,?)').run(kind, data.takenAt, JSON.stringify(data), renderStageHtml(data));
     setSetting(db, `snapshot_${kind}_taken_at`, data.takenAt);
     return redirect('/admin/snapshots');
   }
+  if (p === '/admin/casting/call' || p === '/admin/casting/undo') {
+    const pid = form.get('participant_id'), tid = form.get('take_id');
+    if (p.endsWith('/call')) db.prepare('INSERT OR IGNORE INTO casting_calls(participant_id, take_id) VALUES (?,?)').run(pid, tid);
+    else db.prepare('DELETE FROM casting_calls WHERE participant_id=? AND take_id=?').run(pid, tid);
+    return redirect(`/admin/casting?take=${encodeURIComponent(tid || '')}`);
+  }
+  if (p === '/admin/me/toggle') { setSetting(db, 'show_my_answers', form.get('value') === '1' ? '1' : '0'); return redirect('/admin/casting'); }
   if (p === '/admin/play/freeze') { freezeDeck(db, now); return redirect('/admin/play'); }
   if (p === '/admin/play/open') { setSetting(db, 'play_open', form.get('value') === '1' ? '1' : '0'); return redirect('/admin/play'); }
   if (p === '/admin/outbox/retry') { await retryOutbox(db, env, ctx.fetch); return redirect('/admin'); }

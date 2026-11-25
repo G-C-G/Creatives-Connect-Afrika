@@ -3,7 +3,7 @@ import { readFileSync } from 'node:fs';
 import { createHmac, timingSafeEqual } from 'node:crypto';
 import { fileURLToPath } from 'node:url';
 import { dirname, join } from 'node:path';
-import { openDb, getTakes, getVerifiedFacts } from './db.js';
+import { openDb, getTakes, getVerifiedFacts, getSetting } from './db.js';
 import { str } from './html.js';
 import * as P from './pages.js';
 import * as S from './service.js';
@@ -83,7 +83,7 @@ export function createApp({ db, env = process.env, now = () => new Date(), fetch
       }
       if (p.startsWith('/stage/')) {
         const kind = p.slice(7);
-        if (kind !== 'icebreaker' && kind !== 'final') return null;
+        if (kind !== 'icebreaker' && kind !== 'final' && kind !== 'conference') return null;
         const rows = db.prepare('SELECT html FROM snapshots WHERE kind=? ORDER BY id DESC LIMIT 2').all(kind);
         const row = url.searchParams.get('prev') ? rows[1] : rows[0];
         if (!row) return { status: 404, type: 'text/plain', body: 'No snapshot yet. Freeze one in /admin/snapshots.' };
@@ -130,6 +130,18 @@ export function createApp({ db, env = process.env, now = () => new Date(), fetch
       const start = S.timings(db, env).eventStartsAt ? new Date(S.timings(db, env).eventStartsAt) : null;
       const comeBack = start && now() < start ? start.toLocaleDateString('en-GB', { weekday: 'long', timeZone: 'UTC' }) : null;
       return html(P.donePage({ participant: pt, comeBack, existing: url.searchParams.get('existing') === '1', emailQueued: pending, nextPlay: url.searchParams.get('next') === 'play' ? (playOpen(db) && !!latestDeck(db) ? 'open' : 'wait') : null, lang: lang() }));
+    }
+
+    // ---------- "what did I say?": optional, off until the host switches it on (it shows people their own earlier answers) ----------
+    if (p === '/me' || p === '/me/lookup') {
+      if (getSetting(db, 'show_my_answers') !== '1') return html(P.messagePage('What you said', 'This is not open yet. Your host will tell you when.'));
+      const show = (pt) => html(P.myAnswersPage({ participant: pt, rows: S.myAnswers(db, pt.id), lang: lang() }));
+      if (method === 'GET') { const pt = S.lookupByToken(db, url.searchParams.get('t')); return pt && pt.source !== 'final_only' ? show(pt) : html(P.myIdentityPage({ lang: lang() })); }
+      if (method === 'POST') {
+        if (!lookupLimit(ip(req))) return html(P.messagePage('Slow down', 'Too many attempts. Please wait a few minutes.'), 429);
+        const form = await readForm(req), pt = S.lookupByNameNumber(db, form.get('first_name') || '', form.get('number') || '');
+        return pt ? show(pt) : html(P.myIdentityPage({ error: true, lang: lang() }));
+      }
     }
 
     // ---------- welcome game (phone/tablet, portrait) ----------

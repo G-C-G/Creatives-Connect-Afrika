@@ -7,7 +7,7 @@ Thin instrument for ~100 delegates: pre-event hot takes (5 statements), a number
 ```
 cp .env.example .env   # fill in, then export the vars
 npm start              # http://localhost:3000
-npm test               # 42 tests: linking, duplicates, closing, admin, CSV privacy, metrics, snapshots
+npm test               # 54 tests: linking, duplicates, closing, admin, CSV privacy, metrics, snapshots
 DB_PATH=./data/rehearsal.db npm run seed-demo   # rehearsal data, separate DB only
 ```
 
@@ -17,7 +17,8 @@ DB_PATH=./data/rehearsal.db npm run seed-demo   # rehearsal data, separate DB on
 | `/play` | welcome game: phone/tablet, upright or sideways. Needs a frozen + opened deck in `/admin/play` |
 | `/final`, `/final/done` | Day 3 (name + number, or magic link from the email) |
 | `/admin/*` | password (Basic auth, any username): dashboard, icebreaker, final, stories, volunteers, lookup, snapshots, report, exports |
-| `/stage/icebreaker`, `/stage/final` | big screen, served from the latest frozen snapshot only |
+| `/stage/conference`, `/stage/final`, `/stage/icebreaker` | big screen, served from the latest frozen snapshot only |
+| `/me` | optional "what did I say?" page (off until switched on in `/admin/casting`) |
 
 Content (takes, facts, options, consent) is in `src/content.js`; UI copy is keyed in `src/i18n.js`. Metrics rules are in `src/metrics.js`.
 

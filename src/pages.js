@@ -218,3 +218,19 @@ export function playPage(lang = 'en', ident = null) {
   <div id="play" data-deck="/play/deck.json" data-check="/play/check" data-resend="/play/resend" data-finish="/play/finish" data-join="/door" ${ident ? h`data-name="${ident.name}" data-number="${ident.number}"` : ''}><p class="lead">Loading\u2026</p></div>
   <noscript><p class="lead">This game needs JavaScript. Please use your phone or tablet browser.</p></noscript>` });
 }
+
+export function myIdentityPage({ error = false, lang = 'en' }) {
+  return layout({ lang, title: 'What you said', main: 'narrow', body: h`
+  <h1>What did you <em>say</em>?</h1><p class="lead">First name and your code, and we will show you.</p>
+  <form method="post" action="/me/lookup">${error ? h`<p class="err" role="alert">${t(lang, 'final.no_match')}</p>` : ''}
+    <div class="field"><label for="fn">${t(lang, 'final.first')}</label><input id="fn" name="first_name" required maxlength="80" autocomplete="given-name"></div>
+    <div class="field"><label for="num">${t(lang, 'final.number')}</label><input id="num" name="number" required inputmode="numeric" pattern="[0-9]{4}" maxlength="4"></div>
+    <button class="btn big" type="submit">${t(lang, 'final.go')}</button></form>` });
+}
+
+export function myAnswersPage({ participant, rows, lang = 'en' }) {
+  return layout({ lang, title: 'What you said', main: 'narrow mine', body: h`
+  <p class="eyebrow">${participant.first_name}</p><h1>What you said</h1><p class="lead">Find someone who said the opposite.</p>
+  ${rows.map((r) => h`<div class="row"><p class="echo">${r.text}</p><p class="ask">${t(lang, r.stance === 'agree' ? 'take.agree' : 'take.disagree')}</p>
+    <p class="hint">${t(lang, `strength.${r.strength}`)}${r.level !== 'unknown' ? h` · ${t(lang, `level.${r.level}`)}` : ''}</p></div>`)}` });
+}

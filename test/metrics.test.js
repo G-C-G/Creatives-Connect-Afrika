@@ -86,3 +86,46 @@ test('flipSummary: how many matched people changed side on at least one statemen
   assert.deepEqual(M.flipSummary(data), { matched: 4, changedAtLeastOne: 2, meanFlips: 0.5, changedOnThreeOrMore: 0 });
   assert.equal(M.flipSummary({ ...data, responses: data.responses.filter((r) => r.phase === 'pre') }).matched, 0);
 });
+
+// ---- conference game ----
+const mkP = (id, number, first) => ({ id, number, first_name: first, surname: 'X', country: 'Ghana', sector: 'music', region: 'West', source: 'pre_event' });
+const mkR = (pid, take, stance, strength, say, stage) => ({ participant_id: pid, phase: 'pre', take_id: take, stance, strength, say_aloud: say, speak_on_stage: stage });
+const conf = {
+  takes: [{ id: 'T1', text: 'one' }, { id: 'T2', text: 'two' }],
+  participants: [mkP('a', 1001, 'Ama'), mkP('b', 1002, 'Bo'), mkP('c', 1003, 'Cy'), mkP('d', 1004, 'Di'), mkP('e', 1005, 'Eli'), mkP('f', 1006, 'Fu')],
+  responses: [
+    // T1: 3 agree (a stage 5, b aloud 4, c quiet 5) vs 3 disagree (d stage 3, e stage 5, f quiet 2): a perfectly even split
+    mkR('a', 'T1', 'agree', 5, true, true), mkR('b', 'T1', 'agree', 4, true, false), mkR('c', 'T1', 'agree', 5, false, false),
+    mkR('d', 'T1', 'disagree', 3, true, true), mkR('e', 'T1', 'disagree', 5, true, true), mkR('f', 'T1', 'disagree', 2, false, false),
+    // T2: 5 agree, 1 disagree
+    ...['a', 'b', 'c', 'd', 'e'].map((id) => mkR(id, 'T2', 'agree', 3, true, false)), mkR('f', 'T2', 'disagree', 4, true, true),
+  ],
+};
+
+test('levelOf: microphone > out loud > quiet', () => {
+  assert.equal(M.levelOf({ say_aloud: true, speak_on_stage: true }), 'stage'); assert.equal(M.levelOf({ say_aloud: true, speak_on_stage: false }), 'aloud');
+  assert.equal(M.levelOf({ say_aloud: false, speak_on_stage: false }), 'quiet'); assert.equal(M.levelOf({ say_aloud: null, speak_on_stage: null }), 'unknown');
+});
+
+test('conferenceStats: what the room said and how far each side would take it (hand-calculated)', () => {
+  const [t1, t2] = M.conferenceStats(conf);
+  assert.deepEqual([t1.n, t1.agree, t1.disagree, t1.agreeShare], [6, 3, 3, 0.5]);
+  assert.deepEqual(t1.sides.agree.levels, { stage: 1, aloud: 1, quiet: 1, unknown: 0 }); assert.equal(t1.sides.agree.fighters, 2);
+  assert.deepEqual(t1.sides.disagree.levels, { stage: 2, aloud: 0, quiet: 1, unknown: 0 }); assert.equal(t1.sides.disagree.fighters, 1);
+  assert.deepEqual([t2.agree, t2.disagree], [5, 1]);
+  assert.ok(!JSON.stringify(M.conferenceStats(conf)).match(/Ama|Bo|Cy|first_name/), 'aggregates carry no names');
+});
+
+test('byDivisiveness: the most evenly split statement comes first', () => {
+  assert.deepEqual(M.byDivisiveness(M.conferenceStats(conf)).map((x) => x.takeId), ['T1', 'T2']);
+});
+
+test('castingList: most willing, then most passionate first; suggestPairs pairs opposites and skips people already called', () => {
+  const list = M.castingList(conf, 'T1');
+  assert.deepEqual(list.agree.map((r) => r.name), ['Ama X', 'Bo X', 'Cy X']);           // stage 5, aloud 4, quiet 5
+  assert.deepEqual(list.disagree.map((r) => r.name), ['Eli X', 'Di X', 'Fu X']);        // stage 5, stage 3, quiet
+  const pairs = M.suggestPairs(list);
+  assert.deepEqual(pairs.map((p) => [p.agree.name, p.disagree.name]), [['Ama X', 'Eli X'], ['Bo X', 'Di X']]);  // Cy and Fu are quiet: never suggested
+  const again = M.suggestPairs(list, new Set(['a']));
+  assert.deepEqual(again.map((p) => [p.agree.name, p.disagree.name]), [['Bo X', 'Eli X']]);
+});
