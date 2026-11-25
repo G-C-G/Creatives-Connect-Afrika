@@ -45,8 +45,9 @@ test('the older say/stage fields still work (no-JS and existing clients)', async
 test('logos: first page is CCA only, game screens are clean, and the ending breathes (no logo row, GCG mark bottom-right)', async () => {
   const c = await boot();
   const landing = await (await c.call('/')).text();
-  assert.match(landing, /class="logos hero"/); assert.equal((landing.match(/static\/logos\/(?!gcg)/g) || []).length, 1);
-  assert.ok(landing.includes('creatives-connect-afrika.png'));
+  assert.match(landing, /class="cca-hero"/, 'the CCA mark is the centrepiece of the opening');
+  assert.ok(landing.indexOf('gcg.png') > 0 && landing.indexOf('gcg.png') < landing.indexOf('ghana-arms.png') && landing.indexOf('ghana-arms.png') < landing.indexOf('cca-hero.png'), 'top row: GCG first, then the partners, then the CCA centrepiece');
+  assert.equal((landing.match(/gcg\.png/g) || []).length, 1, 'GCG appears once on the opening (top-left, not repeated in the footer)');
   assert.doesNotMatch(landing.replace(/<[^>]*>/g, ' '), /gold coast games/i, 'no written GCG name in the visible text (the logo carries it)');
   assert.match(landing, /Take a\s+<em>side\.<\/em>/, 'the opening is a call to action, not a registration page');
   assert.doesNotMatch(await (await c.call('/start')).text(), /class="logos/);
@@ -70,7 +71,7 @@ test('the ending adapts if the event has already started', async () => {
 test('SHOW_PARTNER_LOGOS=0 hides the partner marks but keeps the GCG mark', async () => {
   const c = await boot({ SHOW_PARTNER_LOGOS: '0' });
   const landing = await (await c.call('/')).text();
-  assert.doesNotMatch(landing, /class="logos/); assert.ok(landing.includes('gcg.png'));
+  assert.doesNotMatch(landing, /ghana-arms|afcfta|black-star/, 'partner logos switched off'); assert.ok(landing.includes('gcg.png') && landing.includes('cca-hero.png'));
   c.close();
 });
 

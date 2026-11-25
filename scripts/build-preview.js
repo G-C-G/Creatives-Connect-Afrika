@@ -1,5 +1,5 @@
 // Builds a self-contained PREVIEW of the onboarding + welcome game: static pages and a tiny in-browser stand-in for the server.
-// Nothing is saved or sent. Sample room data. Partner logos are left out. Usage: node scripts/build-preview.js <outDir>
+// Nothing is saved or sent. Sample room data. Usage: node scripts/build-preview.js <outDir>
 import { createServer } from 'node:http';
 import { mkdirSync, writeFileSync, readFileSync, copyFileSync, rmSync } from 'node:fs';
 import { join, dirname } from 'node:path';
@@ -34,7 +34,7 @@ freezeDeck(db); setSetting(db, 'play_open', '1');
 const dummy = registerPre(db, { first_name: 'You', surname: 'Preview', email: null, country: 'Ghana', sector: 'gaming', project: null, goal: null, values: [], contact_opt_in: false, consent_aggregate: true,
   answers: takes.map((t) => ({ take_id: t.id, stance: 'agree', strength: 3, say_aloud: true, speak_on_stage: false })) }, { source: 'pre_event', env: { EVENT_STARTS_AT: '2099-01-01T00:00:00Z' } }).participant;
 
-const env = { ADMIN_PASSWORD: 'x', SESSION_SECRET: 'x', BASE_URL: '', SHOW_PARTNER_LOGOS: '0', EVENT_STARTS_AT: '2026-11-30T08:00:00Z' };
+const env = { ADMIN_PASSWORD: 'x', SESSION_SECRET: 'x', BASE_URL: '', SHOW_PARTNER_LOGOS: '1', EVENT_STARTS_AT: '2026-11-30T08:00:00Z' };
 const srv = createServer(createApp({ db, env, now: () => new Date('2026-11-25T12:00:00Z') }));
 await new Promise((r) => srv.listen(0, r));
 const base = `http://127.0.0.1:${srv.address().port}`;
@@ -67,6 +67,6 @@ writeFileSync(join(out, 'static/app.css'), '@charset "utf-8";\n' + css);
 const ascii = (t) => t.replace(/[\u0080-\uffff]/g, (c) => '\\u' + c.charCodeAt(0).toString(16).padStart(4, '0'));
 for (const f of ['app.js', 'play.js', 'sfx.js']) writeFileSync(join(out, 'static', f), ascii(readFileSync(join(ROOT, 'public', f), 'utf8')));
 for (const f of ['instrument-serif-400.woff2', 'instrument-serif-400-italic.woff2']) copyFileSync(join(ROOT, 'public/fonts', f), join(out, 'static/fonts', f));
-copyFileSync(join(ROOT, 'public/logos/gcg.png'), join(out, 'static/logos/gcg.png'));
+for (const f of ['gcg.png', 'cca-hero.png', 'creatives-connect-afrika.png', 'ghana-arms.png', 'black-star.png', 'africa-tourism-partners.png', 'afcfta.png']) copyFileSync(join(ROOT, 'public/logos', f), join(out, 'static/logos', f));
 writeFileSync(join(out, 'static/mock.js'), ascii(readFileSync(join(ROOT, 'scripts/preview-mock.js'), 'utf8')));
 console.log('preview built in', out);

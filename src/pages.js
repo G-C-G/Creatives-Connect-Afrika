@@ -1,11 +1,13 @@
 import { h } from './html.js';
 import { t, label } from './i18n.js';
-import { COUNTRIES, SECTORS, GOALS, VALUES, FACT_SLOTS, LOGOS, GCG_LOGO } from './content.js';
+import { COUNTRIES, SECTORS, GOALS, VALUES, FACT_SLOTS, LOGOS, GCG_LOGO, CCA_HERO } from './content.js';
 
 let showLogos = true;
 export const configure = ({ logos }) => { showLogos = logos; };
 
 const logoRow = (cls = '') => h`<div class="logos ${cls}">${LOGOS.map((l) => h`<img src="/static/logos/${l.file}" alt="${l.alt}">`)}</div>`;
+// opening screen: Gold Coast Games first (top-left), then the partners; the CCA mark is the centrepiece below
+const topLogos = () => h`<div class="logos top"><img class="gcg-top" src="/static/logos/${GCG_LOGO.file}" alt="${GCG_LOGO.alt}">${showLogos ? LOGOS.slice(1).map((l) => h`<img src="/static/logos/${l.file}" alt="${l.alt}">`) : ''}</div>`;
 const heroLogo = () => h`<div class="logos hero"><img src="/static/logos/${LOGOS[0].file}" alt="${LOGOS[0].alt}"></div>`;
 
 // logos: 'none' (game screens stay clean) | 'hero' (opening page: CCA only) | 'row' (opening/closing: CCA first, then partners)
@@ -18,9 +20,9 @@ export function layout({ title, body, lang = 'en', main = '', script = '', logos
 <link rel="preload" href="/static/fonts/instrument-serif-400.woff2" as="font" type="font/woff2" crossorigin>
 <link rel="stylesheet" href="/static/app.css">
 <script src="/static/sfx.js" defer></script><script src="/static/app.js" defer></script></head>
-<body class="${bodyClass}">${showLogos ? (logos === 'hero' ? heroLogo() : logos === 'row' ? logoRow() : '') : ''}
+<body class="${bodyClass}">${logos === 'opening' ? topLogos() : showLogos ? (logos === 'hero' ? heroLogo() : logos === 'row' ? logoRow() : '') : ''}
 <main class="${main}">${body}</main>${script ? h`<script src="${script}" defer></script>` : ''}
-<footer><span>${t(lang, 'brand.partner')}</span><img class="gcg" src="/static/logos/${GCG_LOGO.file}" alt="${GCG_LOGO.alt}" width="84"></footer></body></html>`;
+<footer><span>${t(lang, 'brand.partner')}</span>${logos === 'opening' ? '' : h`<img class="gcg" src="/static/logos/${GCG_LOGO.file}" alt="${GCG_LOGO.alt}" width="84">`}</footer></body></html>`;
 }
 
 const msg = (lang, code) => (code === 'invalid' ? 'Please check this entry.' : code === 'max3' ? t(lang, 'work.values_max') : t(lang, 'err.required'));
@@ -108,7 +110,8 @@ const consentStep = (S, E, lang) => h`<section class="step" data-step data-title
   ${fieldErr(E, 'consent_aggregate', lang)}</section>`;
 
 export function landingPage(lang = 'en') {
-  return layout({ lang, logos: 'hero', title: 'What do you actually think? | CCA 2026', main: 'narrow landing', body: h`
+  return layout({ lang, logos: 'opening', title: 'Take a side | CCA 2026', main: 'narrow landing', body: h`
+  <img class="cca-hero" src="/static/logos/${CCA_HERO.file}" alt="${CCA_HERO.alt}">
   <p class="eyebrow">${t(lang, 'open.eyebrow')} <span>${t(lang, 'open.before')}</span></p>
   <h1 class="open">${t(lang, 'open.h1a')} <em>${t(lang, 'open.h1b')}</em> ${t(lang, 'open.h1c')}</h1>
   <p class="lead">${t(lang, 'open.sub')}</p>

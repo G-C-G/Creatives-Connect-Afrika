@@ -163,5 +163,8 @@ export const LOGOS = [
   { file: 'afcfta.png', alt: 'AfCFTA Secretariat' },
 ];
 
+// The centrepiece of the opening screen: the full Creatives Connect Afrika mark (circle crop of the organisers' artwork).
+export const CCA_HERO = { file: 'cca-hero.png', alt: 'Creatives Connect Afrika' };
+
 // Our own mark, bottom-right of every page and the stage. Always shown.
 export const GCG_LOGO = { file: 'gcg.png', alt: 'Gold Coast Games' };
