@@ -1,6 +1,9 @@
 // Stage views. buildStageData -> plain JSON; renderStageHtml -> a self-contained static page
 // (inline CSS/JS, zero network calls). Freeze stores both; the big screen only ever serves the stored HTML.
 import { h, str, raw } from './html.js';
+import { readFileSync } from 'node:fs';
+import { fileURLToPath } from 'node:url';
+import { LOGOS } from './content.js';
 import { loadData, getSetting } from './db.js';
 import { participation, takeSplit, takeChange, biggestMover, stillSplit, shareLabel, headline } from './metrics.js';
 
@@ -14,13 +17,14 @@ const pickStories = (data) => {
     });
 };
 
-export function buildStageData(db, kind, now = new Date()) {
+export function buildStageData(db, kind, now = new Date(), { logos = true } = {}) {
   const data = loadData(db);
   const takenAt = now.toISOString();
+  const base = { logos };
   if (kind === 'icebreaker') {
     const picks = JSON.parse(getSetting(db, 'icebreaker_takes') || '[]').slice(0, 2);
     return {
-      kind, takenAt, picks,
+      ...base, kind, takenAt, picks,
       takes: picks.map((id) => {
         const tk = data.takes.find((x) => x.id === id); const s = takeSplit(data, id, 'pre');
         return { id, text: tk.text, n: s.n, agree: s.agree, disagree: s.disagree,
@@ -32,7 +36,7 @@ export function buildStageData(db, kind, now = new Date()) {
   const mover = biggestMover(data), split = stillSplit(data);
   const mode = part.matched > 0 ? 'then_now' : 'final_only';
   return {
-    kind, takenAt, mode, participation: part,
+    ...base, kind, takenAt, mode, participation: part,
     headline: mode === 'then_now' ? headline(data) : 'Day 3 results alone: no matched baseline yet.',
     biggestMoverId: mover?.takeId ?? null, stillSplitId: split?.takeId ?? null,
     takes: data.takes.map((tk) => {
@@ -44,17 +48,19 @@ export function buildStageData(db, kind, now = new Date()) {
   };
 }
 
-const CSS = `*{box-sizing:border-box}html,body{margin:0;height:100%;background:#0b0b0b;color:#fff;font:600 3vw/1.25 system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;cursor:none}
-.slide{display:none;min-height:100vh;padding:3vh 6vw 8vh;flex-direction:column;justify-content:center}.slide.on{display:flex}
-.kick{color:#f4c84a;font-size:1.7vw;letter-spacing:.12em;text-transform:uppercase;margin:0 0 2vh}
-.big{font-size:9vw;line-height:1;margin:0;color:#f4c84a}.mid{font-size:3.6vw;margin:2vh 0}
-.take{font-size:3.4vw;margin:0 0 1vh}.row{border-top:.2vw solid #444;padding:1vh 0}.row .take{font-size:2.4vw;margin:0}.sub{font-size:1.7vw;color:#e9e3cf;font-weight:500;margin:.3vh 0}.revealed #prompt{display:none}
-.tag{display:inline-block;background:#f4c84a;color:#000;padding:.05em .5em;border-radius:.3em;font-size:1.3vw;margin-right:1vw}
+const CSS = `*{box-sizing:border-box}html,body{margin:0;height:100%;background:#fff;color:#111;font:800 3vw/1.2 system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;cursor:none}
+body::before{content:"";display:block;height:1.2vh;background:linear-gradient(90deg,#D7262E 0 33.4%,#F2A81D 33.4% 66.7%,#2A7F3A 66.7%)}
+.slide{display:none;min-height:98vh;padding:3vh 6vw 8vh;flex-direction:column;justify-content:center}.slide.on{display:flex}
+.kick{color:#D7262E;font-size:1.5vw;letter-spacing:.14em;text-transform:uppercase;margin:0 0 2vh}
+.big{font-size:11vw;line-height:1;margin:0;background:linear-gradient(90deg,#D7262E,#F2A81D);-webkit-background-clip:text;background-clip:text;-webkit-text-fill-color:transparent}.mid{font-size:3.6vw;margin:2vh 0}
+.take{font-size:3.4vw;margin:0 0 1vh;text-transform:uppercase;line-height:1.1}.row{border-top:2px solid #ddd;padding:1vh 0}.row .take{font-size:2.2vw;margin:0}
+.sub{font-size:1.7vw;color:#333;font-weight:600;margin:.3vh 0}.revealed #prompt{display:none}
+.tag{display:inline-block;background:#D7262E;color:#fff;padding:.05em .5em;border-radius:.2em;font-size:1.2vw;letter-spacing:.08em;margin-right:1vw}
 .rv{visibility:hidden}.rv.show{visibility:visible}
-.quote{font-size:3.2vw;border-left:.8vw solid #0b6b3a;padding-left:2vw;margin:2vh 0}.by{font-size:2vw;color:#f4c84a}
-.n{font-size:1.6vw;color:#bdb6a0;font-weight:500}
-.foot{position:fixed;left:0;right:0;bottom:0;padding:1.2vh 6vw;background:#000;font-size:1.4vw;color:#bdb6a0;font-weight:500;display:flex;justify-content:space-between;gap:2vw}
-.split{display:flex;gap:3vw;margin:3vh 0}.split div{flex:1;border:.3vw solid #f4c84a;padding:3vh 2vw;border-radius:1vw}.split b{display:block;font-size:6vw;color:#f4c84a}`;
+.quote{font-size:3vw;font-weight:700;border-left:.6vw solid #2A7F3A;padding-left:2vw;margin:2vh 0}.by{font-size:1.8vw;color:#D7262E;text-transform:uppercase;letter-spacing:.1em}
+.n{font-size:1.5vw;color:#555;font-weight:600}
+.foot{position:fixed;left:0;right:0;bottom:0;padding:1.2vh 6vw;background:#fff;border-top:2px solid #ddd;font:600 1.3vw system-ui,sans-serif;color:#555;display:flex;justify-content:space-between;gap:2vw}
+.foot .lg{display:flex;gap:1.6vw;align-items:center}.foot img{height:4.2vh;width:auto}.split{display:flex;gap:3vw;margin:3vh 0}.split div{flex:1;border:.3vw solid #111;padding:3vh 2vw;border-radius:.6vw}.split b{display:block;font-size:7vw;color:#D7262E}`;
 
 const JS = `(function(){var s=[].slice.call(document.querySelectorAll('.slide')),i=0;function show(){s.forEach(function(x,j){x.classList.toggle('on',j===i)})}
 function next(){var rv=s[i].querySelector('.rv:not(.show)');if(rv){rv.classList.add('show');s[i].classList.add('revealed');return}if(i<s.length-1){i++;show()}}
@@ -62,10 +68,12 @@ function prev(){if(i>0){i--;show()}}
 document.addEventListener('keydown',function(e){if(e.key==='ArrowRight'||e.key===' '||e.key==='Enter'||e.key==='PageDown')next();else if(e.key==='ArrowLeft'||e.key==='PageUp')prev();else if(e.key==='f'&&document.documentElement.requestFullscreen)document.documentElement.requestFullscreen()});
 document.addEventListener('click',next);show()})();`;
 
+const logoUri = (f) => `data:image/png;base64,${readFileSync(fileURLToPath(new URL(`../public/logos/${f}`, import.meta.url))).toString('base64')}`;
 const when = (iso) => iso.replace('T', ' ').slice(0, 16) + ' UTC';
 
 export function renderStageHtml(d) {
-  const foot = h`<div class="foot"><span>Snapshot taken ${when(d.takenAt)}</span><span>Gold Coast Games · In partnership with Creatives Connect Afrika</span></div>`;
+  const logos = d.logos ? LOGOS.map((l) => h`<img src="${raw(logoUri(l.file))}" alt="${l.alt}">`) : '';
+  const foot = h`<div class="foot"><span class="lg">${logos}</span><span>Snapshot ${when(d.takenAt)} · Gold Coast Games · In partnership with Creatives Connect Afrika</span></div>`;
   let slides;
   if (d.kind === 'icebreaker') {
     slides = d.takes.map((tk, i) => h`<section class="slide"><p class="kick">Welcome game · Statement ${i + 1}</p>

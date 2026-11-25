@@ -208,10 +208,10 @@ test('snapshot is self-contained, stories need consent AND vetted AND use_in_roo
   assert.ok(!html.includes('UNVETTED STORY'));
   for (const f of c.db.prepare('SELECT text FROM facts').all()) assert.ok(!html.includes(f.text.slice(0, 30)), 'fact on stage');
   assert.ok(!/https?:\/\//.test(html.replace(/<[^>]*xmlns[^>]*>/g, '')), 'snapshot makes no external references');
-  assert.ok(html.includes('Snapshot taken'));
+  assert.ok(html.includes('Snapshot 20'));
   const rows = c.db.prepare("SELECT id FROM snapshots WHERE kind='final' ORDER BY id").all();
   assert.equal(rows.length, 2);
-  assert.ok((await (await c.call('/stage/final?prev=1', { json: false })).text()).includes('Snapshot taken'));
+  assert.ok((await (await c.call('/stage/final?prev=1', { json: false })).text()).includes('Snapshot 20'));
   c.close();
 });
 

@@ -9,6 +9,7 @@ import * as P from './pages.js';
 import * as S from './service.js';
 import { queueNumberEmail, sendOutboxRow } from './mail.js';
 import { adminRoute } from './admin.js';
+import { LOGOS } from './content.js';
 
 const PUBLIC = join(dirname(fileURLToPath(import.meta.url)), '..', 'public');
 const STATIC = { '/static/app.css': ['text/css', 'app.css'], '/static/app.js': ['text/javascript', 'app.js'] };
@@ -27,6 +28,7 @@ function limiter(max, windowMs) {
 }
 
 export function createApp({ db, env = process.env, now = () => new Date(), fetchImpl = fetch } = {}) {
+  P.configure({ logos: env.SHOW_PARTNER_LOGOS !== '0' });
   const secret = env.SESSION_SECRET || env.ADMIN_PASSWORD || 'dev-secret';
   const baseUrl = (env.BASE_URL || '').replace(/\/$/, '');
   const csrf = createHmac('sha256', secret).update('admin-csrf').digest('base64url');
@@ -60,6 +62,8 @@ export function createApp({ db, env = process.env, now = () => new Date(), fetch
     const redirect = (to) => ({ status: 303, headers: { Location: to }, body: '' });
 
     if (p === '/healthz') return { status: 200, type: 'text/plain', body: 'ok' };
+    const lm = /^\/static\/logos\/([a-z-]+\.png)$/.exec(p);
+    if (lm && LOGOS.some((l) => l.file === lm[1])) return { status: 200, type: 'image/png', headers: { 'Cache-Control': 'public, max-age=86400' }, body: readFileSync(join(PUBLIC, 'logos', lm[1])) };
     if (STATIC[p]) return { status: 200, type: STATIC[p][0], headers: { 'Cache-Control': 'public, max-age=3600' }, body: readFileSync(join(PUBLIC, STATIC[p][1])) };
 
     // ---------- admin + stage ----------

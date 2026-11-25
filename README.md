@@ -19,3 +19,5 @@ DB_PATH=./data/rehearsal.db npm run seed-demo   # rehearsal data, separate DB on
 | `/stage/icebreaker`, `/stage/final` | big screen, served from the latest frozen snapshot only |
 
 Content (takes, facts, options, consent) is in `src/content.js`; UI copy is keyed in `src/i18n.js`. Metrics rules are in `src/metrics.js`.
+
+**Look:** the CCA palette (white, heavy black type, red/green/gold) with the five programme partner logos in `public/logos/`. These are crops from the organisers' public graphic: replace them with the official kit files (same filenames). `SHOW_PARTNER_LOGOS=0` hides them everywhere.

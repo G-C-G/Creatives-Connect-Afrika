@@ -1,6 +1,9 @@
 import { h } from './html.js';
 import { t, label } from './i18n.js';
-import { COUNTRIES, SECTORS, GOALS, VALUES, FACT_SLOTS } from './content.js';
+import { COUNTRIES, SECTORS, GOALS, VALUES, FACT_SLOTS, LOGOS } from './content.js';
+
+let showLogos = true;
+export const configure = ({ logos }) => { showLogos = logos; };
 
 export function layout({ title, body, lang = 'en', main = '' }) {
   return h`<!doctype html>
@@ -10,7 +13,8 @@ export function layout({ title, body, lang = 'en', main = '' }) {
 <title>${title}</title>
 <link rel="stylesheet" href="/static/app.css">
 <script src="/static/app.js" defer></script></head>
-<body><header class="band"><strong>${t(lang, 'brand.name')}</strong></header>
+<body><header class="top">${t(lang, 'brand.name')}</header>
+${showLogos ? h`<div class="logos">${LOGOS.map((l) => h`<img src="/static/logos/${l.file}" alt="${l.alt}" height="40" loading="eager">`)}</div>` : ''}
 <main class="${main}">${body}</main>
 <footer>${t(lang, 'brand.partner')}</footer></body></html>`;
 }
@@ -83,7 +87,7 @@ const consentStep = (S, E, lang) => h`<section class="step" data-step data-title
 
 export function landingPage(lang = 'en') {
   return layout({ lang, title: `${t(lang, 'landing.title')} | Gold Coast Games`, main: 'narrow', body: h`
-  <h1>${t(lang, 'landing.title')}</h1><p class="lead">${t(lang, 'landing.lead')}</p>
+  <h1>Where does the <mark>room</mark> stand?</h1><p class="lead">${t(lang, 'landing.lead')}</p>
   <ol class="how"><li>${t(lang, 'landing.step1')}</li><li>${t(lang, 'landing.step2')}</li><li>${t(lang, 'landing.step3')}</li></ol>
   <p class="hint">${t(lang, 'landing.time')}</p>
   <p class="consent">${t(lang, 'consent.text')}</p>
@@ -130,7 +134,7 @@ export function donePage({ participant, existing = false, emailQueued = false, l
 export function finalIdentityPage({ fails = 0, error = false, lang = 'en', state = 'open' }) {
   if (state !== 'open') return finalClosedPage(state, lang);
   return layout({ lang, title: 'Day 3 | Gold Coast Games', main: 'narrow', body: h`
-  <h1>${t(lang, 'final.title')}</h1><p class="lead">${t(lang, 'final.lead')}</p>
+  <h1>Day 3: has the room <mark>moved</mark>?</h1><p class="lead">${t(lang, 'final.lead')}</p>
   <form method="post" action="/final/lookup"><input type="hidden" name="fails" value="${fails}">
     ${error ? h`<p class="err" role="alert">${t(lang, 'final.no_match')}</p>` : ''}
     <div class="field"><label for="fn">${t(lang, 'final.first')}</label><input id="fn" name="first_name" required maxlength="80" autocomplete="given-name"></div>
@@ -166,7 +170,7 @@ export function finalForm({ takes, ticket, postOnly, S = new URLSearchParams(), 
     <label class="check"><input type="checkbox" name="story_anon_ok" value="1" ${S.get('story_anon_ok') === '1' ? 'checked' : ''}><span>${t(lang, 'consent.story_anon')}</span></label>
     <label class="check"><input type="checkbox" name="story_name_ok" value="1" ${S.get('story_name_ok') === '1' ? 'checked' : ''}><span>${t(lang, 'consent.story_name')}</span></label></section>`);
   return layout({ lang, title: 'Day 3 | Gold Coast Games', main: 'narrow', body: wizard({ action: '/final', id: 'final', steps, hidden: { ticket }, lang, E,
-    extraTop: h`<h1>${t(lang, 'final.title')}</h1>` }) });
+    extraTop: h`<h1>Day 3: has the room <mark>moved</mark>?</h1>` }) });
 }
 
 export function finalDonePage(lang = 'en') {

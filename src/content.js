@@ -81,3 +81,14 @@ export const FACTS = [
 
 // Where interludes appear in the wizard: after take at this position.
 export const FACT_SLOTS = { 2: 'F1', 4: 'F3' }; // F2 is door-only. Adjust once facts are verified.
+
+// Partner marks, shown because the game is part of the official CCA programme.
+// Crops from the organisers' public graphic: replace the files in public/logos/ with the official kit (same filenames).
+// Switch off instantly with SHOW_PARTNER_LOGOS=0.
+export const LOGOS = [
+  { file: 'ghana-arms.png', alt: 'Government of Ghana' },
+  { file: 'black-star.png', alt: 'Black Star Experience' },
+  { file: 'africa-tourism-partners.png', alt: 'Africa Tourism Partners' },
+  { file: 'creatives-connect-afrika.png', alt: 'Creatives Connect Afrika' },
+  { file: 'afcfta.png', alt: 'AfCFTA Secretariat' },
+];

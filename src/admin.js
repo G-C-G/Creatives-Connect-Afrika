@@ -197,7 +197,7 @@ export async function adminRoute(ctx, req, url, form, csrf) {
   }
   if (p === '/admin/snapshot') {
     const kind = form.get('kind'); if (kind !== 'icebreaker' && kind !== 'final') return { status: 400, type: 'text/plain', body: 'bad kind' };
-    const data = buildStageData(db, kind, now);
+    const data = buildStageData(db, kind, now, { logos: env.SHOW_PARTNER_LOGOS !== '0' });
     db.prepare('INSERT INTO snapshots(kind,taken_at,data_json,html) VALUES (?,?,?,?)').run(kind, data.takenAt, JSON.stringify(data), renderStageHtml(data));
     setSetting(db, `snapshot_${kind}_taken_at`, data.takenAt);
     return redirect('/admin/snapshots');
