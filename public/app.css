@@ -240,10 +240,17 @@ main.landing{width:100%;box-sizing:border-box;text-align:left;padding:0 24px;dis
 .base{border-top:1px solid var(--line);padding:18px 0 20px}
 main.landing .eyebrow{margin:0 0 6px}
 .cover{display:flex;align-items:flex-end;justify-content:space-between;gap:12px}
-main.landing h1.open{font-size:clamp(54px,17.5vw,112px);line-height:.92;margin:0;min-width:0}
+main.landing h1.open{font-size:clamp(42px,calc((100vw - 176px) / 3.35),120px);line-height:.92;margin:0;min-width:0}
 main.landing h1.open span,main.landing h1.open em{display:block;white-space:nowrap}
-main.landing .btn.go{width:auto;min-width:0;min-height:0;height:46px;padding:0 22px;border-radius:999px;font-size:13px;letter-spacing:.08em;flex:none;margin:0 0 10px;display:inline-flex;align-items:center}
+main.landing .btn.go{width:auto;min-width:0;min-height:0;height:44px;padding:0 17px;border-radius:999px;font-size:12px;letter-spacing:.07em;flex:none;margin:0 0 10px;display:inline-flex;align-items:center}
 main.landing .lead{margin:16px 0 0;max-width:none;font-size:16px;line-height:1.45;color:var(--muted)}
 .snd{top:auto;bottom:12px;right:12px}
 @media (min-width:700px){.logos.top img{height:36px}main.landing{min-height:calc(100svh - 80px)}main.landing h1.open{font-size:128px}.cca-hero{width:400px}.base{padding-bottom:28px}main.landing .lead{font-size:19px}}
 @media (max-width:360px){.logos.top img{height:20px}.logos.top .tp{gap:9px}}
+
+/* hierarchy: one hero ("we begin." in red italic), "Before" is its lead-in, the logo is the identity (smaller than the hero), the rest is quiet */
+main.landing h1.open span{font-size:.46em;line-height:1;margin:0 0 .12em .04em;letter-spacing:.01em}
+.cca-hero{width:min(64vw,290px)}
+.logos.top img{height:24px}
+main.landing .lead{font-size:15px;color:#6b6b6b}
+@media (min-width:700px){main.landing h1.open{font-size:128px}.cca-hero{width:340px}.logos.top img{height:34px}main.landing .lead{font-size:18px}}

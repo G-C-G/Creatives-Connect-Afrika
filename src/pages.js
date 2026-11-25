@@ -110,10 +110,10 @@ const consentStep = (S, E, lang) => h`<section class="step" data-step data-title
   ${fieldErr(E, 'consent_aggregate', lang)}</section>`;
 
 export function landingPage(lang = 'en') {
-  return layout({ lang, logos: 'opening', title: 'Creative Hot Takes | CCA 2026', main: 'narrow landing', body: h`
+  return layout({ lang, logos: 'opening', title: 'Before we begin | CCA 2026', main: 'narrow landing', body: h`
   <div class="stage"><img class="cca-hero" src="/static/logos/${CCA_HERO.file}" alt="${CCA_HERO.alt}"></div>
   <div class="base">
-  <div class="cover"><h1 class="open"><span>${t(lang, 'open.h1a')}</span> ${t(lang, 'open.h1b').split(' ').map((w) => h`<em>${w}</em>`)} ${t(lang, 'open.h1c')}</h1>
+  <div class="cover"><h1 class="open"><span>${t(lang, 'open.h1a')}</span> <em>${t(lang, 'open.h1b')}</em> ${t(lang, 'open.h1c')}</h1>
   <a class="btn go" href="/start">${t(lang, 'open.go')} &rarr;</a></div>
   <p class="lead">${t(lang, 'open.sub')}<br>${t(lang, 'open.sub2')}</p></div>` });
 }
