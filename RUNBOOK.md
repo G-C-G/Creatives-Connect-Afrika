@@ -25,7 +25,7 @@ Door QR points to `BASE_URL/play`. People self-serve: **has code** = first name 
 3. `/admin/stories`: read each story. Mark **Vetted** then **Use in room**. Only vetted + consented stories can reach the screen.
 4. `/admin/volunteers`: pick one who changed their mind and one who did not. Brief them beforehand.
 5. `/admin/snapshots` > **Freeze final snapshot**. Open `/stage/final`. Also download the .html (works offline: just double-click it).
-6. Slides: 1 headline and return rate, 2 prompt then reveal (cards up first), 3 stories. If the Wi-Fi dies, the downloaded file still works.
+6. Big screen keys: right arrow / space / click = reveal or next, left arrow = back, **M = mute/unmute** (sound is ON by default on the stage laptop, so test the speakers before the session), F = full screen. Flow: "Did we move?" > return rate > "shifted on X of 5" > each statement (smallest shift first, biggest mover last: statement, THEN, drum-roll, NOW) > stories (if any vetted) > close. If the Wi-Fi dies, the downloaded file still works.
 7. If the freeze looks wrong: fix data, freeze again. `/stage/final?prev=1` is the previous snapshot.
 
 ## Lost number

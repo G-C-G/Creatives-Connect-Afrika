@@ -14,7 +14,7 @@ export function buildDeck(db, now = new Date()) {
   const factRounds = GAME_QUESTIONS.filter((q) => facts.has(q.fact_id)).map((q) => {
     const f = facts.get(q.fact_id);
     return { type: 'fact', id: q.fact_id, question: q.question || f.text, options: q.options, answer: q.answer_index,
-      explain: f.kind === 'true_false' ? f.reveal_text : `${f.text} ${f.reveal_text || ''}`.trim() };
+      explain: f.kind === 'true_false' ? f.reveal_text : `${f.text} ${f.reveal_text || ''}`.trim(), wink: q.wink || null };
   });
   const picks = JSON.parse(getSetting(db, 'icebreaker_takes') || '[]').slice(0, 2);
   const predictRounds = picks.map((id) => {

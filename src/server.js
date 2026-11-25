@@ -13,7 +13,7 @@ import { LOGOS, GCG_LOGO } from './content.js';
 import { latestDeck, playOpen, savePlay, checkPlayer } from './play.js';
 
 const PUBLIC = join(dirname(fileURLToPath(import.meta.url)), '..', 'public');
-const STATIC = { '/static/app.css': ['text/css', 'app.css'], '/static/app.js': ['text/javascript', 'app.js'], '/static/play.js': ['text/javascript', 'play.js'] };
+const STATIC = { '/static/app.css': ['text/css', 'app.css'], '/static/app.js': ['text/javascript', 'app.js'], '/static/play.js': ['text/javascript', 'play.js'], '/static/sfx.js': ['text/javascript', 'sfx.js'] };
 const SEC = { 'X-Content-Type-Options': 'nosniff', 'Referrer-Policy': 'no-referrer', 'X-Frame-Options': 'DENY', 'Cache-Control': 'no-store' };
 const CSP = "default-src 'self'; style-src 'self' 'unsafe-inline'; script-src 'self'; img-src 'self' data:; frame-ancestors 'none'";
 const CSP_STAGE = "default-src 'none'; style-src 'unsafe-inline'; script-src 'unsafe-inline'; frame-ancestors 'none'";

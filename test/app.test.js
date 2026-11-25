@@ -1,4 +1,6 @@
-import test from 'node:test';
+import test, { after } from 'node:test';
+const _servers = [];
+after(() => _servers.forEach((s) => { try { s.closeAllConnections(); s.close(); } catch {} }));
 import assert from 'node:assert/strict';
 import { createServer } from 'node:http';
 import { openDb, loadData, seedContent } from '../src/db.js';
@@ -10,6 +12,7 @@ async function boot(envExtra = {}, clock = { t: new Date('2026-11-27T10:00:00Z')
   const env = { ADMIN_PASSWORD: 'pw', SESSION_SECRET: 's', BASE_URL: 'https://x.test', EVENT_STARTS_AT: '2026-11-30T08:00:00Z', ...envExtra };
   const srv = createServer(createApp({ db, env, now: () => clock.t, fetchImpl: async () => ({ ok: true }) }));
   await new Promise((r) => srv.listen(0, r));
+  _servers.push(srv);
   const base = `http://127.0.0.1:${srv.address().port}`;
   const call = (path, { body, auth = true, json = true, method } = {}) => fetch(base + path, {
     method: method || (body ? 'POST' : 'GET'), redirect: 'manual',

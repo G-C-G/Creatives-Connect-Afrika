@@ -67,7 +67,13 @@ export function parseTakeAnswers(p, takes) {
     const strength = Number(p.get(`t_${t.id}_strength`));
     if (stance !== 'agree' && stance !== 'disagree') errors[`t_${t.id}_stance`] = 'required';
     if (!Number.isInteger(strength) || strength < 1 || strength > 5) errors[`t_${t.id}_strength`] = 'required';
-    answers.push({ take_id: t.id, stance, strength, say_aloud: yn(p.get(`t_${t.id}_say`)), speak_on_stage: yn(p.get(`t_${t.id}_stage`)) });
+    // One question: how far would you take it? quiet = keep it to myself, aloud = say it in the room, stage = argue it on stage.
+    const lvl = p.get(`t_${t.id}_level`);
+    let say = yn(p.get(`t_${t.id}_say`)), stage = yn(p.get(`t_${t.id}_stage`));
+    if (lvl === 'quiet') { say = false; stage = false; }
+    else if (lvl === 'aloud') { say = true; stage = false; }
+    else if (lvl === 'stage') { say = true; stage = true; }
+    answers.push({ take_id: t.id, stance, strength, say_aloud: say, speak_on_stage: stage });
   }
   return { answers, errors };
 }

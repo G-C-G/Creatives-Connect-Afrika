@@ -76,14 +76,37 @@
     steps.forEach(function (s, j) { s.classList.toggle('on', j === cur); });
     progress.hidden = false; nav.hidden = false;
     progress.innerHTML = '';
-    var t = doc.createElement('span'); t.textContent = 'Step ' + (cur + 1) + ' of ' + steps.length;
+    var sr = doc.createElement('span'); sr.className = 'sr'; sr.textContent = 'Step ' + (cur + 1) + ' of ' + steps.length;
     var bar = doc.createElement('div'); bar.className = 'bar'; bar.innerHTML = '<i style="width:' + Math.round(100 * (cur + 1) / steps.length) + '%"></i>';
-    progress.appendChild(t); progress.appendChild(bar);
+    progress.appendChild(sr); progress.appendChild(bar);
     back.style.visibility = cur === 0 ? 'hidden' : 'visible';
-    var last = cur === steps.length - 1; next.hidden = last; submit.hidden = !last;
+    var last = cur === steps.length - 1, auto = steps[cur].hasAttribute('data-auto'), skippable = steps[cur].hasAttribute('data-skippable');
+    next.hidden = last || (auto && !skippable); submit.hidden = !last;
+    nav.classList.toggle('solo', auto && !skippable);
+    refreshSkip();
     errBox.hidden = true; saveDraft();
     if (steps[cur].scrollIntoView) window.scrollTo(0, 0);
   }
+  // optional step: the button says Skip until something is filled in
+  function refreshSkip() {
+    var st = steps[cur]; if (!st || !(st.hasAttribute('data-optional') || st.hasAttribute('data-skippable'))) { next.textContent = next.getAttribute('data-label') || next.textContent; return; }
+    if (!next.getAttribute('data-label')) next.setAttribute('data-label', next.textContent);
+    var filled = [].slice.call(st.querySelectorAll('input,select,textarea')).some(function (el) {
+      return (el.type === 'checkbox' || el.type === 'radio') ? el.checked : !!el.value; });
+    next.textContent = filled ? next.getAttribute('data-label') : 'Skip';
+  }
+  form.addEventListener('keydown', function (e) {
+    var t = e.target; if (e.key !== 'Enter' || !t || t.tagName !== 'INPUT' || /^(checkbox|radio|submit|button)$/.test(t.type)) return;
+    e.preventDefault(); if (cur < steps.length - 1) next.click(); else submit.click();
+  });
+  form.addEventListener('input', refreshSkip); form.addEventListener('change', refreshSkip);
+  // one-tap screens: tapping an answer moves on (click also fires when re-tapping an already chosen answer)
+  form.addEventListener('click', function (e) {
+    var st = steps[cur];
+    if (!st || !st.hasAttribute('data-auto') || !e.target || e.target.type !== 'radio' || !st.contains(e.target)) return;
+    if (window.CCASfx) window.CCASfx.tick();
+    setTimeout(function () { if (steps[cur] === st && !valid(st)) show(cur + 1); }, 200);
+  });
   next.addEventListener('click', function () {
     var bad = valid(steps[cur]);
     if (bad) { errBox.textContent = T.fix; errBox.hidden = false; bad.focus(); return; }

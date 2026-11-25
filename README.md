@@ -7,7 +7,7 @@ Thin instrument for ~100 delegates: pre-event hot takes (5 statements), a number
 ```
 cp .env.example .env   # fill in, then export the vars
 npm start              # http://localhost:3000
-npm test               # 35 tests: linking, duplicates, closing, admin, CSV privacy, metrics, snapshots
+npm test               # 42 tests: linking, duplicates, closing, admin, CSV privacy, metrics, snapshots
 DB_PATH=./data/rehearsal.db npm run seed-demo   # rehearsal data, separate DB only
 ```
 
@@ -21,4 +21,4 @@ DB_PATH=./data/rehearsal.db npm run seed-demo   # rehearsal data, separate DB on
 
 Content (takes, facts, options, consent) is in `src/content.js`; UI copy is keyed in `src/i18n.js`. Metrics rules are in `src/metrics.js`.
 
-**Look:** the CCA palette (white, heavy black type, red/green/gold) with the five programme partner logos in `public/logos/`. These are crops from the organisers' public graphic: replace them with the official kit files (same filenames). `SHOW_PARTNER_LOGOS=0` hides them everywhere.
+**Look:** only the organisation's colours (white, black type, CCA red and gold; green lives in the logos). One question per screen. Phones are silent by default (sound toggle in the game); the stage laptop has sound on, M to mute. The with the five programme partner logos in `public/logos/`. These are crops from the organisers' public graphic: replace them with the official kit files (same filenames). `SHOW_PARTNER_LOGOS=0` hides them everywhere.

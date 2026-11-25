@@ -132,3 +132,11 @@ export function headline(data) {
   const dir = mover.meanNetChange > 0 ? 'toward agreeing' : mover.meanNetChange < 0 ? 'toward disagreeing' : 'with no net movement';
   return `Biggest measured shift: “${t.text}” moved ${dir} (mean net change ${mover.meanNetChange > 0 ? '+' : ''}${mover.meanNetChange}, ${mover.n} matched). ${part.matched} of ${part.preCompleters} came back.`;
 }
+
+// A statement "moved" if the average net score (scale -5..+5) of matched pairs changed by at least `threshold`.
+export const MOVED_THRESHOLD = 0.5;
+export function movedStatements(data, threshold = MOVED_THRESHOLD) {
+  const rows = data.takes.map((t) => ({ takeId: t.id, ...takeChange(data, t.id) })).filter((r) => r.n > 0);
+  const ids = rows.filter((r) => Math.abs(r.meanNetChange) >= threshold).map((r) => r.takeId);
+  return { count: ids.length, total: data.takes.length, ids, threshold };
+}

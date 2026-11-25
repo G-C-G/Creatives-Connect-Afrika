@@ -85,8 +85,8 @@ export const FACTS = [
 // Welcome-game guess questions. A question is only ever played once its fact is verified.
 // answer_index points into options. Edit freely; options are in English only for now.
 export const GAME_QUESTIONS = [
-  { fact_id: 'F1', question: 'How many bands greeted Louis Armstrong when he arrived in Accra?', options: ['3', '7', '13', '30'], answer_index: 2 },
-  { fact_id: 'F2', question: 'How much did Burna Boy reportedly gross at London Stadium in one night (29 June 2024)?', options: ['$1 to 3 million', '$3 to 5 million', '$5 to 7 million', '$7 to 10 million'], answer_index: 2 },
+  { fact_id: 'F1', question: 'How many bands greeted Louis Armstrong when he arrived in Accra?', options: ['3', '7', '13', '30'], answer_index: 2, wink: 'Accra was not playing around.' },
+  { fact_id: 'F2', question: 'How much did Burna Boy reportedly gross at London Stadium in one night (29 June 2024)?', options: ['$1 to 3 million', '$3 to 5 million', '$5 to 7 million', '$7 to 10 million'], answer_index: 2, wink: 'Not a bad night\u2019s work.' },
   { fact_id: 'F3', question: null /* uses the fact text */, options: ['True', 'False'], answer_index: 0 },
 ];
 
