@@ -10,9 +10,10 @@ import * as S from './service.js';
 import { queueNumberEmail, sendOutboxRow } from './mail.js';
 import { adminRoute } from './admin.js';
 import { LOGOS, GCG_LOGO } from './content.js';
+import { latestDeck, playOpen, savePlay, checkPlayer } from './play.js';
 
 const PUBLIC = join(dirname(fileURLToPath(import.meta.url)), '..', 'public');
-const STATIC = { '/static/app.css': ['text/css', 'app.css'], '/static/app.js': ['text/javascript', 'app.js'] };
+const STATIC = { '/static/app.css': ['text/css', 'app.css'], '/static/app.js': ['text/javascript', 'app.js'], '/static/play.js': ['text/javascript', 'play.js'] };
 const SEC = { 'X-Content-Type-Options': 'nosniff', 'Referrer-Policy': 'no-referrer', 'X-Frame-Options': 'DENY', 'Cache-Control': 'no-store' };
 const CSP = "default-src 'self'; style-src 'self' 'unsafe-inline'; script-src 'self'; img-src 'self' data:; frame-ancestors 'none'";
 const CSP_STAGE = "default-src 'none'; style-src 'unsafe-inline'; script-src 'unsafe-inline'; frame-ancestors 'none'";
@@ -32,7 +33,7 @@ export function createApp({ db, env = process.env, now = () => new Date(), fetch
   const secret = env.SESSION_SECRET || env.ADMIN_PASSWORD || 'dev-secret';
   const baseUrl = (env.BASE_URL || '').replace(/\/$/, '');
   const csrf = createHmac('sha256', secret).update('admin-csrf').digest('base64url');
-  const lookupLimit = limiter(200, 10 * 60_000), writeLimit = limiter(300, 10 * 60_000), adminFail = limiter(20, 10 * 60_000);
+  const lookupLimit = limiter(200, 10 * 60_000), writeLimit = limiter(300, 10 * 60_000), adminFail = limiter(20, 10 * 60_000), resendLimit = limiter(3, 60 * 60_000);
   const ctx = { db, env, now, fetch: fetchImpl };
 
   const ip = (req) => (env.TRUST_PROXY ? String(req.headers['x-forwarded-for'] || '').split(',')[0].trim() : '') || req.socket.remoteAddress || '?';
@@ -50,6 +51,12 @@ export function createApp({ db, env = process.env, now = () => new Date(), fetch
     const chunks = []; let size = 0;
     for await (const c of req) { size += c.length; if (size > 100_000) throw Object.assign(new Error('too large'), { status: 413 }); chunks.push(c); }
     return new URLSearchParams(Buffer.concat(chunks).toString());
+  }
+
+  async function readJson(req) {
+    const chunks = []; let size = 0;
+    for await (const c of req) { size += c.length; if (size > 50_000) throw Object.assign(new Error('too large'), { status: 413 }); chunks.push(c); }
+    try { return JSON.parse(Buffer.concat(chunks).toString() || '{}'); } catch { throw Object.assign(new Error('bad json'), { status: 400 }); }
   }
 
   const wantsJson = (req) => (req.headers.accept || '').includes('application/json');
@@ -110,7 +117,7 @@ export function createApp({ db, env = process.env, now = () => new Date(), fetch
         queued = true;
         sendOutboxRow(db, id, env, fetchImpl).catch(() => {}); // fire and forget; failure stays in outbox
       }
-      const to = `/done?t=${r.participant.magic_token}${r.existing ? '&existing=1' : ''}`;
+      const to = `/done?t=${r.participant.magic_token}${r.existing ? '&existing=1' : ''}${short ? '&next=play' : ''}`;
       return wantsJson(req) ? json({ ok: true, redirect: to }) : redirect(to);
     }
 
@@ -118,7 +125,39 @@ export function createApp({ db, env = process.env, now = () => new Date(), fetch
       const pt = S.lookupByToken(db, url.searchParams.get('t'));
       if (!pt) return html(P.messagePage('Link not found', 'Please check the link in your email.'), 404);
       const pending = !!pt.email && !!db.prepare("SELECT 1 FROM outbox WHERE participant_id=? AND status='unsent'").get(pt.id);
-      return html(P.donePage({ participant: pt, existing: url.searchParams.get('existing') === '1', emailQueued: pending, lang: lang() }));
+      return html(P.donePage({ participant: pt, existing: url.searchParams.get('existing') === '1', emailQueued: pending, nextPlay: url.searchParams.get('next') === 'play' ? (playOpen(db) && !!latestDeck(db) ? 'open' : 'wait') : null, lang: lang() }));
+    }
+
+    // ---------- welcome game (phone/tablet, portrait) ----------
+    if (method === 'GET' && p === '/play') {
+      if (!(playOpen(db) && latestDeck(db))) return html(P.messagePage('Welcome game', 'The game has not started yet. Your host will tell you when to begin.'));
+      const pt = S.lookupByToken(db, url.searchParams.get('t')); // link from the onboarding screen: no typing needed
+      return html(P.playPage(lang(), pt && pt.source !== 'final_only' ? { name: pt.first_name, number: pt.number } : null));
+    }
+    if (method === 'POST' && p === '/play/check') {
+      if (!lookupLimit(ip(req))) return json({ ok: false, message: 'Too many attempts. Wait a few minutes.' }, 429);
+      const body = await readJson(req), pt = checkPlayer(db, body.name, body.number);
+      return pt ? json({ ok: true, name: pt.first_name }) : json({ ok: false, message: 'We could not match that name and number.' }, 422);
+    }
+    if (method === 'POST' && p === '/play/resend') {
+      if (!lookupLimit(ip(req))) return json({ ok: false, message: 'Too many attempts.' }, 429);
+      const email = String((await readJson(req)).email ?? '').trim().toLowerCase().slice(0, 254);
+      if (email && resendLimit(email)) {
+        const pt = db.prepare('SELECT * FROM participants WHERE lower(email) = ? AND source != ?').get(email, 'final_only');
+        if (pt) { const id = queueNumberEmail(db, pt, baseUrl); sendOutboxRow(db, id, env, fetchImpl).catch(() => {}); }
+      }
+      return json({ ok: true }); // same answer either way
+    }
+    if (method === 'GET' && p === '/play/deck.json') {
+      const deck = latestDeck(db);
+      return playOpen(db) && deck ? json(deck) : json({ ok: false, message: 'not open' }, 404);
+    }
+    if (method === 'POST' && p === '/play/finish') {
+      if (!writeLimit(ip(req))) return json({ ok: false, message: 'Too many requests.' }, 429);
+      const body = await readJson(req), deck = latestDeck(db);
+      if (!playOpen(db) || !deck || Number(body.deck_id) !== deck.id) return json({ ok: false, message: 'This round of the game has ended.' }, 409);
+      try { return json({ ok: true, ...savePlay(db, { deck, name: body.name, number: body.number, answers: body.answers }) }); }
+      catch (e) { if (e.status === 422) return json({ ok: false, message: 'We could not match your name and number.' }, 422); throw e; }
     }
 
     // ---------- Day 3 ----------

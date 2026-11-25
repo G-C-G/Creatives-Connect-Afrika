@@ -64,19 +64,30 @@ export const TAKES = [
 export const FACTS = [
   {
     id: 'F1', position: 1, kind: 'info', answer_bool: null, verified: false, source_url: '',
-    text: 'In 1956, Louis Armstrong arrived in Accra and was greeted by 13 bands playing E.T. Mensah’s “All for You”, with Armstrong’s name sung into it.',
-    reveal_text: 'He reportedly recognised it as a Creole song from New Orleans. (VERIFY: sources disagree between 1956 and 1957.)',
+    verify: 'Sources disagree between 1956 and 1957. The 13 bands and the Creole recognition need a source.',
+    text: 'In 1956, Louis Armstrong arrived in Accra and was greeted by 13 bands playing E.T. Mensah\u2019s \u201cAll for You\u201d, with Armstrong\u2019s name sung into it.',
+    reveal_text: 'He reportedly recognised it as a Creole song from New Orleans.',
   },
   {
     id: 'F2', position: 2, kind: 'info', answer_bool: null, verified: false, source_url: '',
+    verify: 'Confirm no later record has overtaken it. Figure comes from concert-tracking data via a news report.',
     text: 'Burna Boy at London Stadium, 29 June 2024: a reported $6.147m from 58,973 tickets, the highest single-night gross by an African act.',
-    reveal_text: 'Concert-tracking data reported by the press. (VERIFY: no later record has overtaken it.)',
+    reveal_text: 'Concert-tracking data reported by the press.',
   },
   {
     id: 'F3', position: 3, kind: 'true_false', answer_bool: true, verified: false, source_url: '',
+    verify: 'Wording must be checked with the AfCFTA Secretariat. Annexes adopted Feb 2025, ratification incomplete, "preferential treatment" undefined. Never promise a benefit.',
     text: 'True or false: under the AfCFTA digital trade framework, African content from African-owned enterprises and platforms is eligible for preferential treatment.',
-    reveal_text: 'True. The annexes were adopted in February 2025 and ratification is incomplete. This is not a promise of any benefit. (VERIFY wording with the AfCFTA Secretariat.)',
+    reveal_text: 'True. The annexes were adopted in February 2025 and ratification is incomplete. This is not a promise of any benefit.',
   },
+];
+
+// Welcome-game guess questions. A question is only ever played once its fact is verified.
+// answer_index points into options. Edit freely; options are in English only for now.
+export const GAME_QUESTIONS = [
+  { fact_id: 'F1', question: 'How many bands greeted Louis Armstrong when he arrived in Accra?', options: ['3', '7', '13', '30'], answer_index: 2 },
+  { fact_id: 'F2', question: 'How much did Burna Boy reportedly gross at London Stadium in one night (29 June 2024)?', options: ['$1 to 3 million', '$3 to 5 million', '$5 to 7 million', '$7 to 10 million'], answer_index: 2 },
+  { fact_id: 'F3', question: null /* uses the fact text */, options: ['True', 'False'], answer_index: 0 },
 ];
 
 // Where interludes appear in the wizard: after take at this position.
@@ -86,12 +97,12 @@ export const FACT_SLOTS = { 2: 'F1', 4: 'F3' }; // F2 is door-only. Adjust once 
 // Crops from the organisers' public graphic: replace the files in public/logos/ with the official kit (same filenames).
 // Switch off instantly with SHOW_PARTNER_LOGOS=0.
 export const LOGOS = [
+  { file: 'creatives-connect-afrika.png', alt: 'Creatives Connect Afrika' },
   { file: 'ghana-arms.png', alt: 'Government of Ghana' },
   { file: 'black-star.png', alt: 'Black Star Experience' },
   { file: 'africa-tourism-partners.png', alt: 'Africa Tourism Partners' },
-  { file: 'creatives-connect-afrika.png', alt: 'Creatives Connect Afrika' },
   { file: 'afcfta.png', alt: 'AfCFTA Secretariat' },
 ];
 
-// Our own mark (bottom-right of pages and stage). Always shown.
-export const GCG_LOGO = { file: 'gcg.jpg', alt: 'Gold Coast Games' };
+// Our own mark, bottom-right of every page and the stage. Always shown.
+export const GCG_LOGO = { file: 'gcg.png', alt: 'Gold Coast Games' };

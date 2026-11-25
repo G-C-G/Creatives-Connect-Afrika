@@ -7,14 +7,17 @@
 2. Open `/admin` (user: anything, password: `ADMIN_PASSWORD`). Set **Event starts**, **Day 3 opens**, **Day 3 closes** (times are UTC, which equals Accra time).
 3. Facts: leave **unverified** unless you have checked the source. Unverified facts are never shown anywhere.
 4. 10-person run-through on real phones: time it (target under 5 min), confirm the number shows AND the email arrives (check `/admin` for "unsent"), confirm the magic link opens Day 3.
-5. Send organisers the link: `BASE_URL/start`. Door QR: `BASE_URL/door`.
+5. Send organisers the link: `BASE_URL/` (first page: the CCA game experience). Door QR: `BASE_URL/play`.
 6. **Takes lock on the first stored response. Do not reword them after that.** Test responses count: rehearse on a separate DB (`DB_PATH=./data/rehearsal.db npm run seed-demo`), never the live one.
 
-## Mon 30 Nov (welcome game)
-1. Morning: `/admin/icebreaker`. Review the suggestions (most even split, highest strength). Pick two. Save.
-2. `/admin/snapshots` > **Freeze icebreaker snapshot**. Download the .html to the stage laptop as a backup.
-3. Stage laptop: open `/stage/icebreaker`. Keys: Right/space/click = reveal then next, Left = back, `f` = fullscreen.
-4. Volunteers: `/admin/volunteers` (pre-event, per take and side). Hands up first, then reveal the split.
+## Mon 30 Nov (welcome game: on phones and tablets, upright)
+Door QR points to `BASE_URL/play`. People self-serve: **has code** = first name + code, plays. **No code** = "Get my code" (short onboarding), then "Continue to the welcome game". **Lost code** = "Email it to me". Your team should not need to intervene.
+1. Before doors open: `/admin/icebreaker`. Review the suggestions (most even split, highest strength). Pick two statements. Save.
+2. `/admin` > verify the hot facts you are happy to use. Unverified facts are left out of the game.
+3. `/admin/play` > **Freeze deck now**, check the rounds listed, then **Open game**. (Freeze again if you change picks or facts, before opening. The deck is fixed once players are in.)
+4. Prize: `/admin/play` shows the leaderboard. Each person's first play counts.
+5. Close the game with **Close game** when the session ends.
+6. Optional big-screen companion: `/admin/snapshots` > freeze the icebreaker snapshot, open `/stage/icebreaker` (landscape slides for a projector).
 
 ## Day 3 (final game)
 1. Form closes automatically at the time you set (1 hour before the slot). Check `/admin` shows it set.

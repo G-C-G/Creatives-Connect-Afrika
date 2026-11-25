@@ -1,11 +1,12 @@
 import { h, raw, str } from './html.js';
 import { layout } from './pages.js';
 import { loadData, getSetting, setSetting, lockTakes } from './db.js';
-import { SECTORS } from './content.js';
+import { SECTORS, FACTS } from './content.js';
 import { timings } from './service.js';
 import { retryOutbox } from './mail.js';
 import { privateCsv, aggregateCsv } from './exports.js';
 import { buildStageData, renderStageHtml } from './stage.js';
+import { freezeDeck, latestDeck, playOpen, leaderboard } from './play.js';
 import * as M from './metrics.js';
 
 const sectorLabel = (id) => SECTORS.find((s) => s.id === id)?.en ?? id;
@@ -15,7 +16,7 @@ const toIso = (v) => (v && /^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}/.test(v) ? `${v.slice
 
 function page(title, body, csrf) {
   return layout({ title: `Admin: ${title}`, main: 'admin', body: h`
-  <nav><a href="/admin">Dashboard</a><a href="/admin/icebreaker">Icebreaker</a><a href="/admin/final">Final game</a><a href="/admin/stories">Stories</a>
+  <nav><a href="/admin">Dashboard</a><a href="/admin/icebreaker">Icebreaker</a><a href="/admin/play">Welcome game</a><a href="/admin/final">Final game</a><a href="/admin/stories">Stories</a>
   <a href="/admin/volunteers">Volunteers</a><a href="/admin/lookup">Desk lookup</a><a href="/admin/snapshots">Snapshots</a><a href="/admin/report">Report</a></nav>
   <h1>${title}</h1>${body}` });
 }
@@ -61,7 +62,7 @@ function dashboard(ctx, csrf) {
    <button class="btn" type="submit">Save</button></form>
   <h2>Takes</h2><p>${locked ? 'All takes are LOCKED.' : 'Not locked.'} ${locked ? '' : postBtn('/admin/lock-takes', csrf, 'Lock take wording now', {}, 'btn ghost')}</p>
   <h2>Hot facts</h2><p class="hint">Only verified facts are ever shown to anyone. Verify against the source first.</p>
-  <table>${facts.map((f) => h`<tr><td><b>${f.id}</b> ${f.text}<br><span class="hint">${f.reveal_text}</span></td><td>${f.verified ? 'VERIFIED' : 'unverified'}</td>
+  <table>${facts.map((f) => h`<tr><td><b>${f.id}</b> ${f.text}<br><span class="hint">${f.reveal_text}</span><br><span class="hint"><b>To verify:</b> ${FACTS.find((x) => x.id === f.id)?.verify ?? ''}</span></td><td>${f.verified ? 'VERIFIED' : 'unverified'}</td>
    <td>${postBtn('/admin/facts/verify', csrf, f.verified ? 'Unverify' : 'Mark verified', { id: f.id, verified: f.verified ? '0' : '1' }, 'btn ghost')}</td></tr>`)}</table>
   <h2>Exports</h2><p><a class="btn ghost" href="/admin/export/aggregate.csv">Aggregate CSV (shareable)</a> <a class="btn ghost" href="/admin/export/all.csv">Private CSV (names + emails: do not share)</a></p>`, csrf);
 }
@@ -138,6 +139,22 @@ function snapshots(ctx, csrf) {
    <table>${kindRows(k).map((r, i) => h`<tr><td>#${r.id}</td><td>${r.taken_at}</td><td>${i === 0 ? 'LATEST' : i === 1 ? 'PREVIOUS' : ''}</td><td><a href="/admin/snapshot/${r.id}.html">download .html</a> · <a href="/admin/snapshot/${r.id}.json">.json</a></td></tr>`)}</table>`)}`, csrf);
 }
 
+function playAdmin(ctx, csrf) {
+  const deck = latestDeck(ctx.db), open = playOpen(ctx.db);
+  const picks = JSON.parse(getSetting(ctx.db, 'icebreaker_takes') || '[]');
+  const plays = deck ? ctx.db.prepare('SELECT COUNT(*) c FROM game_plays WHERE deck_id=?').get(deck.id).c : 0;
+  return page('Welcome game (phones and tablets, portrait)', h`
+  <p>Status: <b>${open ? 'OPEN' : 'CLOSED'}</b>. Players go to <b>/play</b>. Content is frozen into a deck, so it cannot change mid-game.</p>
+  <ol><li>Pick the two statements on <a href="/admin/icebreaker">Icebreaker</a> (currently: ${picks.length ? picks.join(', ') : 'none'}).</li>
+  <li>Verify the hot facts on the <a href="/admin">Dashboard</a>. Unverified facts are left out of the game.</li>
+  <li>Freeze the deck, then open the game.</li></ol>
+  <p>${postBtn('/admin/play/freeze', csrf, 'Freeze deck now')} ${postBtn('/admin/play/open', csrf, open ? 'Close game' : 'Open game', { value: open ? '0' : '1' }, 'btn ghost')}</p>
+  ${deck ? h`<h2>Current deck (#${deck.id}, frozen ${deck.takenAt.slice(0, 16).replace('T', ' ')} UTC)</h2>
+  <table>${deck.rounds.map((r, i) => h`<tr><td>${i + 1}. ${r.type === 'fact' ? 'Guess it' : 'Predict the room'}</td><td>${r.type === 'fact' ? r.question : `${r.statement} (room: ${r.label} agreed; answer: ${r.answer})`}</td></tr>`)}</table>
+  <h2>Leaderboard (${plays} plays)</h2>
+  <table><tr><th>#</th><th>Name</th><th>Score</th></tr>${leaderboard(ctx.db, deck.id).map((r, i) => h`<tr><td>${i + 1}</td><td>${r.display_name}</td><td>${r.score} / ${r.max_score}</td></tr>`)}</table>` : h`<p>No deck frozen yet.</p>`}`, csrf);
+}
+
 function report(ctx) {
   const d = loadData(ctx.db), part = M.participation(d), mover = M.biggestMover(d);
   const quotes = d.reflections.filter((r) => r.story && r.story_anon_ok && r.vetted).slice(0, 3);
@@ -161,6 +178,7 @@ export async function adminRoute(ctx, req, url, form, csrf) {
     if (p === '/admin') return html(dashboard(ctx, csrf));
     if (p === '/admin/icebreaker') return html(icebreaker(ctx, csrf));
     if (p === '/admin/final') return html(finalView(ctx, csrf));
+    if (p === '/admin/play') return html(playAdmin(ctx, csrf));
     if (p === '/admin/stories') return html(stories(ctx, csrf, url));
     if (p === '/admin/volunteers') return html(volunteers(ctx));
     if (p === '/admin/lookup') return html(lookup(ctx, url));
@@ -202,6 +220,8 @@ export async function adminRoute(ctx, req, url, form, csrf) {
     setSetting(db, `snapshot_${kind}_taken_at`, data.takenAt);
     return redirect('/admin/snapshots');
   }
+  if (p === '/admin/play/freeze') { freezeDeck(db, now); return redirect('/admin/play'); }
+  if (p === '/admin/play/open') { setSetting(db, 'play_open', form.get('value') === '1' ? '1' : '0'); return redirect('/admin/play'); }
   if (p === '/admin/outbox/retry') { await retryOutbox(db, env, ctx.fetch); return redirect('/admin'); }
   return null;
 }

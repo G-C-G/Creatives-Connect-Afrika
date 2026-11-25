@@ -52,9 +52,15 @@ CREATE TABLE IF NOT EXISTS fact_answers(
 );
 CREATE TABLE IF NOT EXISTS settings(key TEXT PRIMARY KEY, value TEXT);
 CREATE TABLE IF NOT EXISTS snapshots(
-  id INTEGER PRIMARY KEY AUTOINCREMENT, kind TEXT NOT NULL CHECK (kind IN ('icebreaker','final')),
+  id INTEGER PRIMARY KEY AUTOINCREMENT, kind TEXT NOT NULL CHECK (kind IN ('icebreaker','final','deck')),
   taken_at TEXT NOT NULL, data_json TEXT NOT NULL, html TEXT NOT NULL
 );
+CREATE TABLE IF NOT EXISTS game_plays(
+  id INTEGER PRIMARY KEY AUTOINCREMENT, deck_id INTEGER NOT NULL, participant_id TEXT, display_name TEXT NOT NULL,
+  score INTEGER NOT NULL, max_score INTEGER NOT NULL, answers_json TEXT NOT NULL, linked INTEGER NOT NULL DEFAULT 0,
+  created_at TEXT NOT NULL DEFAULT (strftime('%Y-%m-%dT%H:%M:%fZ','now'))
+);
+CREATE UNIQUE INDEX IF NOT EXISTS game_plays_once ON game_plays(deck_id, participant_id) WHERE participant_id IS NOT NULL;
 CREATE TABLE IF NOT EXISTS outbox(
   id INTEGER PRIMARY KEY AUTOINCREMENT, participant_id TEXT, to_email TEXT NOT NULL,
   subject TEXT NOT NULL, body TEXT NOT NULL, status TEXT NOT NULL DEFAULT 'unsent', error TEXT,
@@ -62,10 +68,21 @@ CREATE TABLE IF NOT EXISTS outbox(
 );
 `;
 
+// Older databases: snapshots.kind only allowed ('icebreaker','final'). Rebuild the table once to allow 'deck'.
+function migrate(db) {
+  const row = db.prepare("SELECT sql FROM sqlite_master WHERE type='table' AND name='snapshots'").get();
+  if (!row || row.sql.includes("'deck'")) return;
+  db.exec(`ALTER TABLE snapshots RENAME TO snapshots_old;
+    CREATE TABLE snapshots(id INTEGER PRIMARY KEY AUTOINCREMENT, kind TEXT NOT NULL CHECK (kind IN ('icebreaker','final','deck')), taken_at TEXT NOT NULL, data_json TEXT NOT NULL, html TEXT NOT NULL);
+    INSERT INTO snapshots(id,kind,taken_at,data_json,html) SELECT id,kind,taken_at,data_json,html FROM snapshots_old;
+    DROP TABLE snapshots_old;`);
+}
+
 export function openDb(path = ':memory:') {
   if (path !== ':memory:') mkdirSync(dirname(path), { recursive: true });
   const db = new DatabaseSync(path);
   db.exec('PRAGMA journal_mode = WAL; PRAGMA foreign_keys = ON; PRAGMA busy_timeout = 5000;');
+  migrate(db);
   db.exec(SCHEMA);
   seedContent(db);
   return db;

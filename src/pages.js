@@ -5,7 +5,7 @@ import { COUNTRIES, SECTORS, GOALS, VALUES, FACT_SLOTS, LOGOS, GCG_LOGO } from '
 let showLogos = true;
 export const configure = ({ logos }) => { showLogos = logos; };
 
-export function layout({ title, body, lang = 'en', main = '' }) {
+export function layout({ title, body, lang = 'en', main = '', script = '', hero = false }) {
   return h`<!doctype html>
 <html lang="${lang}"><head><meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
@@ -13,10 +13,9 @@ export function layout({ title, body, lang = 'en', main = '' }) {
 <title>${title}</title>
 <link rel="stylesheet" href="/static/app.css">
 <script src="/static/app.js" defer></script></head>
-<body><header class="top">${t(lang, 'brand.name')}</header>
-${showLogos ? h`<div class="logos">${LOGOS.map((l) => h`<img src="/static/logos/${l.file}" alt="${l.alt}" height="40" loading="eager">`)}</div>` : ''}
-<main class="${main}">${body}</main>
-<footer><span>${t(lang, 'brand.partner')}</span><img class="gcg" src="/static/logos/${GCG_LOGO.file}" alt="${GCG_LOGO.alt}" width="64" height="64"></footer></body></html>`;
+<body>${showLogos ? (hero ? h`<div class="logos hero"><img src="/static/logos/${LOGOS[0].file}" alt="${LOGOS[0].alt}"></div>` : h`<div class="logos">${LOGOS.map((l) => h`<img src="/static/logos/${l.file}" alt="${l.alt}">`)}</div>`) : ''}
+<main class="${main}">${body}</main>${script ? h`<script src="${script}" defer></script>` : ''}
+<footer><span>${t(lang, 'brand.partner')}</span><img class="gcg" src="/static/logos/${GCG_LOGO.file}" alt="${GCG_LOGO.alt}" width="120"></footer></body></html>`;
 }
 
 const msg = (lang, code) => (code === 'invalid' ? 'Please check this entry.' : code === 'max3' ? t(lang, 'work.values_max') : t(lang, 'err.required'));
@@ -86,9 +85,17 @@ const consentStep = (S, E, lang) => h`<section class="step" data-step data-title
   ${fieldErr(E, 'consent_aggregate', lang)}</section>`;
 
 export function landingPage(lang = 'en') {
-  return layout({ lang, title: `${t(lang, 'landing.title')} | Gold Coast Games`, main: 'narrow', body: h`
-  <h1>Where does the <mark>room</mark> stand?</h1><p class="lead">${t(lang, 'landing.lead')}</p>
-  <ol class="how"><li>${t(lang, 'landing.step1')}</li><li>${t(lang, 'landing.step2')}</li><li>${t(lang, 'landing.step3')}</li></ol>
+  return layout({ lang, hero: true, title: 'Game experience | Creatives Connect Afrika', main: 'narrow', body: h`
+  <h1>Game <mark>experience</mark></h1>
+  <p class="lead">Welcome to the Creatives Connect Afrika game experience. Before the event you tell us what you think. At the event you play. On the last day we show the room how opinions moved.</p>
+  <h2>What you will be asked</h2>
+  <ul class="how"><li>Who you are: name, country and sector.</li><li>Your take on five statements about creative wealth and tourism in Africa: agree or disagree, and how strongly.</li></ul>
+  <h2>You choose how much you take part</h2>
+  <ul class="how"><li>Most questions are optional: what you are working on, what you want from these days, your values.</li>
+  <li>For each statement you say whether you would say it out loud in the room, and whether you would argue it on stage. Yes only means you may be invited. It is never required.</li>
+  <li>Sharing your contact link with other delegates is opt-in.</li></ul>
+  <h2>What happens next</h2>
+  <ul class="how"><li>You get a 4-digit code. Keep it.</li><li>At the event, the welcome game on your phone or tablet: guess facts and predict the room.</li><li>On the last day, answer the same five and see how the room moved.</li></ul>
   <p class="hint">${t(lang, 'landing.time')}</p>
   <p class="consent">${t(lang, 'consent.text')}</p>
   <a class="btn" href="/start">${t(lang, 'landing.start')}</a>` });
@@ -122,13 +129,15 @@ export function preForm({ takes, facts = [], S = new URLSearchParams(), E = {}, 
   return layout({ lang, title: 'Gold Coast Games | CCA', main: 'narrow', body: wizard({ action, id: short ? 'door' : 'pre', steps, lang, E, extraTop: top }) });
 }
 
-export function donePage({ participant, existing = false, emailQueued = false, lang = 'en' }) {
+export function donePage({ participant, existing = false, emailQueued = false, nextPlay = null, lang = 'en' }) {
   return layout({ lang, title: 'Your number', main: 'narrow center', body: h`
   <h1>${t(lang, 'done.title')}</h1>
   ${existing ? h`<p class="note">${t(lang, 'done.existing')}</p>` : ''}
   <p class="kicker">${t(lang, 'done.number')}</p><p class="bignum" aria-label="${t(lang, 'done.number')}">${participant.number}</p>
   <p class="lead">${t(lang, 'done.screenshot')}</p>
-  <p class="hint">${participant.email ? (emailQueued ? t(lang, 'done.email_pending') : t(lang, 'done.emailed')) : t(lang, 'done.no_email')}</p>` });
+  <p class="hint">${participant.email ? (emailQueued ? t(lang, 'done.email_pending') : t(lang, 'done.emailed')) : t(lang, 'done.no_email')}</p>
+  ${nextPlay === 'open' ? h`<p><a class="btn" href="/play?t=${participant.magic_token}">Continue to the welcome game</a></p>` : ''}
+  ${nextPlay === 'wait' ? h`<p class="lead">The welcome game opens shortly. Keep this number: it is your code.</p>` : ''}` });
 }
 
 export function finalIdentityPage({ fails = 0, error = false, lang = 'en', state = 'open' }) {
@@ -179,4 +188,11 @@ export function finalDonePage(lang = 'en') {
 
 export function messagePage(title, text, lang = 'en') {
   return layout({ lang, title, main: 'narrow center', body: h`<h1>${title}</h1><p class="lead">${text}</p>` });
+}
+
+export function playPage(lang = 'en', ident = null) {
+  return layout({ lang, title: 'Welcome game | Gold Coast Games', main: 'narrow play', script: '/static/play.js', body: h`
+  <div id="play" data-deck="/play/deck.json" data-check="/play/check" data-resend="/play/resend" data-finish="/play/finish" data-join="/door" ${ident ? h`data-name="${ident.name}" data-number="${ident.number}"` : ''}><p class="lead">Loading\u2026</p></div>
+  <noscript><p class="lead">This game needs JavaScript. Please use your phone or tablet browser.</p></noscript>
+  <div class="rotate" role="alert">Please turn your device upright to play.</div>` });
 }

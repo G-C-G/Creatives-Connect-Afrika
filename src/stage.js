@@ -60,7 +60,7 @@ body::before{content:"";display:block;height:1.2vh;background:linear-gradient(90
 .quote{font-size:3vw;font-weight:700;border-left:.6vw solid #2A7F3A;padding-left:2vw;margin:2vh 0}.by{font-size:1.8vw;color:#D7262E;text-transform:uppercase;letter-spacing:.1em}
 .n{font-size:1.5vw;color:#555;font-weight:600}
 .foot{position:fixed;left:0;right:0;bottom:0;padding:1.2vh 6vw;background:#fff;border-top:2px solid #ddd;font:600 1.3vw system-ui,sans-serif;color:#555;display:flex;justify-content:space-between;gap:2vw}
-.foot{align-items:center}.foot .gcg{height:7vh;width:7vh;border-radius:.8vh;flex:none}.foot .lg{display:flex;gap:1.6vw;align-items:center}.foot img{height:4.2vh;width:auto}.split{display:flex;gap:3vw;margin:3vh 0}.split div{flex:1;border:.3vw solid #111;padding:3vh 2vw;border-radius:.6vw}.split b{display:block;font-size:7vw;color:#D7262E}`;
+.foot{align-items:center}.foot img.gcg{height:9vh;width:auto;flex:none}.foot .lg{display:flex;gap:1.6vw;align-items:center}.foot img{height:4.2vh;width:auto}.split{display:flex;gap:3vw;margin:3vh 0}.split div{flex:1;border:.3vw solid #111;padding:3vh 2vw;border-radius:.6vw}.split b{display:block;font-size:7vw;color:#D7262E}`;
 
 const JS = `(function(){var s=[].slice.call(document.querySelectorAll('.slide')),i=0;function show(){s.forEach(function(x,j){x.classList.toggle('on',j===i)})}
 function next(){var rv=s[i].querySelector('.rv:not(.show)');if(rv){rv.classList.add('show');s[i].classList.add('revealed');return}if(i<s.length-1){i++;show()}}
@@ -73,13 +73,13 @@ const when = (iso) => iso.replace('T', ' ').slice(0, 16) + ' UTC';
 
 export function renderStageHtml(d) {
   const logos = d.logos ? LOGOS.map((l) => h`<img src="${raw(logoUri(l.file))}" alt="${l.alt}">`) : '';
-  const foot = h`<div class="foot"><span class="lg">${logos}</span><span>Snapshot ${when(d.takenAt)} · Gold Coast Games · In partnership with Creatives Connect Afrika</span><img class="gcg" src="${raw(logoUri(GCG_LOGO.file, 'jpeg'))}" alt="${GCG_LOGO.alt}"></div>`;
+  const foot = h`<div class="foot"><span class="lg">${logos}</span><span>Snapshot ${when(d.takenAt)} · In partnership with Creatives Connect Afrika</span><img class="gcg" src="${raw(logoUri(GCG_LOGO.file))}" alt="${GCG_LOGO.alt}"></div>`;
   let slides;
   if (d.kind === 'icebreaker') {
     slides = d.takes.map((tk, i) => h`<section class="slide"><p class="kick">Welcome game · Statement ${i + 1}</p>
       <p class="take" style="font-size:4.4vw">${tk.text}</p>
       <p class="mid">Hands up first. Then we reveal the private split.</p>
-      <div class="split rv"><div><b>${tk.agree}</b>agreed (${tk.agreeLabel})</div><div><b>${tk.disagree}</b>disagreed (${tk.disagreeLabel})</div></div>
+      <div class="split rv"><div><b>${tk.agree}</b>agreed<br><span class="n">${tk.agreeLabel}</span></div><div><b>${tk.disagree}</b>disagreed<br><span class="n">${tk.disagreeLabel}</span></div></div>
       <p class="n">n = ${tk.n} pre-event responses, self-selected. Directional only.</p></section>`);
     if (!slides.length) slides = [h`<section class="slide"><p class="take">No statements picked yet.</p></section>`];
   } else {
