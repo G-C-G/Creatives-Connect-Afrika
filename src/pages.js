@@ -203,6 +203,5 @@ export function playPage(lang = 'en', ident = null) {
   return layout({ lang, title: 'Welcome game | Creatives Connect Afrika', main: 'narrow play', script: '/static/play.js', body: h`
   ${showLogos ? logoRow('edge') : ''}
   <div id="play" data-deck="/play/deck.json" data-check="/play/check" data-resend="/play/resend" data-finish="/play/finish" data-join="/door" ${ident ? h`data-name="${ident.name}" data-number="${ident.number}"` : ''}><p class="lead">Loading\u2026</p></div>
-  <noscript><p class="lead">This game needs JavaScript. Please use your phone or tablet browser.</p></noscript>
-  <div class="rotate" role="alert">Please turn your device upright to play.</div>` });
+  <noscript><p class="lead">This game needs JavaScript. Please use your phone or tablet browser.</p></noscript>` });
 }

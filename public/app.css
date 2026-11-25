@@ -76,7 +76,6 @@ input:focus-visible,select:focus-visible,textarea:focus-visible,.btn:focus-visib
 .bignum{font-size:clamp(96px,32vw,170px);font-weight:800;line-height:1;margin:6px 0 20px;letter-spacing:.02em;color:var(--red);background:linear-gradient(90deg,var(--red),var(--gold));-webkit-background-clip:text;background-clip:text;-webkit-text-fill-color:transparent}
 
 /* welcome game */
-.rotate{display:none}
 .dots{display:flex;gap:6px;margin:0 0 22px}.dots i{flex:1;height:4px;border-radius:2px;background:var(--line)}.dots i.done{background:var(--ink)}.dots i.now{background:var(--red)}
 .q{font-size:clamp(28px,8vw,44px);font-weight:800;text-transform:uppercase;line-height:1.04;letter-spacing:-.01em;margin:10px 0 26px}
 .opt{display:block;width:100%;text-align:left;min-height:72px;padding:16px 20px;margin:0 0 12px;border:2px solid var(--ink);border-radius:16px;background:var(--card);color:var(--ink);font:800 clamp(20px,5.6vw,26px)/1.2 system-ui,sans-serif;cursor:pointer}
@@ -107,8 +106,31 @@ table{border-collapse:collapse;width:100%;font-size:15px}th,td{border-bottom:1px
   .choices.two.big .choice span{min-height:140px}.choices.five.big .choice span{min-height:96px}.choices.stack.big .choice span{min-height:96px}
   .opt{min-height:88px;padding:20px 26px}footer .gcg{width:100px}
 }
-/* sideways touch device while playing: ask to turn upright */
-@media (orientation:landscape) and (pointer:coarse){.play #play,.play .logos{display:none}.rotate{display:flex;min-height:60vh;align-items:center;justify-content:center;text-align:center;font-size:26px;font-weight:800;text-transform:uppercase}}
+/* welcome game works upright AND sideways: question | answers, big thing | the rest */
+@media (orientation:landscape){
+  .play main.narrow{max-width:1000px}.logos.edge{max-width:1000px}
+  .play .qa,.play .intro{display:grid;grid-template-columns:1fr 1fr;gap:5vw;align-items:center}
+  .play .qa .q{margin-top:6px}
+  .play .stage-wrap{display:grid;grid-template-columns:1fr 1fr;gap:5vw;align-items:center;min-height:calc(100svh - 215px)}
+  .play .stage-wrap .btn.big{margin-top:6px}
+}
+/* short screens (phones on their side): tighter, sized by height */
+@media (orientation:landscape) and (max-height:600px){
+  .play main{padding:46px 20px 8px}
+  .logos img{height:28px}.logos.hero img{height:60px}.logos.edge{padding:0 0 8px}
+  .play h1{font-size:clamp(30px,10vh,48px);margin-bottom:8px}.play .lead{font-size:16px;margin-bottom:12px}
+  .play .dots{margin-bottom:10px}
+  .play .q{font-size:clamp(20px,6.4vh,30px);margin-bottom:12px}
+  .play .opt{min-height:54px;padding:10px 16px;font-size:clamp(17px,5vh,21px);margin-bottom:8px}
+  .play .opt small{display:none}
+  .play .verdict{font-size:clamp(34px,13vh,62px)}.play .plus{font-size:clamp(56px,22vh,104px)}
+  .play .stat{font-size:clamp(70px,30vh,130px)}.play .score{font-size:clamp(60px,26vh,110px)}
+  .play .answer{font-size:clamp(18px,5vh,24px)}.play .wink{font-size:clamp(16px,4.6vh,20px)}.play .explain{font-size:13px;margin:6px 0 12px}
+  .play .stage-wrap{min-height:calc(100svh - 120px)}
+  .play .btn.big{min-height:52px;padding:14px}
+  footer{padding:6px 20px 8px}footer .gcg{width:48px}footer span{display:none}
+  .play .field{margin-bottom:10px}.play input{min-height:44px;font-size:18px}
+}
 @media (prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}
 
 /* interaction layer: lock-in, suspense, staged reveal */

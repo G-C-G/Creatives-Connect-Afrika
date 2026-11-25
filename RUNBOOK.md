@@ -10,7 +10,7 @@
 5. Send organisers the link: `BASE_URL/` (first page: the CCA game experience). Door QR: `BASE_URL/play`.
 6. **Takes lock on the first stored response. Do not reword them after that.** Test responses count: rehearse on a separate DB (`DB_PATH=./data/rehearsal.db npm run seed-demo`), never the live one.
 
-## Mon 30 Nov (welcome game: on phones and tablets, upright)
+## Mon 30 Nov (welcome game: on phones and tablets, upright or sideways)
 Door QR points to `BASE_URL/play`. People self-serve: **has code** = first name + code, plays. **No code** = "Get my code" (short onboarding), then "Continue to the welcome game". **Lost code** = "Email it to me". Your team should not need to intervene.
 1. Before doors open: `/admin/icebreaker`. Review the suggestions (most even split, highest strength). Pick two statements. Save.
 2. `/admin` > verify the hot facts you are happy to use. Unverified facts are left out of the game.

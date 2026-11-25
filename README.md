@@ -14,7 +14,7 @@ DB_PATH=./data/rehearsal.db npm run seed-demo   # rehearsal data, separate DB on
 | Route | What |
 |---|---|
 | `/`, `/start`, `/done`, `/door` | first page (CCA game experience), onboarding wizard, code screen, short version (door) |
-| `/play` | welcome game: phone/tablet, upright. Needs a frozen + opened deck in `/admin/play` |
+| `/play` | welcome game: phone/tablet, upright or sideways. Needs a frozen + opened deck in `/admin/play` |
 | `/final`, `/final/done` | Day 3 (name + number, or magic link from the email) |
 | `/admin/*` | password (Basic auth, any username): dashboard, icebreaker, final, stories, volunteers, lookup, snapshots, report, exports |
 | `/stage/icebreaker`, `/stage/final` | big screen, served from the latest frozen snapshot only |

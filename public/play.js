@@ -40,7 +40,7 @@
   function begin(name, number) { S = { name: name, number: number, i: 0, answers: [], deckId: deck.id, done: null }; store(S); round(); }
 
   function intro() {
-    var r = screen(null, true);
+    var r = screen(null, true), cols = el('div', 'intro'), c1 = el('div'), c2 = el('div'); cols.appendChild(c1); cols.appendChild(c2); r.appendChild(cols);
     var h = el('h1'); h.innerHTML = 'Ready to <mark>play</mark>?'; r.appendChild(h);
     r.appendChild(el('p', 'lead', 'Guess the facts. Predict the room. Points for every right answer.'));
     var f = el('form'); f.noValidate = true;
@@ -57,11 +57,11 @@
         if (j.ok) begin(j.name, c); else { err.textContent = (j.__status === 429 ? j.message : 'We could not match that. Check your code, or use the options below.'); err.hidden = false; }
       }).catch(function () { b.disabled = false; err.textContent = 'Could not check. Check your connection and try again.'; err.hidden = false; });
     });
-    r.appendChild(f);
+    c1.appendChild(f);
 
     var no = el('div', 'cards');
     no.appendChild(el('p', 'hint', 'No code yet? Do the quick onboarding first (about 2 minutes). It takes you straight into the game.'));
-    var a = el('a', 'btn ghost', 'Get my code'); a.href = root.getAttribute('data-join'); no.appendChild(a); r.appendChild(no);
+    var a = el('a', 'btn ghost', 'Get my code'); a.href = root.getAttribute('data-join'); no.appendChild(a); c2.appendChild(no);
 
     var lost = el('details', 'cards'); lost.appendChild(el('summary', null, 'Lost your code? Email it to me'));
     var lf = el('form'); lf.noValidate = true;
@@ -72,7 +72,7 @@
       post(root.getAttribute('data-resend'), { email: em }, 2).then(function () { lm.textContent = 'If that email is registered, your code is on its way.'; })
         .catch(function () { lm.textContent = 'Could not send right now. Try again in a moment.'; });
     });
-    lost.appendChild(lf); r.appendChild(lost);
+    lost.appendChild(lf); c2.appendChild(lost);
   }
 
   function dots(i, total) {
@@ -85,63 +85,66 @@
     if (S.i >= deck.rounds.length) return end();
     var R = deck.rounds[S.i], r = screen(null, false), total = deck.rounds.length;
     r.appendChild(dots(S.i, total));
-    r.appendChild(el('p', 'kicker', R.type === 'fact' ? 'Guess it' : 'Predict the room'));
+    var qa = el('div', 'qa'), qcol = el('div', 'qcol'), ocol = el('div', 'ocol'); qa.appendChild(qcol); qa.appendChild(ocol); r.appendChild(qa);
+    qcol.appendChild(el('p', 'kicker', R.type === 'fact' ? 'Guess it' : 'Predict the room'));
     var opts;
     if (R.type === 'fact') {
-      r.appendChild(el('p', 'q', R.question));
+      qcol.appendChild(el('p', 'q', R.question));
       opts = R.options.map(function (o, i) { return { value: i, text: o }; });
     } else {
-      r.appendChild(el('p', 'q', '“' + R.statement + '”'));
-      r.appendChild(el('p', 'lead', 'We asked ' + R.n + ' delegates. Did most of them agree?'));
+      qcol.appendChild(el('p', 'q', '“' + R.statement + '”'));
+      qcol.appendChild(el('p', 'lead', 'We asked ' + R.n + ' delegates. Did most of them agree?'));
       opts = ['agree', 'split', 'disagree'].map(function (k) { return { value: k, text: LABEL[k][0], hint: LABEL[k][1] }; });
     }
-    var box = el('div'); r.appendChild(box);
+    var box = ocol;
     var btns = opts.map(function (o) {
       var b = el('button', 'opt', o.text); b.type = 'button';
       if (o.hint) b.appendChild(el('small', null, o.hint));
       b.addEventListener('click', function () {
         btns.forEach(function (x) { x.disabled = true; if (x !== b) x.classList.add('fade'); }); b.classList.add('locked');
         S.answers[S.i] = o.value; SFX.tick(); buzz(15);
-        var w = el('p', 'wait', 'Wait for it'); r.appendChild(w); SFX.rise();
+        var w = el('p', 'wait', 'Wait for it'); ocol.appendChild(w); SFX.rise();
         setTimeout(function () { reveal(R, o.value); }, calm ? 300 : 1000);
       });
       box.appendChild(b); return b;
     });
   }
 
-  // The reveal is a full-screen colour moment: gold when right, soft red when not.
+  // The reveal is a full-screen colour moment: gold when right, red when not. Big thing on one side, the rest on the other when sideways.
   function reveal(R, v) {
-    var ok = v === R.answer, r = screen(ok ? 'win' : 'miss', false), wrap = el('div', 'stage-wrap'); r.appendChild(wrap);
+    var ok = v === R.answer, r = screen(ok ? 'win' : 'miss', false), wrap = el('div', 'stage-wrap'), hero = el('div', 'hero'), rest = el('div', 'rest');
+    wrap.appendChild(hero); wrap.appendChild(rest); r.appendChild(wrap);
     buzz(ok ? 30 : [10, 40, 10]); if (ok) SFX.chime(); else SFX.miss();
     if (R.type === 'fact') {
-      wrap.appendChild(el('p', 'kicker', 'Guess it'));
-      wrap.appendChild(el('h2', 'verdict pop', ok ? 'Correct.' : 'Not quite.'));
-      if (ok) { var pl = el('p', 'plus pop', '+0'); wrap.appendChild(pl); countUp(pl, deck.points, 450, '+', '', true); wrap.appendChild(el('p', 'wink d1', R.wink || WIN[S.i % WIN.length])); }
-      else { wrap.appendChild(el('p', 'answer d1', 'It was ' + R.options[R.answer] + '.')); wrap.appendChild(el('p', 'wink d2', R.wink || 'The next one is yours.')); }
-      wrap.appendChild(el('p', 'explain d3', R.explain));
+      hero.appendChild(el('p', 'kicker', 'Guess it'));
+      hero.appendChild(el('h2', 'verdict pop', ok ? 'Correct.' : 'Not quite.'));
+      if (ok) { var pl = el('p', 'plus pop', '+0'); hero.appendChild(pl); countUp(pl, deck.points, 450, '+', '', true); rest.appendChild(el('p', 'wink d1', R.wink || WIN[S.i % WIN.length])); }
+      else { hero.appendChild(el('p', 'answer d1', 'It was ' + R.options[R.answer] + '.')); rest.appendChild(el('p', 'wink d2', R.wink || 'The next one is yours.')); }
+      rest.appendChild(el('p', 'explain d3', R.explain));
     } else {
       var small = R.n < 20;
-      wrap.appendChild(el('p', 'kicker', 'The room said'));
-      var st = el('p', 'stat pop', '0'); wrap.appendChild(st);
+      hero.appendChild(el('p', 'kicker', 'The room said'));
+      var st = el('p', 'stat pop', '0'); hero.appendChild(st);
       if (small) countUp(st, R.agree, 700, '', ' of ' + R.n, true); else countUp(st, Math.round(100 * R.agree / R.n), 800, '', '%', true);
-      wrap.appendChild(el('p', 'answer d1', 'agreed' + (small ? '' : ' (' + R.agree + ' of ' + R.n + ')')));
-      wrap.appendChild(el('h2', 'verdict d2', ok ? 'You read the room. +' + deck.points : MISS_ROOM[(S.i >> 1) % MISS_ROOM.length]));
-      wrap.appendChild(el('p', 'explain d3', 'That makes it “' + LABEL[R.answer][0] + '”. These are delegates who chose to answer, so it is directional only.'));
+      hero.appendChild(el('p', 'answer d1', 'agreed' + (small ? '' : ' (' + R.agree + ' of ' + R.n + ')')));
+      rest.appendChild(el('h2', 'verdict d2', ok ? 'You read the room. +' + deck.points : MISS_ROOM[(S.i >> 1) % MISS_ROOM.length]));
+      rest.appendChild(el('p', 'explain d3', 'That makes it “' + LABEL[R.answer][0] + '”. These are delegates who chose to answer, so it is directional only.'));
     }
     var last = S.i + 1 >= deck.rounds.length;
     var nb = el('button', 'btn big d3', last ? 'See my score →' : 'Next →'); nb.type = 'button';
-    nb.addEventListener('click', function () { S.i++; store(S); round(); }); wrap.appendChild(nb);
+    nb.addEventListener('click', function () { S.i++; store(S); round(); }); rest.appendChild(nb);
   }
 
   function localScore() { var c = 0; deck.rounds.forEach(function (R, i) { if (S.answers[i] === R.answer) c++; }); return c * deck.points; }
 
   function end() {
     var r = screen('score', true), max = deck.rounds.length * deck.points, pts = localScore();
-    r.appendChild(el('p', 'kicker', 'Your score')); r.lastChild.style.color = '#F2A81D';
-    var sc = el('p', 'score pop', '0 / ' + max); r.appendChild(sc); countUp(sc, pts, 1100, '', ' / ' + max, true);
-    r.appendChild(el('p', 'wink', pts === max ? 'Flawless.' : pts * 2 >= max ? 'Strong showing.' : 'The room keeps its secrets.'));
-    var status = el('p', 'lead', 'Sending your score…'); status.style.color = '#ffffff'; r.appendChild(status);
-    var retry = el('button', 'btn', 'Send my score again'); retry.type = 'button'; retry.hidden = true; r.appendChild(retry);
+    var wrap = el('div', 'stage-wrap'), hero = el('div', 'hero'), rest = el('div', 'rest'); wrap.appendChild(hero); wrap.appendChild(rest); r.appendChild(wrap);
+    var kk = el('p', 'kicker', 'Your score'); kk.style.color = '#F2A81D'; hero.appendChild(kk);
+    var sc = el('p', 'score pop', '0 / ' + max); hero.appendChild(sc); countUp(sc, pts, 1100, '', ' / ' + max, true);
+    rest.appendChild(el('p', 'wink', pts === max ? 'Flawless.' : pts * 2 >= max ? 'Strong showing.' : 'The room keeps its secrets.'));
+    var status = el('p', 'lead', 'Sending your score…'); status.style.color = '#ffffff'; rest.appendChild(status);
+    var retry = el('button', 'btn', 'Send my score again'); retry.type = 'button'; retry.hidden = true; rest.appendChild(retry);
     function send() {
       retry.hidden = true; status.textContent = 'Sending your score…';
       post(root.getAttribute('data-finish'), { deck_id: deck.id, name: S.name, number: S.number, answers: S.answers }, 3).then(function (j) {
