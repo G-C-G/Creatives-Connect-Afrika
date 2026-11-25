@@ -166,5 +166,8 @@ export const LOGOS = [
 // The centrepiece of the opening screen: the full Creatives Connect Afrika mark (circle crop of the organisers' artwork).
 export const CCA_HERO = { file: 'cca-hero.png', alt: 'Creatives Connect Afrika' };
 
+// Faint oversized accent behind the opening headline: the northern half of the Africa artwork (no lettering).
+export const CCA_ACCENT = { file: 'africa-accent.png' };
+
 // Our own mark, bottom-right of every page and the stage. Always shown.
 export const GCG_LOGO = { file: 'gcg.png', alt: 'Gold Coast Games' };

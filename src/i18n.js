@@ -104,7 +104,7 @@ export const en = {
   'open.eyebrow': 'CCA 2026',
   'open.before': 'Before we begin',
   'open.h1a': 'Take a', 'open.h1b': 'side.', 'open.h1c': '',
-  'open.sub': 'Five questions about the future of African creativity. No right answers. We\u2019ll ask you these again on the final day.',
+  'open.sub': 'Five questions. No right answers.', 'open.sub2': 'We\u2019ll ask you again on the final day.',
   'open.go': 'Let\u2019s go',
   'opener.pre.1': 'Okay. Let\u2019s start a fight.', 'opener.pre.2': 'No fence-sitting.', 'opener.pre.3': 'Pick a side.', 'opener.pre.4': 'Nearly there.', 'opener.pre.5': 'Last one. Make it count.',
   'opener.final.1': 'Same five statements.', 'opener.final.2': 'Answer for today.', 'opener.final.3': 'Honestly.', 'opener.final.4': 'Nearly there.', 'opener.final.5': 'Last one.',

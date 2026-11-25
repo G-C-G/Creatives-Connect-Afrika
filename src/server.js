@@ -9,7 +9,7 @@ import * as P from './pages.js';
 import * as S from './service.js';
 import { queueNumberEmail, sendOutboxRow } from './mail.js';
 import { adminRoute } from './admin.js';
-import { LOGOS, GCG_LOGO, CCA_HERO } from './content.js';
+import { LOGOS, GCG_LOGO, CCA_HERO, CCA_ACCENT } from './content.js';
 import { latestDeck, playOpen, savePlay, checkPlayer } from './play.js';
 
 const PUBLIC = join(dirname(fileURLToPath(import.meta.url)), '..', 'public');
@@ -70,7 +70,7 @@ export function createApp({ db, env = process.env, now = () => new Date(), fetch
 
     if (p === '/healthz') return { status: 200, type: 'text/plain', body: 'ok' };
     const lm = /^\/static\/logos\/([a-z-]+\.(?:png|jpg))$/.exec(p);
-    if (lm && (lm[1] === GCG_LOGO.file || lm[1] === CCA_HERO.file || LOGOS.some((l) => l.file === lm[1]))) return { status: 200, type: lm[1].endsWith('.jpg') ? 'image/jpeg' : 'image/png', headers: { 'Cache-Control': 'public, max-age=86400' }, body: readFileSync(join(PUBLIC, 'logos', lm[1])) };
+    if (lm && (lm[1] === GCG_LOGO.file || lm[1] === CCA_HERO.file || lm[1] === CCA_ACCENT.file || LOGOS.some((l) => l.file === lm[1]))) return { status: 200, type: lm[1].endsWith('.jpg') ? 'image/jpeg' : 'image/png', headers: { 'Cache-Control': 'public, max-age=86400' }, body: readFileSync(join(PUBLIC, 'logos', lm[1])) };
     const fm = /^\/static\/fonts\/(instrument-serif-400(?:-italic)?\.woff2)$/.exec(p);
     if (fm) return { status: 200, type: 'font/woff2', headers: { 'Cache-Control': 'public, max-age=31536000, immutable' }, body: readFileSync(join(PUBLIC, 'fonts', fm[1])) };
     if (STATIC[p]) return { status: 200, type: STATIC[p][0], headers: { 'Cache-Control': 'public, max-age=3600' }, body: readFileSync(join(PUBLIC, STATIC[p][1])) };

@@ -55,7 +55,7 @@ await page(`/done?t=${dummy.magic_token}`, 'done.html', (x) => x.replace(/(<div 
   const html = rel(await get('/'));
   const head = html.match(/<head>([\s\S]*?)<\/head>/)[1], body = html.match(/<body[^>]*>([\s\S]*?)<\/body>/)[1];
   const links = [...head.matchAll(/<link[^>]*>|<script[^>]*><\/script>/g)].map((m) => m[0]).join('\n');
-  writeFileSync(join(out, 'index.html'), `<title>CCA Game Preview</title>\n<meta charset="utf-8">\n${links}\n${body}\n`);
+  writeFileSync(join(out, 'index.html'), `<title>CCA Game Preview</title>\n<meta charset="utf-8">\n<meta name="viewport" content="width=device-width,initial-scale=1">\n${links}\n${body}\n`);
 }
 writeFileSync(join(out, 'deck.json'), await get('/play/deck.json'));
 srv.close();
@@ -67,6 +67,6 @@ writeFileSync(join(out, 'static/app.css'), '@charset "utf-8";\n' + css);
 const ascii = (t) => t.replace(/[\u0080-\uffff]/g, (c) => '\\u' + c.charCodeAt(0).toString(16).padStart(4, '0'));
 for (const f of ['app.js', 'play.js', 'sfx.js']) writeFileSync(join(out, 'static', f), ascii(readFileSync(join(ROOT, 'public', f), 'utf8')));
 for (const f of ['instrument-serif-400.woff2', 'instrument-serif-400-italic.woff2']) copyFileSync(join(ROOT, 'public/fonts', f), join(out, 'static/fonts', f));
-for (const f of ['gcg.png', 'cca-hero.png', 'creatives-connect-afrika.png', 'ghana-arms.png', 'black-star.png', 'africa-tourism-partners.png', 'afcfta.png']) copyFileSync(join(ROOT, 'public/logos', f), join(out, 'static/logos', f));
+for (const f of ['gcg.png', 'cca-hero.png', 'creatives-connect-afrika.png', 'africa-accent.png', 'ghana-arms.png', 'black-star.png', 'africa-tourism-partners.png', 'afcfta.png']) copyFileSync(join(ROOT, 'public/logos', f), join(out, 'static/logos', f));
 writeFileSync(join(out, 'static/mock.js'), ascii(readFileSync(join(ROOT, 'scripts/preview-mock.js'), 'utf8')));
 console.log('preview built in', out);
