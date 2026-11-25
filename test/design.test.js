@@ -7,6 +7,8 @@ import { openDb } from '../src/db.js';
 import { createApp } from '../src/server.js';
 import { movedStatements } from '../src/metrics.js';
 
+const visibleText = (html) => html.replace(/<(style|script)[\s\S]*?<\/\1>/g, ' ').replace(/<\/?(em|span|b|i|strong)\b[^>]*>/g, '').replace(/<[^>]*>/g, ' ').replace(/\s+/g, ' ');
+
 async function boot(envExtra = {}) {
   const db = openDb(':memory:');
   const env = { ADMIN_PASSWORD: 'pw', SESSION_SECRET: 's', EVENT_STARTS_AT: '2026-11-30T08:00:00Z', ...envExtra };
@@ -151,13 +153,14 @@ test('stage final: theatre order (smallest shift first, biggest mover last), cou
   const csrf = /name="csrf" value="([^"]+)"/.exec(page)[1];
   await c.call('/admin/snapshot', { auth: true, body: { csrf, kind: 'final' } });
   const html = await (await c.call('/stage/final', { auth: true })).text();
-  assert.match(html, /Did we move\?/); assert.ok(html.includes('data-count="6"'));
+  assert.match(visibleText(html), /Did we move\?/); assert.ok(html.includes('data-count="6"'));
   assert.match(html, /The room shifted on/); assert.ok(html.includes('data-count="1"'), 'exactly 1 statement moved: T3 (T1 changed for one person only, average under the 0.5 threshold)');
   const idx = (txt) => html.indexOf(txt);
   const mover = idx('BIGGEST MOVER'), t3 = idx('African creatives should give up equity');
   assert.ok(mover > 0 && t3 > 0 && mover < t3 && t3 > idx('The biggest winners of African festivals'), 'biggest mover (T3) is the last statement revealed');
   assert.ok(html.indexOf('The biggest winners') < t3 && html.indexOf('Gaming will do more') < t3);
   assert.ok(html.includes('CCA_SFX_STAGE') && html.includes('AudioContext'));
+  assert.ok(html.includes('<svg class="field flow"') && html.includes('class="a-d"'), 'the imagery: dots, with the people who crossed the room');
   assert.ok(!/https?:\/\//.test(html), 'no network references');
   c.close();
 });

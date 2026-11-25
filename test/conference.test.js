@@ -6,6 +6,8 @@ import { createApp } from '../src/server.js';
 const _servers = [];
 after(() => _servers.forEach((s) => { try { s.closeAllConnections(); s.close(); } catch {} }));
 
+const visibleText = (html) => html.replace(/<(style|script)[\s\S]*?<\/\1>/g, ' ').replace(/<\/?(em|span|b|i|strong)\b[^>]*>/g, '').replace(/<[^>]*>/g, ' ').replace(/\s+/g, ' ');
+
 async function boot() {
   const db = openDb(':memory:');
   const env = { ADMIN_PASSWORD: 'pw', SESSION_SECRET: 's', EVENT_STARTS_AT: '2026-11-30T08:00:00Z' };
@@ -59,16 +61,18 @@ test('conference stage deck: aggregates only (no names), most divisive first, op
   assert.ok(snaps.includes('conference'));
   await c.call('/admin/snapshot', { auth: true, body: { csrf: /name="csrf" value="([^"]+)"/.exec(snaps)[1], kind: 'conference' } });
   const html = await (await c.call('/stage/conference', { auth: true })).text();
-  assert.match(html, /What did the room say\?/); assert.match(html, /6 delegates answered before the event/);
+  assert.match(visibleText(html), /What did the room say\?/); assert.match(html, /6 delegates answered before the event/);
   const visible = html.replace(/<(style|script)[\s\S]*?<\/\1>/g, ' ').replace(/<[^>]*>/g, ' ');
   for (const name of ['Ama', 'Bo', 'Cy', 'Di', 'Eli', 'Fu', 'Surname']) assert.ok(!new RegExp(`\\b${name}\\b`).test(visible), `no names on the big screen: ${name}`);
   assert.ok(html.indexOf('Find your opposite') > html.indexOf('Statement 5 of 5'));
   assert.ok(html.includes('data-timer="90"') && html.includes('Ninety seconds each.') && html.includes('Did anyone move?'));
-  assert.ok(html.includes('Would take the microphone'), 'counts of volunteers, not who they are');
+  assert.match(visibleText(html), /would take the microphone/, 'counts of volunteers, not who they are');
+  assert.ok(html.includes('<svg class="field split"'));
+  assert.equal((html.match(/<circle class="[ad]/g) || []).length, 30, 'one dot per delegate per statement: 6 delegates x 5 statements');
   assert.ok(!/https?:\/\//.test(html), 'no network references');
   // T1 (a perfect 3/3 split) is the first statement shown; T2..T5 (6/0) follow
   const first = html.slice(html.indexOf('Statement 1 of 5'), html.indexOf('Statement 2 of 5'));
-  assert.ok(first.includes('The biggest winners of African festivals') && first.includes('<b>3</b>agreed'), 'most divisive statement first');
+  assert.ok(first.includes('The biggest winners of African festivals') && /<span class="num">3<\/span><span class="lab">agreed/.test(first), 'most divisive statement first');
   assert.equal(c.db.prepare("SELECT COUNT(*) c FROM snapshots WHERE kind='conference'").get().c, 1);
 });
 
