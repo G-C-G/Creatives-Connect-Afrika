@@ -42,7 +42,7 @@ test('the older say/stage fields still work (no-JS and existing clients)', async
   c.close();
 });
 
-test('logos: first page is CCA only, game screens are clean, and the ending breathes (no logo row, GCG mark bottom-right)', async () => {
+test('logos: first page is CCA only, game screens are clean, and the ending breathes (no logos, no footer mark)', async () => {
   const c = await boot();
   const landing = await (await c.call('/')).text();
   assert.match(landing, /class="logos top"/); assert.match(landing, /class="cca-hero"/, 'the CCA mark sits clear in the middle');
@@ -54,7 +54,7 @@ test('logos: first page is CCA only, game screens are clean, and the ending brea
   const loc = (await c.call('/start', { body: reg() })).headers.get('location');
   const done = await (await c.call(loc)).text();
   assert.doesNotMatch(done, /class="logos/, 'the ending has no partner row: it is allowed to breathe');
-  assert.ok(done.includes('/static/logos/gcg.png'));
+  assert.doesNotMatch(done, /logos\/gcg\.png/, 'no GCG mark at the bottom or anywhere during the experience');
   const text = done.replace(/<[^>]*>/g, ' ').replace(/\s+/g, ' ');
   for (const line of ['That’s all.', 'For now.', 'You just told us what you think.', 'What does everyone else think?', 'Come back Monday.', 'Keep it.', 'See you Monday.']) assert.ok(text.includes(line.replace('’', '&#39;')) || text.includes(line), `ending says: ${line}`);
   assert.ok(!/thank you for completing/i.test(text), 'never a thank-you-for-completing page');

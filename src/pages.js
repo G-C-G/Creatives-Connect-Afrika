@@ -20,9 +20,9 @@ export function layout({ title, body, lang = 'en', main = '', script = '', logos
 <link rel="preload" href="/static/fonts/instrument-serif-400.woff2" as="font" type="font/woff2" crossorigin>
 <link rel="stylesheet" href="/static/app.css">
 <script src="/static/sfx.js" defer></script><script src="/static/app.js" defer></script></head>
-<body class="${bodyClass}">${logos === 'opening' ? topLogos() : showLogos ? (logos === 'hero' ? heroLogo() : logos === 'row' ? logoRow() : '') : ''}
+<body class="${bodyClass}">${logos === 'opening' || logos === 'row' ? topLogos() : ''}
 <main class="${main}">${body}</main>${script ? h`<script src="${script}" defer></script>` : ''}
-${logos === 'opening' ? '' : h`<footer><img class="gcg" src="/static/logos/${GCG_LOGO.file}" alt="${GCG_LOGO.alt}" width="84"></footer>`}</body></html>`;
+</body></html>`;
 }
 
 const msg = (lang, code) => (code === 'invalid' ? 'Please check this entry.' : code === 'max3' ? t(lang, 'work.values_max') : t(lang, 'err.required'));
