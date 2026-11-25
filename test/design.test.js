@@ -49,7 +49,7 @@ test('logos: first page is CCA only, game screens are clean, and the ending brea
   assert.ok(landing.indexOf('gcg.png') < landing.indexOf('ghana-arms.png') && landing.indexOf('ghana-arms.png') < landing.indexOf('cca-hero.png') && landing.indexOf('cca-hero.png') < landing.indexOf('class="open"'), 'top row: GCG left then the partners; then the CCA mark; then the headline');
   assert.equal((landing.match(/gcg\.png/g) || []).length, 1, 'GCG appears once on the opening (top-left, not repeated in the footer)');
   assert.doesNotMatch(landing.replace(/<[^>]*>/g, ' '), /gold coast games/i, 'no written GCG name in the visible text (the logo carries it)');
-  assert.match(landing, /Before<\/span>\s+<em>we begin\.<\/em>/, 'the opening is a call to action, not a registration page');
+  assert.match(landing, /Before we begin\./, 'the opening is a call to action, not a registration page');
   assert.doesNotMatch(await (await c.call('/start')).text(), /class="logos/);
   const loc = (await c.call('/start', { body: reg() })).headers.get('location');
   const done = await (await c.call(loc)).text();

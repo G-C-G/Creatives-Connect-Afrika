@@ -227,30 +227,16 @@ body.night .hint{color:#d9d9d9}
 
 .mine .row{border-top:1px solid var(--line);padding:18px 0}.mine .row .ask{font-size:42px;margin:0 0 4px}.mine .row .echo{margin:0 0 8px}
 
-/* OPENING SCREEN: an impression page. Three quiet zones on one screen, nothing scrolls.
-   top    GCG left, the four partners right, one shared height
-   middle the Creatives Connect Afrika mark, optically centred in all the free space
-   base   a hairline, then the eyebrow, "Take a side." left with the pill right, two lines of copy */
+/* OPENING SCREEN: a poster. GCG top-left, the four partners top-right (one shared height); the CCA mark, the title and two lines of copy centred in the free space; one full-width pill at the bottom. */
 .logos.top{flex-wrap:nowrap;align-items:center;justify-content:space-between;gap:12px;padding:20px 24px 0;max-width:1000px;margin:0 auto}
 .logos.top img{height:26px;width:auto;mix-blend-mode:normal;display:block}
 .logos.top .tp{display:flex;align-items:center;gap:14px}
-main.landing{width:100%;box-sizing:border-box;text-align:left;padding:0 24px;display:flex;flex-direction:column;min-height:calc(100vh - 66px);min-height:calc(100svh - 66px)}
-.stage{flex:1 1 auto;display:flex;align-items:center;justify-content:center;padding:18px 0}
-.cca-hero{display:block;width:min(74vw,330px);height:auto;margin:0}
-.base{border-top:1px solid var(--line);padding:18px 0 20px}
-main.landing .eyebrow{margin:0 0 6px}
-.cover{display:flex;align-items:flex-end;justify-content:space-between;gap:12px}
-main.landing h1.open{font-size:clamp(42px,calc((100vw - 176px) / 3.35),120px);line-height:.92;margin:0;min-width:0}
-main.landing h1.open span,main.landing h1.open em{display:block;white-space:nowrap}
-main.landing .btn.go{width:auto;min-width:0;min-height:0;height:44px;padding:0 17px;border-radius:999px;font-size:12px;letter-spacing:.07em;flex:none;margin:0 0 10px;display:inline-flex;align-items:center}
-main.landing .lead{margin:16px 0 0;max-width:none;font-size:16px;line-height:1.45;color:var(--muted)}
+main.landing{width:100%;box-sizing:border-box;padding:0 24px 28px;display:flex;flex-direction:column;min-height:calc(100vh - 66px);min-height:calc(100svh - 66px)}
+.stage{flex:1 1 auto;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:26px;text-align:center;padding:18px 0}
+.cca-hero{display:block;width:min(86vw,380px);height:auto;margin:0}
+main.landing h1.open{font-size:clamp(36px,12vw,64px);line-height:1;margin:0;white-space:nowrap}
+main.landing .lead{margin:0;max-width:none;font-size:16px;line-height:1.45;color:var(--muted)}
+main.landing .btn.go{width:100%;min-height:54px;height:54px;border-radius:999px;font-size:14px;letter-spacing:.08em;display:flex;align-items:center;justify-content:center;margin:0}
 .snd{top:auto;bottom:12px;right:12px}
-@media (min-width:700px){.logos.top img{height:36px}main.landing{min-height:calc(100svh - 80px)}main.landing h1.open{font-size:128px}.cca-hero{width:400px}.base{padding-bottom:28px}main.landing .lead{font-size:19px}}
+@media (min-width:700px){.logos.top img{height:36px}main.landing{min-height:calc(100svh - 80px);max-width:560px}main.landing h1.open{font-size:72px}.cca-hero{width:420px}main.landing .lead{font-size:19px}}
 @media (max-width:360px){.logos.top img{height:20px}.logos.top .tp{gap:9px}}
-
-/* hierarchy: one hero ("we begin." in red italic), "Before" is its lead-in, the logo is the identity (smaller than the hero), the rest is quiet */
-main.landing h1.open span{font-size:.46em;line-height:1;margin:0 0 .12em .04em;letter-spacing:.01em}
-.cca-hero{width:min(64vw,290px)}
-.logos.top img{height:24px}
-main.landing .lead{font-size:15px;color:#6b6b6b}
-@media (min-width:700px){main.landing h1.open{font-size:128px}.cca-hero{width:340px}.logos.top img{height:34px}main.landing .lead{font-size:18px}}
