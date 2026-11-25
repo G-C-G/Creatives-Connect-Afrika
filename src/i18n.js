@@ -103,7 +103,7 @@ export const en = {
   'q.details.t': 'A few details',
   'open.eyebrow': 'CCA 2026',
   'open.before': 'Before we begin',
-  'open.h1a': 'Take a', 'open.h1b': 'side.', 'open.h1c': '',
+  'open.h1a': 'Creative', 'open.h1b': 'hot takes.', 'open.h1c': '',
   'open.sub': 'Five questions. No right answers.', 'open.sub2': 'We\u2019ll ask you again on the final day.',
   'open.go': 'Let\u2019s go',
   'opener.pre.1': 'Okay. Let\u2019s start a fight.', 'opener.pre.2': 'No fence-sitting.', 'opener.pre.3': 'Pick a side.', 'opener.pre.4': 'Nearly there.', 'opener.pre.5': 'Last one. Make it count.',

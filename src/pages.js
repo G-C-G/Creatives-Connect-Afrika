@@ -1,14 +1,13 @@
 import { h } from './html.js';
 import { t, label } from './i18n.js';
-import { COUNTRIES, SECTORS, GOALS, VALUES, FACT_SLOTS, LOGOS, GCG_LOGO, CCA_HERO, CCA_ACCENT } from './content.js';
+import { COUNTRIES, SECTORS, GOALS, VALUES, FACT_SLOTS, LOGOS, GCG_LOGO, CCA_HERO } from './content.js';
 
 let showLogos = true;
 export const configure = ({ logos }) => { showLogos = logos; };
 
 const logoRow = (cls = '') => h`<div class="logos ${cls}">${LOGOS.map((l) => h`<img src="/static/logos/${l.file}" alt="${l.alt}">`)}</div>`;
-// opening screen: one small "CCA x GCG" mark top-left; partners sit in one quiet strip at the bottom
-const topLogos = () => h`<div class="logos top"><img class="cca-top" src="/static/logos/${CCA_HERO.file}" alt="${CCA_HERO.alt}"><span class="x">&times;</span><img class="gcg-top" src="/static/logos/${GCG_LOGO.file}" alt="${GCG_LOGO.alt}"></div>`;
-const partnerStrip = () => showLogos ? h`<div class="partners">${LOGOS.slice(1).map((l) => h`<img src="/static/logos/${l.file}" alt="${l.alt}">`)}</div>` : '';
+// opening screen: Gold Coast Games top-left, the partners top-right, all the same height
+const topLogos = () => h`<div class="logos top"><img src="/static/logos/${GCG_LOGO.file}" alt="${GCG_LOGO.alt}"><span class="tp">${showLogos ? LOGOS.slice(1).map((l) => h`<img src="/static/logos/${l.file}" alt="${l.alt}">`) : ''}</span></div>`;
 const heroLogo = () => h`<div class="logos hero"><img src="/static/logos/${LOGOS[0].file}" alt="${LOGOS[0].alt}"></div>`;
 
 // logos: 'none' (game screens stay clean) | 'hero' (opening page: CCA only) | 'row' (opening/closing: CCA first, then partners)
@@ -23,7 +22,7 @@ export function layout({ title, body, lang = 'en', main = '', script = '', logos
 <script src="/static/sfx.js" defer></script><script src="/static/app.js" defer></script></head>
 <body class="${bodyClass}">${logos === 'opening' ? topLogos() : showLogos ? (logos === 'hero' ? heroLogo() : logos === 'row' ? logoRow() : '') : ''}
 <main class="${main}">${body}</main>${script ? h`<script src="${script}" defer></script>` : ''}
-${logos === 'opening' ? partnerStrip() : ''}<footer><span>${t(lang, 'brand.partner')}</span>${logos === 'opening' ? '' : h`<img class="gcg" src="/static/logos/${GCG_LOGO.file}" alt="${GCG_LOGO.alt}" width="84">`}</footer></body></html>`;
+${logos === 'opening' ? '' : h`<footer><img class="gcg" src="/static/logos/${GCG_LOGO.file}" alt="${GCG_LOGO.alt}" width="84"></footer>`}</body></html>`;
 }
 
 const msg = (lang, code) => (code === 'invalid' ? 'Please check this entry.' : code === 'max3' ? t(lang, 'work.values_max') : t(lang, 'err.required'));
@@ -111,12 +110,12 @@ const consentStep = (S, E, lang) => h`<section class="step" data-step data-title
   ${fieldErr(E, 'consent_aggregate', lang)}</section>`;
 
 export function landingPage(lang = 'en') {
-  return layout({ lang, logos: 'opening', title: 'Take a side | CCA 2026', main: 'narrow landing', body: h`
-  <div class="accent-wrap" aria-hidden="true"><img class="accent" src="/static/logos/${CCA_ACCENT.file}" alt=""></div>
-  <p class="eyebrow">${t(lang, 'open.eyebrow')} <span>${t(lang, 'open.before')}</span></p>
-  <h1 class="open">${t(lang, 'open.h1a')} <em>${t(lang, 'open.h1b')}</em> ${t(lang, 'open.h1c')}</h1>
-  <p class="lead">${t(lang, 'open.sub')}<br>${t(lang, 'open.sub2')}</p>
-  <a class="btn big go" href="/start">${t(lang, 'open.go')} &rarr;</a>` });
+  return layout({ lang, logos: 'opening', title: 'Creative Hot Takes | CCA 2026', main: 'narrow landing', body: h`
+  <div class="stage"><img class="cca-hero" src="/static/logos/${CCA_HERO.file}" alt="${CCA_HERO.alt}"></div>
+  <div class="base">
+  <div class="cover"><h1 class="open"><span>${t(lang, 'open.h1a')}</span> ${t(lang, 'open.h1b').split(' ').map((w) => h`<em>${w}</em>`)} ${t(lang, 'open.h1c')}</h1>
+  <a class="btn go" href="/start">${t(lang, 'open.go')} &rarr;</a></div>
+  <p class="lead">${t(lang, 'open.sub')}<br>${t(lang, 'open.sub2')}</p></div>` });
 }
 
 export function preForm({ takes, facts = [], S = new URLSearchParams(), E = {}, short = false, lang = 'en' }) {

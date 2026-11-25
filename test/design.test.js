@@ -45,17 +45,16 @@ test('the older say/stage fields still work (no-JS and existing clients)', async
 test('logos: first page is CCA only, game screens are clean, and the ending breathes (no logo row, GCG mark bottom-right)', async () => {
   const c = await boot();
   const landing = await (await c.call('/')).text();
-  assert.match(landing, /class="logos top"/); assert.match(landing, /class="accent"/, 'the Africa artwork is a faint accent, not the hero');
-  assert.ok(landing.indexOf('cca-hero.png') < landing.indexOf('class="open"') && landing.indexOf('ghana-arms.png') > landing.indexOf('class="open"'), 'small CCA x GCG mark on top; the partners are one quiet strip below the headline');
-  assert.match(landing, /class="partners"/);
+  assert.match(landing, /class="logos top"/); assert.match(landing, /class="cca-hero"/, 'the CCA mark sits clear in the middle');
+  assert.ok(landing.indexOf('gcg.png') < landing.indexOf('ghana-arms.png') && landing.indexOf('ghana-arms.png') < landing.indexOf('cca-hero.png') && landing.indexOf('cca-hero.png') < landing.indexOf('class="open"'), 'top row: GCG left then the partners; then the CCA mark; then the headline');
   assert.equal((landing.match(/gcg\.png/g) || []).length, 1, 'GCG appears once on the opening (top-left, not repeated in the footer)');
   assert.doesNotMatch(landing.replace(/<[^>]*>/g, ' '), /gold coast games/i, 'no written GCG name in the visible text (the logo carries it)');
-  assert.match(landing, /Take a\s+<em>side\.<\/em>/, 'the opening is a call to action, not a registration page');
+  assert.match(landing, /Creative<\/span>\s+<em>hot<\/em><em>takes\.<\/em>/, 'the opening is a call to action, not a registration page');
   assert.doesNotMatch(await (await c.call('/start')).text(), /class="logos/);
   const loc = (await c.call('/start', { body: reg() })).headers.get('location');
   const done = await (await c.call(loc)).text();
   assert.doesNotMatch(done, /class="logos/, 'the ending has no partner row: it is allowed to breathe');
-  assert.ok(done.includes('/static/logos/gcg.png') && done.includes('In partnership with Creatives Connect Afrika'));
+  assert.ok(done.includes('/static/logos/gcg.png'));
   const text = done.replace(/<[^>]*>/g, ' ').replace(/\s+/g, ' ');
   for (const line of ['That’s all.', 'For now.', 'You just told us what you think.', 'What does everyone else think?', 'Come back Monday.', 'Keep it.', 'See you Monday.']) assert.ok(text.includes(line.replace('’', '&#39;')) || text.includes(line), `ending says: ${line}`);
   assert.ok(!/thank you for completing/i.test(text), 'never a thank-you-for-completing page');
@@ -72,7 +71,7 @@ test('the ending adapts if the event has already started', async () => {
 test('SHOW_PARTNER_LOGOS=0 hides the partner marks but keeps the GCG mark', async () => {
   const c = await boot({ SHOW_PARTNER_LOGOS: '0' });
   const landing = await (await c.call('/')).text();
-  assert.doesNotMatch(landing, /ghana-arms|afcfta|black-star/, 'partner logos switched off'); assert.ok(landing.includes('gcg.png') && landing.includes('cca-hero.png') && !landing.includes('class="partners"'));
+  assert.doesNotMatch(landing, /ghana-arms|afcfta|black-star/, 'partner logos switched off'); assert.ok(landing.includes('gcg.png') && landing.includes('cca-hero.png'));
   c.close();
 });
 

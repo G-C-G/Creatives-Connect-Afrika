@@ -227,19 +227,23 @@ body.night .hint{color:#d9d9d9}
 
 .mine .row{border-top:1px solid var(--line);padding:18px 0}.mine .row .ask{font-size:42px;margin:0 0 4px}.mine .row .echo{margin:0 0 8px}
 
-/* opening screen = a cover: Take a side. is the hero; everything else is quiet */
-.logos.top{flex-wrap:nowrap;align-items:center;gap:10px;padding:18px 24px 0}.logos.top img{mix-blend-mode:normal;width:auto}
-.logos.top .cca-top{height:34px}.logos.top .gcg-top{height:26px}.logos.top .x{color:var(--muted);font-size:14px}
-.accent-wrap{position:absolute;left:0;right:0;top:0;height:700px;overflow:hidden;pointer-events:none;z-index:0}
-.accent{position:absolute;right:-30vw;top:70px;width:96vw;max-width:620px;opacity:.22;pointer-events:none;z-index:0;-webkit-mask-image:linear-gradient(to bottom,#000 30%,transparent 92%);mask-image:linear-gradient(to bottom,#000 30%,transparent 92%)}
-body{position:relative;overflow-x:hidden}
-main.landing{position:relative;z-index:1;text-align:left;display:flex;flex-direction:column;align-items:flex-start;justify-content:center;min-height:calc(100vh - 190px);padding-top:0}
-main.landing .eyebrow{margin-bottom:10px}
-main.landing h1.open{font-size:clamp(84px,27vw,150px);line-height:.88;margin:0 0 20px}
-main.landing .lead{margin:0 0 26px;max-width:none;font-size:17px;color:var(--muted)}
-main.landing .btn.go{align-self:flex-start;width:auto;min-width:0;padding:14px 30px;min-height:0;font-size:14px}
-.partners{display:flex;justify-content:flex-start;align-items:center;gap:18px;max-width:1000px;margin:0 auto;padding:0 24px 6px}
-.partners img{height:20px;width:auto;opacity:.55;filter:grayscale(1)}
-.snd{top:14px}
-@media (min-width:700px){main.landing h1.open{font-size:170px}.logos.top .cca-top{height:44px}.accent{width:620px;right:4vw}}
-main.landing{width:100%;box-sizing:border-box}
+/* OPENING SCREEN: an impression page. Three quiet zones on one screen, nothing scrolls.
+   top    GCG left, the four partners right, one shared height
+   middle the Creatives Connect Afrika mark, optically centred in all the free space
+   base   a hairline, then the eyebrow, "Take a side." left with the pill right, two lines of copy */
+.logos.top{flex-wrap:nowrap;align-items:center;justify-content:space-between;gap:12px;padding:20px 24px 0;max-width:1000px;margin:0 auto}
+.logos.top img{height:26px;width:auto;mix-blend-mode:normal;display:block}
+.logos.top .tp{display:flex;align-items:center;gap:14px}
+main.landing{width:100%;box-sizing:border-box;text-align:left;padding:0 24px;display:flex;flex-direction:column;min-height:calc(100vh - 66px);min-height:calc(100svh - 66px)}
+.stage{flex:1 1 auto;display:flex;align-items:center;justify-content:center;padding:18px 0}
+.cca-hero{display:block;width:min(74vw,330px);height:auto;margin:0}
+.base{border-top:1px solid var(--line);padding:18px 0 20px}
+main.landing .eyebrow{margin:0 0 6px}
+.cover{display:flex;align-items:flex-end;justify-content:space-between;gap:12px}
+main.landing h1.open{font-size:clamp(54px,17.5vw,112px);line-height:.92;margin:0;min-width:0}
+main.landing h1.open span,main.landing h1.open em{display:block;white-space:nowrap}
+main.landing .btn.go{width:auto;min-width:0;min-height:0;height:46px;padding:0 22px;border-radius:999px;font-size:13px;letter-spacing:.08em;flex:none;margin:0 0 10px;display:inline-flex;align-items:center}
+main.landing .lead{margin:16px 0 0;max-width:none;font-size:16px;line-height:1.45;color:var(--muted)}
+.snd{top:auto;bottom:12px;right:12px}
+@media (min-width:700px){.logos.top img{height:36px}main.landing{min-height:calc(100svh - 80px)}main.landing h1.open{font-size:128px}.cca-hero{width:400px}.base{padding-bottom:28px}main.landing .lead{font-size:19px}}
+@media (max-width:360px){.logos.top img{height:20px}.logos.top .tp{gap:9px}}
