@@ -70,10 +70,15 @@ export const FACTS = [
   },
   {
     id: 'F2', position: 2, kind: 'info', answer_bool: null, verified: false, source_url: '',
-    verify: 'Confirm no later record has overtaken it. Figure comes from concert-tracking data via a news report.',
-    text: 'Burna Boy at London Stadium, 29 June 2024: a reported $6.147m from 58,973 tickets, the highest single-night gross by an African act.',
-    reveal_text: 'Concert-tracking data reported by the press.',
+    verify: 'I could not open any article (403) and found no primary source (Billboard Boxscore, venue or promoter). The figure is repeated by several outlets and attributed to the tracker Touring Data. Please check it before ticking verified. I removed the "highest single-night gross by an African act" claim from the game copy: widely repeated, but unconfirmed here and possibly overtaken since.',
+    text: 'Burna Boy\u2019s London Stadium show on 29 June 2024 reportedly grossed about US$6.1 million from 58,973 tickets, according to concert-tracking data.',
+    reveal_text: 'That is a press-reported tracking figure, not an official box-office statement.',
+    sources: [
+      { name: 'Vanguard, "How Burna Boy cashed out at London Stadium" (Jul 2024)', url: 'https://www.vanguardngr.com/2024/07/how-burna-boy-cashed-out-at-london-stadium/amp/', date: 'Jul 2024', passage: '(not opened: HTTP 403 to my fetch)', note: 'Search results say outlets report $6,147,209 from 58,973 tickets, credited to Touring Data.' },
+      { name: 'NME, "Burna Boy made $12million from eight shows"', url: 'https://www.nme.com/news/music/burna-boy-made-12million-from-eight-shows-3591308', date: '2024', passage: '(not opened: HTTP 403 to my fetch)', note: 'Secondary report. A primary source (Billboard Boxscore or the promoter) would be better.' },
+    ],
   },
+
   {
     id: 'F3', position: 3, kind: 'true_false', answer_bool: true, verified: false, source_url: '',
     verify: 'Wording must be checked with the AfCFTA Secretariat. Annexes adopted Feb 2025, ratification incomplete, "preferential treatment" undefined. Never promise a benefit.',
@@ -131,14 +136,14 @@ export const FACTS = [
 // Welcome-game guess questions. A question is only ever played once its fact is verified.
 // answer_index points into options. Edit freely; options are in English only for now.
 export const GAME_QUESTIONS = [
-  // Original examples: kept for the door cards and form interludes, not in the game unless you set game: true.
+  // Original examples F1 and F3: kept for the door cards and form interludes, not in the game unless you set game: true.
   { fact_id: 'F1', game: false, question: 'How many bands greeted Louis Armstrong when he arrived in Accra?', options: ['3', '7', '13', '30'], answer_index: 2, wink: 'Accra was not playing around.' },
-  { fact_id: 'F2', game: false, question: 'How much did Burna Boy reportedly gross at London Stadium in one night (29 June 2024)?', options: ['$1 to 3 million', '$3 to 5 million', '$5 to 7 million', '$7 to 10 million'], answer_index: 2, wink: 'Not a bad night\u2019s work.' },
   { fact_id: 'F3', game: false, question: null /* uses the fact text */, options: ['True', 'False'], answer_index: 0 },
-  // The seven-round story: how big is it > Africa already > growth > a global deal > capital > new infrastructure > predict the room.
+  // The story, in this order: how big is it > Africa already > growth > a big night > a global deal > capital > new infrastructure > predict the room.
   { fact_id: 'F4', question: 'In 2022, how much did creative services generate in exports worldwide?', options: ['$140 billion', '$700 billion', '$1.4 trillion', '$3.8 trillion'], answer_index: 2 },
   { fact_id: 'F5', question: 'UNESCO\u2019s 2021 mapping estimated roughly how many people work in Africa\u2019s film and audiovisual industries?', options: ['500,000', '1 million', '5 million', '15 million'], answer_index: 2 },
   { fact_id: 'F6', question: 'How much did recorded-music revenue grow in Sub-Saharan Africa in 2025?', options: ['3.2%', '8.7%', '15.2%', '31.4%'], answer_index: 2 },
+  { fact_id: 'F2', question: 'How much did Burna Boy reportedly gross at London Stadium in one night (29 June 2024)?', options: ['$1 to 3 million', '$3 to 5 million', '$5 to 7 million', '$7 to 10 million'], answer_index: 2, wink: 'Not a bad night\u2019s work.' },
   { fact_id: 'F7', question: 'In 2024, which global music company announced a majority investment in Nigeria\u2019s Mavin Global?', options: ['Warner Music Group', 'Sony Music Group', 'Universal Music Group', 'Spotify'], answer_index: 2 },
   { fact_id: 'F8', question: 'How much did Sony initially allocate to its Sony Innovation Fund: Africa?', options: ['US$1 million', 'US$10 million', 'US$50 million', 'US$100 million'], answer_index: 1 },
   { fact_id: 'F9', question: 'In 2023, IFC made its first investment in Africa\u2019s creative sector. What kind of business received it?', options: ['A film studio', 'A music label', 'An online sales platform for creators and merchants', 'A national tourism board'], answer_index: 2 },

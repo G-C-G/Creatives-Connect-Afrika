@@ -11,7 +11,7 @@ export const classify = (share) => (share >= 0.6 ? 'agree' : share <= 0.4 ? 'dis
 export function buildDeck(db, now = new Date()) {
   const data = loadData(db);
   const facts = new Map(db.prepare('SELECT * FROM facts WHERE verified = 1').all().map((f) => [f.id, f]));
-  const factRounds = GAME_QUESTIONS.filter((q) => q.game !== false && facts.has(q.fact_id)).sort((a, b) => facts.get(a.fact_id).position - facts.get(b.fact_id).position).map((q) => {
+  const factRounds = GAME_QUESTIONS.filter((q) => q.game !== false && facts.has(q.fact_id)).map((q) => {
     const f = facts.get(q.fact_id);
     return { type: 'fact', id: q.fact_id, question: q.question || f.text, options: q.options, answer: q.answer_index,
       explain: f.kind === 'true_false' ? f.reveal_text : `${f.text} ${f.reveal_text || ''}`.trim(), wink: q.wink || null };
@@ -22,7 +22,7 @@ export function buildDeck(db, now = new Date()) {
     if (!tk || !s.n) return null;
     return { type: 'predict', id, statement: tk.text, n: s.n, agree: s.agree, disagree: s.disagree, label: shareLabel(s.agree, s.n), answer: classify(s.agreeShare) };
   }).filter(Boolean);
-  // Story arc: the verified facts in order, then "predict the room" as the payoff.
+  // Story arc: the verified facts in the order of GAME_QUESTIONS, then "predict the room" as the payoff.
   const rounds = [...factRounds, ...predictRounds];
   return { takenAt: now.toISOString(), points: POINTS, rounds };
 }

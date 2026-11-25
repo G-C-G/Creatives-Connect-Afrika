@@ -12,6 +12,7 @@ Story arc (7 rounds): how big is it > Africa already > growth > a global deal > 
 | 4 F7 | In 2024, which global music company announced a majority investment in Nigeria's Mavin Global? | Universal Music Group | UMG press release, 26 Feb 2024 | Release read: "today announced a majority investment in ... Mavin Global (Mavin)." |
 | 5 F8 | How much did Sony initially allocate to its Sony Innovation Fund: Africa? | US$10 million | Sony Group, 11 Oct 2023 | Page read: "Sony is initially allocating US$10 million towards such investments." |
 | 6 F9 | In 2023, IFC made its first investment in Africa's creative sector. What kind of business received it? | An online sales platform for creators and merchants (ANKA) | IFC press release, 19 Sep 2023 | Page read: "IFC's $3.4 million equity investment ... into Côte d'Ivoire-based ANKA marks IFC's first investment into Africa's creative sector." |
+| 4b F2 | How much did Burna Boy reportedly gross at London Stadium in one night (29 June 2024)? | $5 to 7 million (about $6.1m) | Press reports crediting tracker Touring Data | **No page opened** (Vanguard and NME returned 403). Search results: about $6,147,209 from 58,973 tickets. **No primary source found.** Placed after the music-growth round. |
 | 7 | Predict the room (two statements, from the onboarding answers) | from the data | n/a | n/a |
 
 ## Things the first draft got wrong, or that need care
@@ -30,9 +31,9 @@ Story arc (7 rounds): how big is it > Africa already > growth > a global deal > 
 - Mavin valuation: not in the primary source.
 - Select-all questions: not needed; every round fits multiple choice or predict-the-room.
 
-## Original examples, kept out of the game
+## Burna Boy is in the game; the other two originals are not
 
-F1 (Armstrong), F2 (Burna Boy) and F3 (AfCFTA true/false) are still in the seed for the door cards and form interludes, but `game: false` keeps them out of the seven rounds. F2 was your own example: set `game: true` in `GAME_QUESTIONS` to bring it back (it is also unverified).
+Burna Boy (F2) is in, after the music-growth round, because it was your example. Its status is the weakest in the bank: secondary reports only, no primary source, and I removed the "highest single-night gross by an African act" claim because I could not confirm it. F1 (Armstrong) and F3 (AfCFTA true/false) stay in the seed for the door cards and form interludes, with `game: false`. With Burna the game is 7 facts + predict-the-room (8 or 9 rounds depending on how many statements you pick).
 
 ## Method note
 

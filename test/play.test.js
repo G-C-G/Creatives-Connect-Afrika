@@ -45,10 +45,10 @@ test('deck: unverified facts are left out; verified ones included in order; pred
   assert.deepEqual(deck.rounds.map((r) => r.type), ['predict', 'predict']); // no verified facts yet
   assert.deepEqual(deck.rounds.map((r) => r.answer), ['split', 'agree']);
   assert.equal(deck.rounds[1].agree, 5); assert.equal(deck.rounds[1].n, 6);
-  db.prepare("UPDATE facts SET verified=1 WHERE id IN ('F5','F4','F2')").run(); // F2 is an original example: kept out of the game (game:false)
+  db.prepare("UPDATE facts SET verified=1 WHERE id IN ('F5','F4','F2','F1')").run(); // F1 is an original example kept out of the game (game:false)
   deck = buildDeck(db);
-  assert.deepEqual(deck.rounds.map((r) => r.type), ['fact', 'fact', 'predict', 'predict']); // story arc: facts in order, predict the room last
-  assert.deepEqual(deck.rounds.map((r) => r.id), ['F4', 'F5', 'T2', 'T4']);
+  assert.deepEqual(deck.rounds.map((r) => r.type), ['fact', 'fact', 'fact', 'predict', 'predict']); // story arc: facts in order, predict the room last
+  assert.deepEqual(deck.rounds.map((r) => r.id), ['F4', 'F5', 'F2', 'T2', 'T4'], 'story order; Burna Boy (F2) is in, Armstrong (F1) is not');
   assert.equal(deck.rounds[0].answer, 2); assert.match(deck.rounds[0].question, /In 2022/);
   assert.match(deck.rounds[1].question, /2021 mapping/, 'dated: the UNESCO figures are from 2021, never "currently"');
   assert.ok(!JSON.stringify(deck).includes('VERIFY'));
