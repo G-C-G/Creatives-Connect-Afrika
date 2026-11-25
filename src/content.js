@@ -92,3 +92,6 @@ export const LOGOS = [
   { file: 'creatives-connect-afrika.png', alt: 'Creatives Connect Afrika' },
   { file: 'afcfta.png', alt: 'AfCFTA Secretariat' },
 ];
+
+// Our own mark (bottom-right of pages and stage). Always shown.
+export const GCG_LOGO = { file: 'gcg.jpg', alt: 'Gold Coast Games' };

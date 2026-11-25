@@ -1,6 +1,6 @@
 import { h } from './html.js';
 import { t, label } from './i18n.js';
-import { COUNTRIES, SECTORS, GOALS, VALUES, FACT_SLOTS, LOGOS } from './content.js';
+import { COUNTRIES, SECTORS, GOALS, VALUES, FACT_SLOTS, LOGOS, GCG_LOGO } from './content.js';
 
 let showLogos = true;
 export const configure = ({ logos }) => { showLogos = logos; };
@@ -16,7 +16,7 @@ export function layout({ title, body, lang = 'en', main = '' }) {
 <body><header class="top">${t(lang, 'brand.name')}</header>
 ${showLogos ? h`<div class="logos">${LOGOS.map((l) => h`<img src="/static/logos/${l.file}" alt="${l.alt}" height="40" loading="eager">`)}</div>` : ''}
 <main class="${main}">${body}</main>
-<footer>${t(lang, 'brand.partner')}</footer></body></html>`;
+<footer><span>${t(lang, 'brand.partner')}</span><img class="gcg" src="/static/logos/${GCG_LOGO.file}" alt="${GCG_LOGO.alt}" width="64" height="64"></footer></body></html>`;
 }
 
 const msg = (lang, code) => (code === 'invalid' ? 'Please check this entry.' : code === 'max3' ? t(lang, 'work.values_max') : t(lang, 'err.required'));

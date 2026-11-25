@@ -9,7 +9,7 @@ import * as P from './pages.js';
 import * as S from './service.js';
 import { queueNumberEmail, sendOutboxRow } from './mail.js';
 import { adminRoute } from './admin.js';
-import { LOGOS } from './content.js';
+import { LOGOS, GCG_LOGO } from './content.js';
 
 const PUBLIC = join(dirname(fileURLToPath(import.meta.url)), '..', 'public');
 const STATIC = { '/static/app.css': ['text/css', 'app.css'], '/static/app.js': ['text/javascript', 'app.js'] };
@@ -62,8 +62,8 @@ export function createApp({ db, env = process.env, now = () => new Date(), fetch
     const redirect = (to) => ({ status: 303, headers: { Location: to }, body: '' });
 
     if (p === '/healthz') return { status: 200, type: 'text/plain', body: 'ok' };
-    const lm = /^\/static\/logos\/([a-z-]+\.png)$/.exec(p);
-    if (lm && LOGOS.some((l) => l.file === lm[1])) return { status: 200, type: 'image/png', headers: { 'Cache-Control': 'public, max-age=86400' }, body: readFileSync(join(PUBLIC, 'logos', lm[1])) };
+    const lm = /^\/static\/logos\/([a-z-]+\.(?:png|jpg))$/.exec(p);
+    if (lm && (lm[1] === GCG_LOGO.file || LOGOS.some((l) => l.file === lm[1]))) return { status: 200, type: lm[1].endsWith('.jpg') ? 'image/jpeg' : 'image/png', headers: { 'Cache-Control': 'public, max-age=86400' }, body: readFileSync(join(PUBLIC, 'logos', lm[1])) };
     if (STATIC[p]) return { status: 200, type: STATIC[p][0], headers: { 'Cache-Control': 'public, max-age=3600' }, body: readFileSync(join(PUBLIC, STATIC[p][1])) };
 
     // ---------- admin + stage ----------

@@ -3,7 +3,7 @@
 import { h, str, raw } from './html.js';
 import { readFileSync } from 'node:fs';
 import { fileURLToPath } from 'node:url';
-import { LOGOS } from './content.js';
+import { LOGOS, GCG_LOGO } from './content.js';
 import { loadData, getSetting } from './db.js';
 import { participation, takeSplit, takeChange, biggestMover, stillSplit, shareLabel, headline } from './metrics.js';
 
@@ -60,7 +60,7 @@ body::before{content:"";display:block;height:1.2vh;background:linear-gradient(90
 .quote{font-size:3vw;font-weight:700;border-left:.6vw solid #2A7F3A;padding-left:2vw;margin:2vh 0}.by{font-size:1.8vw;color:#D7262E;text-transform:uppercase;letter-spacing:.1em}
 .n{font-size:1.5vw;color:#555;font-weight:600}
 .foot{position:fixed;left:0;right:0;bottom:0;padding:1.2vh 6vw;background:#fff;border-top:2px solid #ddd;font:600 1.3vw system-ui,sans-serif;color:#555;display:flex;justify-content:space-between;gap:2vw}
-.foot .lg{display:flex;gap:1.6vw;align-items:center}.foot img{height:4.2vh;width:auto}.split{display:flex;gap:3vw;margin:3vh 0}.split div{flex:1;border:.3vw solid #111;padding:3vh 2vw;border-radius:.6vw}.split b{display:block;font-size:7vw;color:#D7262E}`;
+.foot{align-items:center}.foot .gcg{height:7vh;width:7vh;border-radius:.8vh;flex:none}.foot .lg{display:flex;gap:1.6vw;align-items:center}.foot img{height:4.2vh;width:auto}.split{display:flex;gap:3vw;margin:3vh 0}.split div{flex:1;border:.3vw solid #111;padding:3vh 2vw;border-radius:.6vw}.split b{display:block;font-size:7vw;color:#D7262E}`;
 
 const JS = `(function(){var s=[].slice.call(document.querySelectorAll('.slide')),i=0;function show(){s.forEach(function(x,j){x.classList.toggle('on',j===i)})}
 function next(){var rv=s[i].querySelector('.rv:not(.show)');if(rv){rv.classList.add('show');s[i].classList.add('revealed');return}if(i<s.length-1){i++;show()}}
@@ -68,12 +68,12 @@ function prev(){if(i>0){i--;show()}}
 document.addEventListener('keydown',function(e){if(e.key==='ArrowRight'||e.key===' '||e.key==='Enter'||e.key==='PageDown')next();else if(e.key==='ArrowLeft'||e.key==='PageUp')prev();else if(e.key==='f'&&document.documentElement.requestFullscreen)document.documentElement.requestFullscreen()});
 document.addEventListener('click',next);show()})();`;
 
-const logoUri = (f) => `data:image/png;base64,${readFileSync(fileURLToPath(new URL(`../public/logos/${f}`, import.meta.url))).toString('base64')}`;
+const logoUri = (f, type = 'png') => `data:image/${type};base64,${readFileSync(fileURLToPath(new URL(`../public/logos/${f}`, import.meta.url))).toString('base64')}`;
 const when = (iso) => iso.replace('T', ' ').slice(0, 16) + ' UTC';
 
 export function renderStageHtml(d) {
   const logos = d.logos ? LOGOS.map((l) => h`<img src="${raw(logoUri(l.file))}" alt="${l.alt}">`) : '';
-  const foot = h`<div class="foot"><span class="lg">${logos}</span><span>Snapshot ${when(d.takenAt)} · Gold Coast Games · In partnership with Creatives Connect Afrika</span></div>`;
+  const foot = h`<div class="foot"><span class="lg">${logos}</span><span>Snapshot ${when(d.takenAt)} · Gold Coast Games · In partnership with Creatives Connect Afrika</span><img class="gcg" src="${raw(logoUri(GCG_LOGO.file, 'jpeg'))}" alt="${GCG_LOGO.alt}"></div>`;
   let slides;
   if (d.kind === 'icebreaker') {
     slides = d.takes.map((tk, i) => h`<section class="slide"><p class="kick">Welcome game · Statement ${i + 1}</p>
