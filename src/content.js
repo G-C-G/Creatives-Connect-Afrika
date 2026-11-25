@@ -52,11 +52,11 @@ export function regionOf(country) {
 
 // LOCKED once launched. Never reword after locked = 1. theme_tag: TBD per spec.
 export const TAKES = [
-  { id: 'T1', position: 1, theme_tag: null, text: 'The biggest winners of African festivals are hotels and airlines, not artists.' },
-  { id: 'T2', position: 2, theme_tag: null, text: 'Africa has enough talent. What it lacks is money and distribution.' },
-  { id: 'T3', position: 3, theme_tag: null, text: 'African creatives should give up equity to get funded.' },
-  { id: 'T4', position: 4, theme_tag: null, text: 'A viral song markets a destination better than any tourism ad.' },
-  { id: 'T5', position: 5, theme_tag: null, text: 'Gaming will do more for African tourism than music in the next 10 years.' },
+  { id: 'T1', position: 1, theme_tag: null, text: 'A creative business that can\u2019t make money isn\u2019t a successful creative business.' },
+  { id: 'T2', position: 2, theme_tag: null, text: 'African creatives should win Africa before they go after the world.' },
+  { id: 'T3', position: 3, theme_tag: null, text: 'African creatives would earn more if they got better at valuing and negotiating their own work.' },
+  { id: 'T4', position: 4, theme_tag: null, text: 'I\u2019d rather see African work go global under foreign ownership than stay 100% African-owned and unseen.' },
+  { id: 'T5', position: 5, theme_tag: null, text: 'If international audiences will pay for African culture, it\u2019s fine to repackage it for them.' },
 ];
 
 // ALL verified:false until Hinda confirms (flip in /admin). Unverified facts are never shown anywhere.

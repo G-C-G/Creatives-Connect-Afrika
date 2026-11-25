@@ -77,7 +77,7 @@ test('conference stage deck: aggregates only (no names), most divisive first, op
   assert.equal((html.match(/<circle class="[ad]/g) || []).length, 30, 'one dot per delegate per statement: 6 delegates x 5 statements');
   assert.ok(!/https?:\/\//.test(html), 'no network references');
   // T1 (a perfect 3/3 split) is the first statement shown; T2..T5 (6/0) follow
-  assert.ok(first.includes('The biggest winners of African festivals') && /<span class="num">3<\/span><span class="lab">agreed/.test(first), 'most divisive statement first');
+  assert.ok(first.includes('A creative business that can') && /<span class="num">3<\/span><span class="lab">agreed/.test(first), 'most divisive statement first');
   assert.equal(c.db.prepare("SELECT COUNT(*) c FROM snapshots WHERE kind='conference'").get().c, 1);
 });
 

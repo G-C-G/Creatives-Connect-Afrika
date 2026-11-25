@@ -48,7 +48,7 @@ test('logos: first page is CCA only, game screens are clean, and the ending brea
   assert.match(landing, /class="logos hero"/); assert.equal((landing.match(/static\/logos\/(?!gcg)/g) || []).length, 1);
   assert.ok(landing.includes('creatives-connect-afrika.png'));
   assert.doesNotMatch(landing.replace(/<[^>]*>/g, ' '), /gold coast games/i, 'no written GCG name in the visible text (the logo carries it)');
-  assert.match(landing, /What do you\s+<em>actually<\/em>\s+think\?/, 'the opening is a question, not a registration page');
+  assert.match(landing, /Take a\s+<em>side\.<\/em>/, 'the opening is a call to action, not a registration page');
   assert.doesNotMatch(await (await c.call('/start')).text(), /class="logos/);
   const loc = (await c.call('/start', { body: reg() })).headers.get('location');
   const done = await (await c.call(loc)).text();
@@ -156,9 +156,9 @@ test('stage final: theatre order (smallest shift first, biggest mover last), cou
   assert.match(visibleText(html), /Did we move\?/); assert.ok(html.includes('data-count="6"'));
   assert.match(html, /The room shifted on/); assert.ok(html.includes('data-count="1"'), 'exactly 1 statement moved: T3 (T1 changed for one person only, average under the 0.5 threshold)');
   const idx = (txt) => html.indexOf(txt);
-  const mover = idx('BIGGEST MOVER'), t3 = idx('African creatives should give up equity');
-  assert.ok(mover > 0 && t3 > 0 && mover < t3 && t3 > idx('The biggest winners of African festivals'), 'biggest mover (T3) is the last statement revealed');
-  assert.ok(html.indexOf('The biggest winners') < t3 && html.indexOf('Gaming will do more') < t3);
+  const mover = idx('BIGGEST MOVER'), t3 = idx('African creatives would earn more if they got better');
+  assert.ok(mover > 0 && t3 > 0 && mover < t3 && t3 > idx('A creative business that can'), 'biggest mover (T3) is the last statement revealed');
+  assert.ok(html.indexOf('A creative business that can') < t3 && html.indexOf('If international audiences') < t3);
   assert.ok(html.includes('CCA_SFX_STAGE') && html.includes('AudioContext'));
   assert.ok(html.includes('<svg class="field flow"') && html.includes('class="a-d"'), 'the imagery: dots, with the people who crossed the room');
   assert.ok(!/https?:\/\//.test(html), 'no network references');
