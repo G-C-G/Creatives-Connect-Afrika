@@ -23,6 +23,10 @@
     rise: function () { for (var i = 0; i < 9; i++) tone(260 + i * 55, i * 0.075, 0.1, 'triangle', 0.05); },
     lock: function () { tone(196, 0, 0.09, 'sine', 0.1); tone(392, 0.04, 0.12, 'triangle', 0.05); },
     cliff: function () { tone(110, 0, 1.2, 'sine', 0.14); tone(165, 0.1, 1.0, 'sine', 0.08); tone(220, 0.9, 1.4, 'sine', 0.09); },
+    beep: function (go) { tone(go ? 990 : 660, 0, go ? 0.35 : 0.12, 'triangle', go ? 0.09 : 0.07); },
+    drum: function () { var t = 0; for (var i = 0; i < 16; i++) { tone(95 + (i % 2) * 28, t, 0.07, 'triangle', 0.13); t += Math.max(0.045, 0.12 - i * 0.005); } },
+    sting: function () { tone(392, 0, 0.55, 'sawtooth', 0.05); tone(494, 0, 0.55, 'sawtooth', 0.045); tone(587, 0, 0.55, 'sawtooth', 0.045); tone(784, 0.02, 0.7, 'triangle', 0.08); tone(98, 0, 0.6, 'sine', 0.2); },
+    buzzer: function () { tone(118, 0, 0.55, 'sawtooth', 0.12); tone(124, 0, 0.55, 'sawtooth', 0.12); },
     chime: function () { [523, 659, 784, 1047].forEach(function (f, i) { tone(f, i * 0.085, 0.3, 'sine', 0.13); }); },
     miss: function () { tone(196, 0, 0.2, 'sine', 0.12); tone(147, 0.15, 0.34, 'sine', 0.1); },
     boom: function () { tone(70, 0, 0.55, 'sine', 0.3); tone(140, 0, 0.22, 'triangle', 0.1); }

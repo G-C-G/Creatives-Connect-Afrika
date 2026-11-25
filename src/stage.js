@@ -6,7 +6,7 @@ import { fileURLToPath } from 'node:url';
 import { LOGOS, GCG_LOGO } from './content.js';
 const SFX = readFileSync(fileURLToPath(new URL('../public/sfx.js', import.meta.url)), 'utf8');
 import { loadData, getSetting } from './db.js';
-import { participation, takeSplit, takeChange, biggestMover, stillSplit, shareLabel, headline, movedStatements, flipSummary, conferenceStats, byDivisiveness } from './metrics.js';
+import { participation, takeSplit, takeChange, biggestMover, stillSplit, shareLabel, headline, movedStatements, flipSummary, conferenceStats, byDivisiveness, roomVerdict } from './metrics.js';
 
 const pickStories = (data) => {
   const byId = new Map(data.participants.map((p) => [p.id, p]));
@@ -28,7 +28,7 @@ export function buildStageData(db, kind, now = new Date(), { logos = true } = {}
       ...base, kind, takenAt, picks,
       takes: picks.map((id) => {
         const tk = data.takes.find((x) => x.id === id); const s = takeSplit(data, id, 'pre');
-        return { id, text: tk.text, n: s.n, agree: s.agree, disagree: s.disagree,
+        return { id, text: tk.text, n: s.n, agree: s.agree, disagree: s.disagree, verdict: roomVerdict(s.agreeShare),
           agreeLabel: shareLabel(s.agree, s.n), disagreeLabel: shareLabel(s.disagree, s.n) };
       }),
     };
@@ -38,7 +38,7 @@ export function buildStageData(db, kind, now = new Date(), { logos = true } = {}
     return {
       ...base, kind, takenAt, n: participation(data).preCompleters,
       statements: stats.map((x) => ({
-        id: x.takeId, text: x.text, n: x.n, agree: x.agree, disagree: x.disagree, agreeLabel: shareLabel(x.agree, x.n), disagreeLabel: shareLabel(x.disagree, x.n),
+        id: x.takeId, text: x.text, n: x.n, agree: x.agree, disagree: x.disagree, verdict: roomVerdict(x.agreeShare), agreeLabel: shareLabel(x.agree, x.n), disagreeLabel: shareLabel(x.disagree, x.n),
         micAgree: x.sides.agree.levels.stage, micDisagree: x.sides.disagree.levels.stage, fightAgree: x.sides.agree.fighters, fightDisagree: x.sides.disagree.fighters,
       })),
     };
@@ -149,18 +149,55 @@ html,body{margin:0;height:100%;background:#fff;color:#111;font:400 2vw/1.3 syste
 .night-on .foot{color:#bdbdbd}.opp-on .foot .mid{visibility:hidden}
 .foot .lg{display:flex;gap:1.6vw;align-items:center;visibility:hidden}.edge .foot .lg{visibility:visible}.foot .lg img{height:4.4vh;width:auto;mix-blend-mode:multiply}.night-on .foot .lg{background:#fff;padding:.8vh 1.4vw;border-radius:1vh}
 .foot img.gcg{height:8vh;width:auto;flex:none}#snd{color:inherit}
-.foot .mid{flex:1;text-align:center}`;
+.foot .mid{flex:1;text-align:center}
+.round{align-self:flex-start;background:#D7262E;color:#fff;font:800 1.5vw/1 system-ui,sans-serif;letter-spacing:.18em;text-transform:uppercase;padding:1.1vh 2.2vw 1.1vh 1.6vw;margin:0 0 2.2vh;clip-path:polygon(0 0,100% 0,95% 100%,0 100%)}.round b{font-weight:800}
+.slide.on{position:relative}
+/* marquee bulbs light up while the drum rolls; the screen flashes at the reveal */
+.slide.drum::before,.slide.drum::after{content:"";position:absolute;left:0;right:0;height:2.4vh;background:radial-gradient(circle at 50% 50%,#F2A81D 0 30%,transparent 34%) 0 0/3.2vw 2.4vh repeat-x;animation:chase .45s steps(1) infinite}
+.slide.drum::before{top:0}.slide.drum::after{bottom:12vh}
+@keyframes chase{50%{background-position:1.6vw 0}}
+.slide.drum .take{animation:jolt .12s linear infinite}@keyframes jolt{50%{transform:translateX(.15vw)}}
+#flash{position:fixed;inset:0;background:#F2A81D;opacity:0;pointer-events:none;z-index:5}body.flashing #flash{animation:flash .8s ease-out}
+@keyframes flash{0%{opacity:.95}100%{opacity:0}}
+/* cards-up countdown and the verdict stamp */
+.cd{display:none;align-self:center;justify-self:start;z-index:2}.cd.on{display:block}.slide.revealed .cd{display:none}.slide.counting .prompt{visibility:hidden}
+.cdn{font:800 11vw/.9 system-ui,sans-serif;color:#D7262E;font-variant-numeric:tabular-nums;display:block;animation:cdpop .8s ease-out}.cdn.go{font:800 6vw/1 system-ui,sans-serif;background:#F2A81D;color:#111;padding:1.4vh 2.4vw;border-radius:1vw;letter-spacing:.04em;text-transform:uppercase}
+@keyframes cdpop{from{transform:scale(1.5);opacity:0}to{transform:none;opacity:1}}
+.heads{position:relative}.stamp{position:absolute;right:-24vw;top:1vh;border:.4vw solid #D7262E;color:#D7262E;font:800 3.4vw/1 system-ui,sans-serif;letter-spacing:.04em;text-transform:uppercase;padding:1.4vh 1.8vw;border-radius:.6vw;transform:rotate(-5deg);background:#fff}
+.rv.show .stamp{animation:stampin .5s cubic-bezier(.2,1.6,.4,1) .15s both}@keyframes stampin{from{transform:rotate(-5deg) scale(2.2);opacity:0}to{transform:rotate(-5deg) scale(1);opacity:1}}
+.delta{display:inline-block;background:#111;color:#fff;font:700 1.3vw/1 system-ui,sans-serif;letter-spacing:.12em;padding:.9vh 1.2vw;border-radius:99px;margin:.6vh 0 1vh}
+/* the debate: two podiums, a clock each, a buzzer */
+.pods{display:flex;align-items:flex-end;justify-content:center;gap:3vw;margin:2vh 0 1vh}
+.pod{width:20vw;height:30vh;display:flex;align-items:flex-start;justify-content:center;font:400 3.8vw/1 "Instrument Serif",Georgia,serif;padding-top:2vh;opacity:.3;transition:opacity .3s,transform .3s}.pod.a{background:#D7262E;color:#fff}.pod.d{background:#fff;color:#111}
+.pod.on{opacity:1;transform:translateY(-1.4vh)}.pods .clock{margin:0;font-size:17vw}
+.night .sub.who{color:#fff}`;
 
 const JS = `(function(){var s=[].slice.call(document.querySelectorAll('.slide')),i=0,busy=false,calm=window.matchMedia&&window.matchMedia('(prefers-reduced-motion: reduce)').matches;
-var X=window.CCASfx||{tick:function(){},rise:function(){},boom:function(){},toggle:function(){},isOn:function(){return false}};
+var N=function(){};var X=window.CCASfx||{tick:N,rise:N,boom:N,beep:N,drum:N,sting:N,buzzer:N,toggle:N,isOn:function(){return false}};
 function lab(){var e=document.getElementById('snd');if(e)e.textContent=X.isOn()?'sound on (M to mute)':'sound off (M)'}
+function flash(){var b=document.body;b.classList.remove('flashing');void b.offsetWidth;b.classList.add('flashing');setTimeout(function(){b.classList.remove('flashing')},850)}
 function count(e){var to=+e.getAttribute('data-count'),t0=null;if(calm||!to){e.textContent=to;return}function f(t){if(!t0)t0=t;var k=Math.min(1,(t-t0)/1000);e.textContent=Math.round(to*k);if(k<1)requestAnimationFrame(f)}requestAnimationFrame(f)}
-function counts(root){[].slice.call(root.querySelectorAll('[data-count]')).forEach(count)}
-function show(){s.forEach(function(x,j){x.classList.toggle('on',j===i)});document.body.classList.toggle('edge',i===0||i===s.length-1);document.body.classList.toggle('night-on',s[i].classList.contains('night'));document.body.classList.toggle('opp-on',s[i].classList.contains('opp'));X.tick();[].slice.call(s[i].querySelectorAll('[data-count]')).filter(function(e){return!e.closest('.rv')}).forEach(count)}
-function reveal(rv){busy=true;s[i].classList.add('revealed');var isNow=rv.classList.contains('now');var done=function(){rv.classList.add('show');var g=rv.getAttribute('data-group');if(g)[].slice.call(s[i].querySelectorAll('.rv[data-group="'+g+'"]')).forEach(function(e){e.classList.add('show')});if(isNow)s[i].classList.add('moved');X.boom();counts(rv);busy=false};
-if(rv.classList.contains('now')&&!calm){s[i].classList.add('drum');X.rise();setTimeout(function(){s[i].classList.remove('drum');done()},1000)}else done()}
-function clock(sl){var secs=+sl.getAttribute('data-timer'),el=sl.querySelector('.clock');function fmt(n){return Math.floor(n/60)+':'+('0'+(n%60)).slice(-2)}el.textContent=fmt(secs);var t=setInterval(function(){secs--;el.textContent=fmt(Math.max(secs,0));if(secs<=10)el.classList.add('low');if(secs<=0){clearInterval(t);el.textContent='Time.';el.classList.remove('low');el.classList.add('done');X.boom()}},1000);X.tick()}
-function next(){if(busy)return;if(s[i].hasAttribute('data-timer')&&!s[i].getAttribute('data-ran')){s[i].setAttribute('data-ran','1');clock(s[i]);return}var rv=s[i].querySelector('.rv:not(.show)');if(rv){reveal(rv);return}if(i<s.length-1){i++;show()}}
+function countRange(e){var from=+e.getAttribute('data-from'),to=+e.getAttribute('data-to'),suf=e.getAttribute('data-suffix')||'';if(calm||from===to){e.textContent=to+suf;return}var t0=null,last=null;function f(t){if(!t0)t0=t;var k=Math.min(1,(t-t0)/1500),v=Math.round(from+(to-from)*k);e.textContent=v+suf;if(v!==last){last=v;X.tick()}if(k<1)requestAnimationFrame(f)}requestAnimationFrame(f)}
+function counts(root){[].slice.call(root.querySelectorAll('[data-count]')).forEach(count);[].slice.call(root.querySelectorAll('[data-to]')).forEach(countRange)}
+function show(){s.forEach(function(x,j){x.classList.toggle('on',j===i)});var b=document.body;b.classList.toggle('edge',i===0||i===s.length-1);b.classList.toggle('night-on',s[i].classList.contains('night'));b.classList.toggle('opp-on',s[i].classList.contains('opp'));X.tick();[].slice.call(s[i].querySelectorAll('[data-count]')).filter(function(e){return!e.closest('.rv')}).forEach(count)}
+function reveal(rv){busy=true;var sl=s[i];sl.classList.add('revealed');var isNow=rv.classList.contains('now');var ms=+(rv.getAttribute('data-drum')||0)||(isNow?1000:0);
+var done=function(){sl.classList.remove('drum');rv.classList.add('show');var g=rv.getAttribute('data-group');if(g)[].slice.call(sl.querySelectorAll('.rv[data-group="'+g+'"]')).forEach(function(e){e.classList.add('show')});if(isNow)sl.classList.add('moved');
+if(rv.hasAttribute('data-sting')||(isNow&&sl.hasAttribute('data-mover'))){X.sting();flash()}else X.boom();counts(rv);busy=false};
+if(ms&&!calm){sl.classList.add('drum');if(isNow)X.rise();else X.drum();setTimeout(done,ms)}else done()}
+function countdown(sl){busy=true;sl.setAttribute('data-cd','1');sl.classList.add('counting');var cd=sl.querySelector('.cd'),n=sl.querySelector('.cdn'),k=3;cd.classList.add('on');
+function step(){if(k>0){n.className='cdn';void n.offsetWidth;n.textContent=k;n.className='cdn';X.beep(false);k--;setTimeout(step,calm?250:850)}else{n.textContent='Cards up!';n.className='cdn go';X.beep(true);busy=false}}step()}
+function fmt(n){return Math.floor(n/60)+':'+('0'+(n%60)).slice(-2)}
+function timerPress(sl){var st=+(sl.getAttribute('data-st')||0),el=sl.querySelector('.clock'),who=sl.querySelector('.who'),pa=sl.querySelector('.pod.a'),pd=sl.querySelector('.pod.d'),total=+sl.getAttribute('data-timer');
+function stop(){clearInterval(sl._t)}
+function run(next){var secs=total;el.textContent=fmt(secs);el.classList.remove('low','done');stop();sl._t=setInterval(function(){secs--;el.textContent=fmt(Math.max(secs,0));if(secs<=10)el.classList.add('low');if(secs<=3&&secs>0)X.tick();if(secs<=0){stop();el.textContent='Time.';el.classList.remove('low');el.classList.add('done');X.buzzer();sl.setAttribute('data-st',String(next))}},1000);X.beep(true)}
+function ready(side){el.textContent=fmt(total);el.classList.remove('low','done');pa.classList.toggle('on',side==='a');pd.classList.toggle('on',side==='d');who.textContent=(side==='a'?'Agree':'Disagree')+' side. Press to start the clock.'}
+if(st===0){sl.setAttribute('data-st','1');pa.classList.add('on');pd.classList.remove('on');who.textContent='Agree side. Clock running. Press to stop early.';run(2);return true}
+if(st===1){stop();sl.setAttribute('data-st','2');ready('d');return true}
+if(st===2){sl.setAttribute('data-st','3');pa.classList.remove('on');pd.classList.add('on');who.textContent='Disagree side. Clock running. Press to stop early.';run(4);return true}
+if(st===3){stop();sl.setAttribute('data-st','4');el.textContent='Done.';return true}
+if(st===4&&!sl.getAttribute('data-end')){sl.setAttribute('data-end','1');ready('d');pa.classList.remove('on');pd.classList.remove('on');who.textContent='Both sides done. Press for the vote.';el.textContent='Done.';return true}
+return false}
+function next(){if(busy)return;var sl=s[i];if(sl.hasAttribute('data-timer')&&timerPress(sl))return;if(sl.hasAttribute('data-cards')&&!sl.getAttribute('data-cd')){countdown(sl);return}var rv=sl.querySelector('.rv:not(.show)');if(rv){reveal(rv);return}if(i<s.length-1){i++;show()}}
 function prev(){if(busy)return;if(i>0){i--;show()}}
 document.addEventListener('keydown',function(e){if(e.key==='ArrowRight'||e.key===' '||e.key==='Enter'||e.key==='PageDown')next();else if(e.key==='ArrowLeft'||e.key==='PageUp')prev();else if(e.key==='f'&&document.documentElement.requestFullscreen)document.documentElement.requestFullscreen();else if(e.key==='m'||e.key==='M'){X.toggle();lab()}});
 document.addEventListener('click',next);show();lab()})();`;
@@ -176,22 +213,25 @@ export function renderStageHtml(d) {
   if (d.kind === 'conference') {
     const open = h`<section class="slide"><p class="kick">The conference game</p><p class="huge">What did the room <em>say</em>?</p>
       <p class="sub">${d.n} delegates answered before the event. Predict first. Then we look.</p></section>`;
-    const per = d.statements.map((x, i) => h`<section class="slide"><p class="kick">Statement ${i + 1} of ${d.statements.length}</p><p class="take ${takeSize(x.text)}">${x.text}</p>
+    const per = d.statements.map((x, i) => h`<section class="slide" data-cards><div class="round"><b>Round ${i + 1}</b> of ${d.statements.length}</div><p class="take ${takeSize(x.text)}">${x.text}</p>
       <div class="topcell"><div class="prompt"><p class="ask">Cards up. What did the room say?</p><div class="pills"><span>Mostly agree</span><span>Split</span><span>Mostly disagree</span></div></div>
-        <div class="heads rv"><div class="a"><span class="num">${x.agree}</span><span class="lab">agreed</span><span class="cap">${x.agreeLabel}</span></div><div class="d"><span class="num">${x.disagree}</span><span class="lab">disagreed</span><span class="cap">${x.disagreeLabel}</span></div></div></div>
+        <div class="cd" aria-hidden="true"><span class="cdn"></span></div>
+        <div class="heads rv" data-drum="1300" data-sting><div class="a"><span class="num">${x.agree}</span><span class="lab">agreed</span><span class="cap">${x.agreeLabel}</span></div><div class="d"><span class="num">${x.disagree}</span><span class="lab">disagreed</span><span class="cap">${x.disagreeLabel}</span></div><div class="stamp">${x.verdict}.</div></div></div>
       ${field({ mode: 'split', a: x.agree, d: x.disagree, micA: x.micAgree, micD: x.micDisagree, label: `${x.agree} agreed and ${x.disagree} disagreed` })}
       <div class="facts rv"><p><b>${x.micAgree + x.micDisagree}</b>would take the microphone (ringed)<i>${x.micAgree} on the agree side · ${x.micDisagree} on the disagree side</i></p>
         <p><b>${x.fightAgree + x.fightDisagree}</b>said \u201cI\u2019d fight you on this\u201d<i>${x.fightAgree} agree · ${x.fightDisagree} disagree</i></p></div></section>`);
     const opposite = h`<section class="slide opp"><p class="kick">Find your opposite</p><div class="vs"><span class="a">Agree</span><span class="or">or</span><span class="d">Disagree</span></div>
       <p class="sub rv">Stand up if you said one. Now find someone who said the other.</p></section>`;
-    const debate = h`<section class="slide night" data-timer="90"><p class="kick">On stage</p><p class="huge md">Ninety seconds each.</p><p class="clock">1:30</p>
-      <p class="sub">Agree side first. Press to start the clock.</p></section>`;
+    const debate = h`<section class="slide night" data-timer="90"><p class="kick">On stage</p><p class="huge md">Ninety seconds each.</p>
+      <div class="pods"><div class="pod a on"><span>Agree</span></div><p class="clock">1:30</p><div class="pod d"><span>Disagree</span></div></div>
+      <p class="sub who">Agree side first. Press to start the clock.</p></section>`;
     const after = h`<section class="slide night"><p class="kick">After the debate</p><p class="huge">Hands up again.<br><em>Did anyone move?</em></p></section>`;
     slides = [open, ...per, opposite, debate, after];
   } else if (d.kind === 'icebreaker') {
-    slides = d.takes.map((tk, i) => h`<section class="slide"><p class="kick">Welcome game · Statement ${i + 1}</p><p class="take ${takeSize(tk.text)}">${tk.text}</p>
+    slides = d.takes.map((tk, i) => h`<section class="slide" data-cards><div class="round"><b>Round ${i + 1}</b> of ${d.takes.length}</div><p class="take ${takeSize(tk.text)}">${tk.text}</p>
       <div class="topcell"><div class="prompt"><p class="ask">Hands up first. Then we reveal the private split.</p></div>
-        <div class="heads rv"><div class="a"><span class="num">${tk.agree}</span><span class="lab">agreed</span><span class="cap">${tk.agreeLabel}</span></div><div class="d"><span class="num">${tk.disagree}</span><span class="lab">disagreed</span><span class="cap">${tk.disagreeLabel}</span></div></div></div>
+        <div class="cd" aria-hidden="true"><span class="cdn"></span></div>
+        <div class="heads rv" data-drum="1300" data-sting><div class="a"><span class="num">${tk.agree}</span><span class="lab">agreed</span><span class="cap">${tk.agreeLabel}</span></div><div class="d"><span class="num">${tk.disagree}</span><span class="lab">disagreed</span><span class="cap">${tk.disagreeLabel}</span></div><div class="stamp">${tk.verdict}.</div></div></div>
       ${field({ mode: 'split', a: tk.agree, d: tk.disagree, label: `${tk.agree} agreed and ${tk.disagree} disagreed` })}</section>`);
     if (!slides.length) slides = [h`<section class="slide"><p class="take">No statements picked yet.</p></section>`];
   } else {
@@ -206,13 +246,16 @@ export function renderStageHtml(d) {
       <p class="huge md">${m.count ? h`The room shifted on <em><span data-count="${m.count}">${m.count}</span> of ${m.total}</em> statements.` : 'The room held its ground.'}</p>
       <p class="sub">${d.flips.matched ? `${d.flips.changedAtLeastOne} of ${d.flips.matched} changed side on at least one statement. ` : ''}Shifted = the average score moved by ${m.threshold} or more (scale -5 to +5), matched people only.</p></section>`;
     const flowOf = (c) => ({ stayA: c.agreePre - c.flipsToDisagree, a2d: c.flipsToDisagree, d2a: c.flipsToAgree, stayD: c.n - c.agreePre - c.flipsToAgree });
-    const per = ordered.map((tk, i) => h`<section class="slide"><p class="kick">Statement ${i + 1} of ${total}</p>
+    const pct = (lab) => { const m = /^(\d+)%/.exec(parts(lab)[0]); return m ? Number(m[1]) : null; };
+    const per = ordered.map((tk, i) => h`<section class="slide" ${tk.id === d.biggestMoverId ? 'data-mover' : ''}><div class="round"><b>Round ${i + 1}</b> of ${total}</div>
       <div>${tk.id === d.biggestMoverId ? h`<span class="tag">BIGGEST MOVER</span>` : ''}${tk.id === d.stillSplitId ? h`<span class="tag">STILL SPLIT</span>` : ''}</div>
       <p class="take ${takeSize(tk.text)}">${tk.text}</p><div class="drumline">&hellip;</div>
       ${finalOnly
         ? h`<div class="pair"><div class="rv now"><div class="lab">Today</div><span class="num">${parts(tk.finalOnlyLabel)[0]}</span><div class="sm">${parts(tk.finalOnlyLabel)[1]} agreed (n = ${tk.final.n})</div></div></div>`
         : h`<div class="pair"><div class="rv" data-group="then"><div class="lab">Then</div><span class="num">${parts(tk.thenLabel)[0]}</span><div class="sm">${parts(tk.thenLabel)[1]} agreed</div></div>
-            <div class="rv now"><div class="lab">Now</div><span class="num">${parts(tk.nowLabel)[0]}</span><div class="sm">${parts(tk.nowLabel)[1]} agreed · average moved ${signed(tk.change.meanNetChange)} · ${tk.change.flips} changed sides</div></div></div>
+            <div class="rv now"><div class="lab">Now</div>${pct(tk.thenLabel) != null && pct(tk.nowLabel) != null
+              ? h`<span class="num" data-from="${pct(tk.thenLabel)}" data-to="${pct(tk.nowLabel)}" data-suffix="%">${pct(tk.thenLabel)}%</span><span class="delta">${pct(tk.nowLabel) === pct(tk.thenLabel) ? 'No change' : `${pct(tk.nowLabel) > pct(tk.thenLabel) ? '\u25b2' : '\u25bc'} ${Math.abs(pct(tk.nowLabel) - pct(tk.thenLabel))} pts`}</span>`
+              : h`<span class="num">${parts(tk.nowLabel)[0]}</span>`}<div class="sm">${parts(tk.nowLabel)[1]} agreed · average moved ${signed(tk.change.meanNetChange)} · ${tk.change.flips} changed sides</div></div></div>
             <div class="rv" data-group="then">${field({ mode: 'flow', ...flowOf(tk.change), label: `${tk.change.flips} of ${tk.change.n} changed side` })}<p class="legend">Ringed dots changed side.</p></div>`}
       </section>`);
     const stories = d.stories.length
@@ -222,5 +265,5 @@ export function renderStageHtml(d) {
     slides = [s0, s1, ...per, stories, close];
   }
   return str(h`<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
-<title>Stage · ${d.kind}</title><style>${raw(CSS())}</style></head><body>${slides}${foot}<script>window.CCA_SFX_STAGE=1;${raw(SFX)}</script><script>${raw(JS)}</script></body></html>`);
+<title>Stage · ${d.kind}</title><style>${raw(CSS())}</style></head><body><div id="flash"></div>${slides}${foot}<script>window.CCA_SFX_STAGE=1;${raw(SFX)}</script><script>${raw(JS)}</script></body></html>`);
 }

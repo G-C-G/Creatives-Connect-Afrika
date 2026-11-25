@@ -64,14 +64,19 @@ test('conference stage deck: aggregates only (no names), most divisive first, op
   assert.match(visibleText(html), /What did the room say\?/); assert.match(html, /6 delegates answered before the event/);
   const visible = html.replace(/<(style|script)[\s\S]*?<\/\1>/g, ' ').replace(/<[^>]*>/g, ' ');
   for (const name of ['Ama', 'Bo', 'Cy', 'Di', 'Eli', 'Fu', 'Surname']) assert.ok(!new RegExp(`\\b${name}\\b`).test(visible), `no names on the big screen: ${name}`);
-  assert.ok(html.indexOf('Find your opposite') > html.indexOf('Statement 5 of 5'));
+  assert.ok(html.indexOf('Find your opposite') > html.indexOf('Round 5</b> of 5'));
+  const first = html.slice(html.indexOf('Round 1</b> of 5'), html.indexOf('Round 2</b> of 5'));
+  // game show: every statement is a round with a countdown, a drum roll, a verdict stamp
+  assert.equal((html.match(/<section class="slide" data-cards>/g) || []).length, 5); assert.ok(first.includes('class="cdn"') && first.includes('data-drum="1300"'));
+  assert.ok(first.includes('<div class="stamp">Split.</div>'), 'a 3/3 room is a Split');
+  assert.ok(html.includes('class="pod a on"') && html.includes('class="pod d"'), 'two podiums, one clock each');
+  assert.ok(html.includes('id="flash"') && html.includes('buzzer'));
   assert.ok(html.includes('data-timer="90"') && html.includes('Ninety seconds each.') && html.includes('Did anyone move?'));
   assert.match(visibleText(html), /would take the microphone/, 'counts of volunteers, not who they are');
   assert.ok(html.includes('<svg class="field split"'));
   assert.equal((html.match(/<circle class="[ad]/g) || []).length, 30, 'one dot per delegate per statement: 6 delegates x 5 statements');
   assert.ok(!/https?:\/\//.test(html), 'no network references');
   // T1 (a perfect 3/3 split) is the first statement shown; T2..T5 (6/0) follow
-  const first = html.slice(html.indexOf('Statement 1 of 5'), html.indexOf('Statement 2 of 5'));
   assert.ok(first.includes('The biggest winners of African festivals') && /<span class="num">3<\/span><span class="lab">agreed/.test(first), 'most divisive statement first');
   assert.equal(c.db.prepare("SELECT COUNT(*) c FROM snapshots WHERE kind='conference'").get().c, 1);
 });

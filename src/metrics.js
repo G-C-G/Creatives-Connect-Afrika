@@ -194,3 +194,6 @@ export function suggestPairs(list, calledIds = new Set(), k = 3) {
   for (let i = 0; i < Math.min(k, a.length, d.length); i++) pairs.push({ agree: a[i], disagree: d[i] });
   return pairs;
 }
+
+// The answer to the prediction question on stage (same thresholds as the phone game's colour cards).
+export const roomVerdict = (share) => (share >= 0.6 ? 'Mostly agree' : share <= 0.4 ? 'Mostly disagree' : 'Split');

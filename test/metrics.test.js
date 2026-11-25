@@ -129,3 +129,8 @@ test('castingList: most willing, then most passionate first; suggestPairs pairs 
   const again = M.suggestPairs(list, new Set(['a']));
   assert.deepEqual(again.map((p) => [p.agree.name, p.disagree.name]), [['Bo X', 'Eli X']]);
 });
+
+test('roomVerdict: the answer to "what did the room say?"', () => {
+  assert.equal(M.roomVerdict(0.6), 'Mostly agree'); assert.equal(M.roomVerdict(0.59), 'Split'); assert.equal(M.roomVerdict(0.5), 'Split');
+  assert.equal(M.roomVerdict(0.41), 'Split'); assert.equal(M.roomVerdict(0.4), 'Mostly disagree');
+});
