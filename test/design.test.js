@@ -63,22 +63,24 @@ test('SHOW_PARTNER_LOGOS=0 hides the partner marks but keeps the GCG mark', asyn
   c.close();
 });
 
-test('wizard: statements first, then ONE question per screen, optional extras skippable, consent last', async () => {
+test('wizard: statements first; then who (name, surname, country together), sector, why you are here, email; consent last', async () => {
   const c = await boot();
   const html = await (await c.call('/start')).text();
   const screens = html.split('<section class="step"').slice(1);
-  assert.equal(screens.length, 25, '15 statement screens + name, surname, email, country, sector + 4 optional + consent');
+  assert.equal(screens.length, 23, '15 statement screens + who + sector + why + email + project + values + contact + consent');
   const has = (re) => screens.map((x, i) => (re.test(x) ? i : -1)).filter((i) => i >= 0);
-  assert.deepEqual(has(/t_T1_stance/), [0]); assert.deepEqual(has(/name="first_name"/), [15]); assert.deepEqual(has(/name="surname"/), [16]);
-  assert.deepEqual(has(/name="email"/), [17]); assert.deepEqual(has(/name="country"/), [18]); assert.deepEqual(has(/name="sector"/), [19]);
-  assert.deepEqual(has(/name="project"/), [20]); assert.deepEqual(has(/name="consent_aggregate"/), [24]);
-  // no screen asks for more than one thing (a screen has at most one text/select field)
-  for (const x of screens) assert.ok(((x.match(/<input[^>]*type="(text|email)"|<select|<textarea/g) || []).length) <= 1);
-  assert.equal((html.match(/data-auto/g) || []).length, 18, '15 statement taps + sector + goal + contact');
+  assert.deepEqual(has(/t_T1_stance/), [0]);
+  assert.deepEqual(has(/name="first_name"/), [15]); assert.deepEqual(has(/name="surname"/), [15]); assert.deepEqual(has(/name="country"/), [15], 'name, surname and country on one page');
+  assert.deepEqual(has(/name="sector"/), [16]); assert.deepEqual(has(/name="goal"/), [17], '"why you are here" is its own page');
+  assert.deepEqual(has(/name="email"/), [18]); assert.deepEqual(has(/name="project"/), [19]); assert.deepEqual(has(/name="consent_aggregate"/), [22]);
+  // "why you are here" cannot be skipped in the UI (an auto-advancing screen with a required choice and no skip)
+  assert.ok(/data-auto/.test(screens[17]) && !/data-skippable/.test(screens[17]) && /required/.test(screens[17]));
+  // every other screen asks for one thing (the who page has three fields by design)
+  screens.forEach((x, i) => assert.ok(((x.match(/<input[^>]*type="(text|email)"|<select|<textarea/g) || []).length) <= (i === 15 ? 3 : 1), `screen ${i}`));
+  assert.equal((html.match(/data-auto/g) || []).length, 18, '15 statement taps + sector + why + contact');
   assert.equal((html.match(/data-optional/g) || []).length, 3 /* email, project, values */);
-  // the door version skips the optional extras
   const door = (await (await c.call('/door')).text()).split('<section class="step"').slice(1);
-  assert.equal(door.length, 21);
+  assert.equal(door.length, 20, 'door: 15 + who + sector + why + email + consent');
   c.close();
 });
 

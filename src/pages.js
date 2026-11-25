@@ -113,15 +113,17 @@ export function landingPage(lang = 'en') {
 export function preForm({ takes, facts = [], S = new URLSearchParams(), E = {}, short = false, lang = 'en' }) {
   const action = short ? '/door' : '/start';
   const q = [
-    ask({ k: t(lang, 'q.name.k'), title: t(lang, 'q.name.t'), hint: t(lang, 'q.name.h'), body: bigInput('first_name', S, E, lang, { required: true, autocomplete: 'given-name', label: t(lang, 'about.first') }) }, lang),
-    ask({ k: t(lang, 'q.surname.k'), title: t(lang, 'q.surname.t'), hint: t(lang, 'q.surname.h'), body: bigInput('surname', S, E, lang, { required: true, autocomplete: 'family-name', label: t(lang, 'about.surname') }) }, lang),
-    ask({ k: t(lang, 'q.email.k'), title: t(lang, 'q.email.t'), hint: t(lang, 'q.email.h'), optional: true, body: bigInput('email', S, E, lang, { type: 'email', max: 254, autocomplete: 'email', label: t(lang, 'about.email') }) }, lang),
-    ask({ k: t(lang, 'q.country.k'), title: t(lang, 'q.country.t'), body: h`<div class="field">${select('country', COUNTRIES, S, lang, E)}${fieldErr(E, 'country', lang)}</div>` }, lang),
+    // name, surname and country share one page; sector, and "why you are here", each get their own
+    ask({ k: t(lang, 'q.name.k'), title: t(lang, 'q.name.t'), hint: t(lang, 'q.name.h'),
+      body: h`${bigInput('first_name', S, E, lang, { required: true, autocomplete: 'given-name', label: t(lang, 'about.first') })}
+        ${bigInput('surname', S, E, lang, { required: true, autocomplete: 'family-name', label: t(lang, 'about.surname') })}
+        <div class="field"><label for="f_country">${t(lang, 'about.country')}</label>${select('country', COUNTRIES, S, lang, E)}${fieldErr(E, 'country', lang)}</div>` }, lang),
     ask({ k: t(lang, 'q.sector.k'), title: t(lang, 'q.sector.t'), auto: true, body: h`${chipPick('sector', SECTORS, S, lang)}${fieldErr(E, 'sector', lang)}` }, lang),
+    ask({ k: t(lang, 'q.goal.k'), title: t(lang, 'q.goal.t'), hint: t(lang, 'q.goal.h'), auto: true, body: chipPick('goal', GOALS, S, lang, true) }, lang),
+    ask({ k: t(lang, 'q.email.k'), title: t(lang, 'q.email.t'), hint: t(lang, 'q.email.h'), optional: true, body: bigInput('email', S, E, lang, { type: 'email', max: 254, autocomplete: 'email', label: t(lang, 'about.email') }) }, lang),
   ];
   const extras = short ? [] : [
     ask({ k: t(lang, 'q.project.k'), title: t(lang, 'q.project.t'), hint: t(lang, 'q.project.h'), optional: true, body: bigInput('project', S, E, lang, { max: 140 }) }, lang),
-    ask({ k: t(lang, 'q.goal.k'), title: t(lang, 'q.goal.t'), auto: true, skip: true, body: chipPick('goal', GOALS, S, lang, false) }, lang),
     ask({ k: t(lang, 'q.values.k'), title: t(lang, 'q.values.t'), hint: t(lang, 'q.values.h'), optional: true,
       body: h`<fieldset class="field" data-maxcheck="3"><div class="chips">${VALUES.map((v) => h`<label class="chip"><input type="checkbox" name="values" value="${v.id}" ${S.getAll('values').includes(v.id) ? 'checked' : ''}><span>${label(v, lang)}</span></label>`)}</div><p class="hint" data-maxmsg></p>${fieldErr(E, 'values', lang)}</fieldset>` }, lang),
     ask({ k: t(lang, 'q.contact.k'), title: t(lang, 'q.contact.t'), hint: t(lang, 'q.contact.h'), auto: true, skip: true,
