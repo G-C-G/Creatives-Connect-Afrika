@@ -73,7 +73,7 @@ export const TAKE_DETAIL = {
   T3: { stem: 'A big opportunity, but they cannot pay. Do you still do it?',
     agree: { good: 'A big audience sees your work', bad: 'Clients expect it cheap after' },
     disagree: { good: 'People respect your work', bad: 'Fewer referrals, a smaller network' } },
-  T5: { setup: 'Both matter. But invest in one first.', stem: 'Which is more valuable to tourism and cultural experiences?',
+  T5: { stem: 'Which is more valuable to tourism and cultural experiences?',
     agree: { eg: 'Artists, storytellers, guides, craftspeople, staff', good: 'They make a place special and worth choosing', bad: 'Without comfortable places, visitors will not come' },
     disagree: { eg: 'Nature, hotels, restaurants, venues', good: 'Comfortable places make visitors want to stay', bad: 'Without culture, visitors can go anywhere else' } },
 };
@@ -85,7 +85,7 @@ export const TAKES = [
   { id: 'T2', position: 5, theme_tag: null, text: 'One budget, one year. Where does it go? Build Africa first for a loyal home audience nobody can take away, but slower money and the world may move on. Go global now for a bigger audience and bigger money, but without a home base you are a guest everywhere.' },
   { id: 'T3', position: 2, theme_tag: null, text: 'A big opportunity comes, but they cannot pay for your work. Do it free and a big audience sees your work, but you may not grow, as clients start expecting it cheap. Stand by your price and your work is respected, but you walk away from the opportunity, and may not grow either, with less work behind you, fewer referrals and a smaller network. What should creatives do?' },
   { id: 'T4', position: 3, theme_tag: null, text: 'I\u2019d rather see African work go global under foreign ownership than stay 100% African-owned and unseen.' },
-  { id: 'T5', position: 1, theme_tag: null, text: 'Both matter, but invest in one first. Which is more valuable to tourism and cultural experiences: the people and social experiences (artists, storytellers, guides, craftspeople, staff), or the place and natural surroundings (nature, hotels, restaurants, venues)?' },
+  { id: 'T5', position: 1, theme_tag: null, text: 'Which is more valuable to tourism and cultural experiences: the people and social experiences (artists, storytellers, guides, craftspeople, staff), or the place and natural surroundings (nature, hotels, restaurants, venues)?' },
 ];
 
 // ALL verified:false until Hinda confirms (flip in /admin). Unverified facts are never shown anywhere.
