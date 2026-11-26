@@ -70,7 +70,7 @@ export const TAKE_DETAIL = {
     disagree: { good: 'A bigger audience and bigger money', bad: 'Without a home base, you are a guest everywhere' } },
   T3: { stem: 'A big opportunity comes, but they cannot pay for your work. Do you still do it?',
     agree: { good: 'A big audience sees your work, and doors may open', bad: 'You may not grow: clients start expecting it cheap, and it gets hard to charge more later' },
-    disagree: { good: 'People respect your work and your price', bad: 'You walk away from a big opportunity, and may not grow either: less work behind you, and few clients who can afford you' } },
+    disagree: { good: 'People respect your work and your price', bad: 'You walk away from a big opportunity, and may not grow either: less work behind you, fewer referrals, and a smaller network' } },
   T5: { stem: 'You can only back one. Who adds more value to a cultural experience?',
     agree: { eg: 'Musicians, tour guides, event and workshop hosts, kids\u2019 activities', good: 'They are the reason people come, and the reason people remember', bad: 'Without a safe, well-run country to host them, the experience falls apart' },
     disagree: { eg: 'Government, hotels, safety, roads, the welcome and the feel of the place', good: 'A safe, welcoming, well-run place is what makes any experience possible', bad: 'Without the artists and experience makers, there is little to come for' } },
@@ -81,7 +81,7 @@ export const detailOf = (id) => TAKE_DETAIL[id] || null;
 export const TAKES = [
   { id: 'T1', position: 4, theme_tag: null, text: 'If you had to choose: making a living, or making work that matters. Money first, and you have security and can keep creating, but the work you care about most may never get made. Meaning first, and the work stays true to you, but your income and security take the hit. Which comes first?' },
   { id: 'T2', position: 5, theme_tag: null, text: 'One budget, one year. Where does it go? Build Africa first for a loyal home audience nobody can take away, but slower money and the world may move on. Go global now for a bigger audience and bigger money, but without a home base you are a guest everywhere.' },
-  { id: 'T3', position: 2, theme_tag: null, text: 'A big opportunity comes, but they cannot pay for your work. Do it free and a big audience sees your work, but you may not grow, as clients start expecting it cheap. Stand by your price and your work is respected, but you walk away from the opportunity, and may not grow either, with less work behind you and few clients who can afford you. What should creatives do?' },
+  { id: 'T3', position: 2, theme_tag: null, text: 'A big opportunity comes, but they cannot pay for your work. Do it free and a big audience sees your work, but you may not grow, as clients start expecting it cheap. Stand by your price and your work is respected, but you walk away from the opportunity, and may not grow either, with less work behind you, fewer referrals and a smaller network. What should creatives do?' },
   { id: 'T4', position: 3, theme_tag: null, text: 'I\u2019d rather see African work go global under foreign ownership than stay 100% African-owned and unseen.' },
   { id: 'T5', position: 1, theme_tag: null, text: 'You can only back one. Who adds more value to a cultural experience: the artists and experience makers (musicians, tour guides, event and workshop hosts), or the host country and its institutions (government, hotels, safety, the welcome)?' },
 ];
