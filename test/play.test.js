@@ -123,7 +123,7 @@ test('check endpoint: matches name+number case-insensitively, refuses others', a
 test('no code: door onboarding hands straight into the game (button only once the game is open)', async () => {
   const c = await boot(); seed(c.db); setSetting(c.db, 'icebreaker_takes', '["T2","T4"]');
   const take = Object.fromEntries(['T1', 'T2', 'T3', 'T4', 'T5'].flatMap((id) => [[`t_${id}_stance`, 'agree'], [`t_${id}_strength`, '3']]));
-  const door = async (email) => (await (await c.call('/door', { auth: false, body: { first_name: 'Kojo', surname: 'A', email, country: 'Ghana', sector: 'film', consent_aggregate: '1', ...take } })).headers.get('location'));
+  const door = async (email) => (await (await c.call('/door', { auth: false, body: { first_name: 'Kojo', surname: 'A', email, country: 'Ghana', sector: 'film', role: 'visitor', consent_aggregate: '1', ...take } })).headers.get('location'));
   let loc = await door('kojo@example.com');
   assert.match(loc, /next=play/);
   assert.match(await (await c.call(loc, { auth: false })).text(), /opens shortly/);
@@ -136,7 +136,7 @@ test('no code: door onboarding hands straight into the game (button only once th
   assert.ok(page.includes('data-name="Kojo"') && page.includes(`data-number="${pt.number}"`), 'no typing needed');
   assert.ok(!(await (await c.call('/play?t=bogus', { auth: false })).text()).includes('data-name='));
   // the normal pre-event link does not push people into a game that is not for them yet
-  const pre = await (await c.call('/start', { auth: false, body: { first_name: 'Esi', surname: 'B', email: 'esi@example.com', country: 'Ghana', sector: 'film', consent_aggregate: '1', ...take } })).headers.get('location');
+  const pre = await (await c.call('/start', { auth: false, body: { first_name: 'Esi', surname: 'B', email: 'esi@example.com', country: 'Ghana', sector: 'film', role: 'visitor', consent_aggregate: '1', ...take } })).headers.get('location');
   assert.doesNotMatch(pre, /next=play/);
   c.close();
 });

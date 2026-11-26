@@ -1,5 +1,5 @@
 import { randomBytes, randomUUID, createHmac, timingSafeEqual, randomInt } from 'node:crypto';
-import { COUNTRIES, SECTORS, GOALS, VALUES, FACT_SLOTS } from './content.js';
+import { COUNTRIES, ROLES, SECTORS, GOALS, VALUES, FACT_SLOTS } from './content.js';
 import { getSetting, getTakes, lockTakes } from './db.js';
 
 export class ClosedError extends Error { constructor(kind) { super(kind); this.kind = kind; } } // 'closed' | 'not_open'
@@ -57,7 +57,7 @@ export function readTicket(secret, ticket, now = new Date()) {
 
 // ---------- validation ----------
 const optIds = (list) => new Set(list.map((o) => o.id));
-const SECTOR_IDS = optIds(SECTORS), GOAL_IDS = optIds(GOALS), VALUE_IDS = optIds(VALUES);
+const ROLE_IDS = optIds(ROLES), SECTOR_IDS = optIds(SECTORS), GOAL_IDS = optIds(GOALS), VALUE_IDS = optIds(VALUES);
 const yn = (v) => (v === 'y' ? true : v === 'n' ? false : null);
 
 export function parseTakeAnswers(p, takes) {
@@ -89,6 +89,8 @@ export function validatePre(p, { short = false, takes }) {
   if (email && !isEmail(email)) errors.email = 'invalid';
   if (!COUNTRIES.includes(country)) errors.country = 'required';
   if (!SECTOR_IDS.has(sector)) errors.sector = 'required';
+  const role = p.get('role') || '';
+  if (!ROLE_IDS.has(role)) errors.role = 'required';
   if (p.get('consent_aggregate') !== '1') errors.consent_aggregate = 'required';
   const goal = p.get('goal') || '';
   if (goal && !GOAL_IDS.has(goal)) errors.goal = 'invalid';
@@ -99,7 +101,7 @@ export function validatePre(p, { short = false, takes }) {
   return {
     errors,
     clean: {
-      first_name: first, surname, email: email || null, country, sector,
+      first_name: first, surname, email: email || null, country, sector, role,
       project: short ? null : clip(p.get('project'), 140) || null,
       goal: short ? null : goal || null, memory: clip(p.get('memory'), 140) || null, values,
       contact_opt_in: short ? false : p.get('contact_opt_in') === '1',
@@ -169,8 +171,8 @@ export function registerPre(db, clean, { source, env = {}, now = new Date(), fac
     let participant, created = false, edited = false;
     if (existing) {
       if (editable) {
-        db.prepare(`UPDATE participants SET first_name=?,surname=?,country=?,sector=?,project=?,goal=?,memory=?,values_json=?,contact_opt_in=?,consent_aggregate=? WHERE id=?`)
-          .run(clean.first_name, clean.surname, clean.country, clean.sector, clean.project, clean.goal, clean.memory ?? null, JSON.stringify(clean.values), +clean.contact_opt_in, +clean.consent_aggregate, existing.id);
+        db.prepare(`UPDATE participants SET first_name=?,surname=?,country=?,sector=?,role=?,project=?,goal=?,memory=?,values_json=?,contact_opt_in=?,consent_aggregate=? WHERE id=?`)
+          .run(clean.first_name, clean.surname, clean.country, clean.sector, clean.role, clean.project, clean.goal, clean.memory ?? null, JSON.stringify(clean.values), +clean.contact_opt_in, +clean.consent_aggregate, existing.id);
         writeResponses(db, existing.id, 'pre', clean.answers);
         writeFactAnswers(db, existing.id, factAnswers);
         edited = true;
@@ -178,9 +180,9 @@ export function registerPre(db, clean, { source, env = {}, now = new Date(), fac
       participant = db.prepare('SELECT * FROM participants WHERE id = ?').get(existing.id);
     } else {
       const id = randomUUID();
-      db.prepare(`INSERT INTO participants(id,number,first_name,surname,email,country,sector,project,goal,memory,values_json,contact_opt_in,consent_aggregate,magic_token,source)
-        VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)`)
-        .run(id, issueNumber(db), clean.first_name, clean.surname, clean.email, clean.country, clean.sector, clean.project, clean.goal, clean.memory ?? null, JSON.stringify(clean.values), +clean.contact_opt_in, +clean.consent_aggregate, newToken(), source);
+      db.prepare(`INSERT INTO participants(id,number,first_name,surname,email,country,sector,role,project,goal,memory,values_json,contact_opt_in,consent_aggregate,magic_token,source)
+        VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)`)
+        .run(id, issueNumber(db), clean.first_name, clean.surname, clean.email, clean.country, clean.sector, clean.role, clean.project, clean.goal, clean.memory ?? null, JSON.stringify(clean.values), +clean.contact_opt_in, +clean.consent_aggregate, newToken(), source);
       writeResponses(db, id, 'pre', clean.answers);
       writeFactAnswers(db, id, factAnswers);
       participant = db.prepare('SELECT * FROM participants WHERE id = ?').get(id);

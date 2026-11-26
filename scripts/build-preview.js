@@ -10,7 +10,7 @@ import { registerPre } from '../src/service.js';
 import { freezeDeck } from '../src/play.js';
 import { suggestIcebreaker } from '../src/metrics.js';
 import { loadData } from '../src/db.js';
-import { COUNTRIES, SECTORS } from '../src/content.js';
+import { COUNTRIES, ROLES, SECTORS } from '../src/content.js';
 
 const ROOT = join(dirname(fileURLToPath(import.meta.url)), '..');
 const out = process.argv[2];
@@ -22,7 +22,7 @@ const db = openDb(':memory:');
 let seed = 11; const rnd = () => (seed = (seed * 16807) % 2147483647) / 2147483647, pick = (a) => a[Math.floor(rnd() * a.length)];
 const takes = db.prepare('SELECT id FROM takes').all();
 for (let i = 0; i < 60; i++) {
-  registerPre(db, { first_name: `Sample${i}`, surname: 'Delegate', email: null, country: pick(COUNTRIES.slice(0, 54)), sector: pick(SECTORS).id, project: null, goal: null, values: [], contact_opt_in: false, consent_aggregate: true,
+  registerPre(db, { first_name: `Sample${i}`, surname: 'Delegate', email: null, country: pick(COUNTRIES.slice(0, 54)), sector: pick(SECTORS).id, role: pick(ROLES).id, project: null, goal: null, values: [], contact_opt_in: false, consent_aggregate: true,
     answers: takes.map((t) => ({ take_id: t.id, stance: rnd() < 0.5 ? 'agree' : 'disagree', strength: 1 + Math.floor(rnd() * 5), say_aloud: rnd() < 0.6, speak_on_stage: rnd() < 0.25 })) },
     { source: 'pre_event', env: { EVENT_STARTS_AT: '2099-01-01T00:00:00Z' } });
 }
@@ -31,7 +31,7 @@ db.prepare("UPDATE facts SET verified = 1 WHERE id IN ('F2','F4','F5','F6','F7',
 const sg = suggestIcebreaker(loadData(db));
 setSetting(db, 'icebreaker_takes', JSON.stringify([...new Set([sg.mostEven, sg.highestStrength, 'T3', 'T1'])].slice(0, 2)));
 freezeDeck(db); setSetting(db, 'play_open', '1');
-const dummy = registerPre(db, { first_name: 'You', surname: 'Preview', email: null, country: 'Ghana', sector: 'gaming', project: null, goal: null, values: [], contact_opt_in: false, consent_aggregate: true,
+const dummy = registerPre(db, { first_name: 'You', surname: 'Preview', email: null, country: 'Ghana', sector: 'gaming', role: 'independent', project: null, goal: null, values: [], contact_opt_in: false, consent_aggregate: true,
   answers: takes.map((t) => ({ take_id: t.id, stance: 'agree', strength: 3, say_aloud: true, speak_on_stage: false })) }, { source: 'pre_event', env: { EVENT_STARTS_AT: '2099-01-01T00:00:00Z' } }).participant;
 
 const env = { ADMIN_PASSWORD: 'x', SESSION_SECRET: 'x', BASE_URL: '', SHOW_PARTNER_LOGOS: '1', EVENT_STARTS_AT: '2026-11-30T08:00:00Z' };

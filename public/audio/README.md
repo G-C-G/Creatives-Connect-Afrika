@@ -10,6 +10,6 @@ Files are MP3, short, and named exactly as below. Keep them small: many delegate
 | `fx/stance-agree.mp3`, `fx/stance-disagree.mp3` | Tapping Agree / Disagree |
 | `fx/strength-1.mp3` to `fx/strength-5.mp3` | "Not very" to "I'd fight you on this" |
 | `fx/level-quiet.mp3`, `fx/level-aloud.mp3`, `fx/level-stage.mp3` | "Keeping that to myself" / "I'd say it out loud" / "Give me the microphone" |
-| `fx/sector.mp3`, `fx/goal.mp3` | Picking a sector / why you are here |
+| `fx/role.mp3`, `fx/sector.mp3`, `fx/goal.mp3` | Picking who you are / a sector / why you are here |
 
 Rights: recordings and voice clips belong to whoever made them. Crediting the source is good practice but is not permission. Do not commit a file to the repository, or host it, until you have the right to. Stage cues are a separate mechanism: `cues/<name>.mp3` next to the downloaded stage deck.

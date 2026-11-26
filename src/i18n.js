@@ -92,6 +92,7 @@ export const en = {
   'q.memory.k': 'One more thing', 'q.memory.t': 'What from your country\u2019s creative past deserves to be remembered?', 'q.memory.h': 'Optional. A song, a film, a look, a festival, a person. One line.', 'about.memory': 'Your answer',
   'q.email.k': 'Email, optional', 'q.email.t': 'Where do we send your code?', 'q.email.h': 'Your code and your Day 3 link. Skip it and screenshot your code instead.',
   'q.country.k': 'Country', 'q.country.t': 'Where are you from?',
+  'q.role.k': 'You, at CCA', 'q.role.t': 'Which best describes you here?', 'q.role.h': 'Pick the closest. It helps us read the room.',
   'q.sector.k': 'Sector', 'q.sector.t': 'What do you do?',
   'q.project.k': 'Optional', 'q.project.t': 'What are you working on?', 'q.project.h': 'One line.',
   'q.goal.k': 'Your reason', 'q.goal.t': 'Why are you here?', 'q.goal.h': 'Pick the one that matters most.',

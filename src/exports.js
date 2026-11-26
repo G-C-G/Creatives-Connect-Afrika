@@ -17,7 +17,7 @@ export function privateCsv(db) {
   const d = loadData(db);
   const resp = new Map(d.responses.map((r) => [`${r.participant_id}|${r.phase}|${r.take_id}`, r]));
   const refl = new Map(d.reflections.map((r) => [r.participant_id, r]));
-  const cols = ['number', 'source', 'first_name', 'surname', 'email', 'country', 'region', 'sector', 'project', 'goal', 'memory', 'values', 'contact_opt_in', 'consent_aggregate', 'created_at'];
+  const cols = ['number', 'source', 'first_name', 'surname', 'email', 'country', 'region', 'role', 'sector', 'project', 'goal', 'memory', 'values', 'contact_opt_in', 'consent_aggregate', 'created_at'];
   for (const t of d.takes) for (const ph of ['pre', 'final']) for (const f of ['stance', 'strength', 'say_aloud', 'speak_on_stage']) cols.push(`${t.id}_${ph}_${f}`);
   cols.push('changed_take_ids', 'what_shaped', 'story', 'story_anon_ok', 'story_name_ok', 'vetted', 'use_in_room');
   const rows = d.participants.map((p) => {
@@ -48,7 +48,7 @@ export function aggregateCsv(db) {
     }
     const c = takeChange(d, t.id);
     for (const [m, v] of Object.entries(c)) add('take_matched', t.id, '', m, v);
-    for (const seg of ['sector', 'region']) {
+    for (const seg of ['role', 'sector', 'region']) {
       for (const cell of segmentTable(d, seg, t.id)) {
         if (cell.suppressed) add(`segment_${seg}`, t.id, cell.segment, 'suppressed_n_lt_5', '');
         else for (const m of ['n', 'agreePre', 'agreeFinal', 'meanNetChange', 'flips']) add(`segment_${seg}`, t.id, cell.segment, m, cell[m]);

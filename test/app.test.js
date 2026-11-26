@@ -23,7 +23,7 @@ async function boot(envExtra = {}, clock = { t: new Date('2026-11-27T10:00:00Z')
   return { db, call, base, clock, close: () => { srv.closeAllConnections(); srv.close(); } };
 }
 const takeFields = (stance = 'agree', strength = 3) => Object.fromEntries(['T1', 'T2', 'T3', 'T4', 'T5'].flatMap((id) => [[`t_${id}_stance`, stance], [`t_${id}_strength`, String(strength)], [`t_${id}_say`, 'y'], [`t_${id}_stage`, 'y']]));
-const pre = (o = {}) => ({ first_name: 'Ama', surname: 'Mensah', email: 'ama@example.com', country: 'Ghana', sector: 'music', consent_aggregate: '1', ...takeFields(), ...o });
+const pre = (o = {}) => ({ first_name: 'Ama', surname: 'Mensah', email: 'ama@example.com', country: 'Ghana', sector: 'music', role: 'independent', consent_aggregate: '1', ...takeFields(), ...o });
 const admin = (ctx) => ({ csrf: null });
 async function csrfOf(ctx) { const html = await (await ctx.call('/admin', { json: false })).text(); return /name="csrf" value="([^"]+)"/.exec(html)[1]; }
 

@@ -155,7 +155,7 @@
     if (chosen) chosen.classList.add('locked');
     var ack = st.querySelector('.ack'); if (ack) ack.textContent = st.getAttribute('data-ack') || '';
     if (SFX) {   // a voice expression for this answer if you added one (public/audio/fx/<slot>.mp3), otherwise the synthesised lock sound
-      var nm = e.target.name.replace(/^t_T\d+_/, ''), slot = /^(sector|goal)$/.test(nm) ? nm : nm + '-' + e.target.value, fxBase = form.getAttribute('data-fx');
+      var nm = e.target.name.replace(/^t_T\d+_/, ''), slot = /^(role|sector|goal)$/.test(nm) ? nm : nm + '-' + e.target.value, fxBase = form.getAttribute('data-fx');
       SFX.answer(fxBase ? fxBase + slot + '.mp3' : null);
     }
     try { if (navigator.vibrate) navigator.vibrate(12); } catch (x) {}

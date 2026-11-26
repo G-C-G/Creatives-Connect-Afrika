@@ -1,6 +1,6 @@
 import { h } from './html.js';
 import { t, label } from './i18n.js';
-import { COUNTRIES, SECTORS, GOALS, VALUES, FACT_SLOTS, LOGOS, GCG_LOGO, CCA_HERO, sidesOf, detailOf, PICKABLE_COUNTRIES } from './content.js';
+import { COUNTRIES, SECTORS, GOALS, VALUES, FACT_SLOTS, LOGOS, GCG_LOGO, CCA_HERO, sidesOf, detailOf, PICKABLE_COUNTRIES, ROLES } from './content.js';
 
 let showLogos = true;
 export const configure = ({ logos }) => { showLogos = logos; };
@@ -129,6 +129,7 @@ export function preForm({ takes, facts = [], S = new URLSearchParams(), E = {}, 
     ask({ k: t(lang, 'who.k'), title: t(lang, 'q.name.t'), hint: t(lang, 'q.name.h'),
       body: h`${bigInput('first_name', S, E, lang, { required: true, autocomplete: 'given-name', label: t(lang, 'about.first') })}
         ${bigInput('surname', S, E, lang, { required: true, autocomplete: 'family-name', label: t(lang, 'about.surname') })}` }, lang),
+    ask({ k: t(lang, 'q.role.k'), title: t(lang, 'q.role.t'), hint: t(lang, 'q.role.h'), auto: true, body: h`<div class="roles">${chipPick('role', ROLES, S, lang)}</div>${fieldErr(E, 'role', lang)}` }, lang),
     ask({ k: t(lang, 'q.sector.k'), title: t(lang, 'q.sector.t'), auto: true, body: h`${chipPick('sector', SECTORS, S, lang)}${fieldErr(E, 'sector', lang)}` }, lang),
     ask({ k: t(lang, 'q.goal.k'), title: t(lang, 'q.goal.t'), hint: t(lang, 'q.goal.h'), auto: true, body: chipPick('goal', GOALS, S, lang, true) }, lang),
     ask({ k: t(lang, 'q.memory.k'), title: t(lang, 'q.memory.t'), hint: t(lang, 'q.memory.h'), optional: true, body: bigInput('memory', S, E, lang, { max: 140, label: t(lang, 'about.memory') }) }, lang),

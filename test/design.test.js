@@ -24,7 +24,7 @@ async function boot(envExtra = {}) {
   return { db, call, close: () => { srv.closeAllConnections(); srv.close(); } };
 }
 const base5 = (o = {}) => Object.fromEntries(['T1', 'T2', 'T3', 'T4', 'T5'].flatMap((id) => [[`t_${id}_stance`, 'agree'], [`t_${id}_strength`, '3'], [`t_${id}_level`, o[id] ?? 'quiet']]));
-const reg = (extra = {}, levels = {}) => ({ first_name: 'Ama', surname: 'M', email: 'a@example.com', country: 'Ghana', sector: 'music', consent_aggregate: '1', ...base5(levels), ...extra });
+const reg = (extra = {}, levels = {}) => ({ first_name: 'Ama', surname: 'M', email: 'a@example.com', country: 'Ghana', sector: 'music', role: 'independent', consent_aggregate: '1', ...base5(levels), ...extra });
 
 test('one-tap "how far would you take it" maps to say-aloud / argue-on-stage', async () => {
   const c = await boot();
@@ -75,23 +75,23 @@ test('SHOW_PARTNER_LOGOS=0 hides the partner marks but keeps the GCG mark', asyn
   c.close();
 });
 
-test('wizard: country first (a short clip of its song can play); then the statements; then who (name and surname), sector, why you are here, an optional memory, email; consent last', async () => {
+test('wizard: country first (a short clip of its song can play); then the statements; then who (name and surname), role, sector, why you are here, an optional memory, email; consent last', async () => {
   const c = await boot();
   const html = await (await c.call('/start')).text();
   const screens = html.split('<section class="step"').slice(1);
-  assert.equal(screens.length, 22, 'country + 15 statement screens + who + sector + why + memory + email + consent: nothing else');
+  assert.equal(screens.length, 23, 'country + 15 statement screens + who + role + sector + why + memory + email + consent: nothing else');
   const has = (re) => screens.map((x, i) => (re.test(x) ? i : -1)).filter((i) => i >= 0);
   assert.deepEqual(has(/name="country"/), [0], 'country is the very first question'); assert.deepEqual(has(/t_T5_stance/), [1]);
   assert.deepEqual(has(/name="first_name"/), [16]); assert.deepEqual(has(/name="surname"/), [16], 'name and surname on one page');
-  assert.deepEqual(has(/name="sector"/), [17]); assert.deepEqual(has(/name="goal"/), [18], '"why you are here" is its own page');
-  assert.deepEqual(has(/name="memory"/), [19], 'the optional creative-past question'); assert.deepEqual(has(/name="email"/), [20]); assert.deepEqual(has(/name="consent_aggregate"/), [21]);
+  assert.deepEqual(has(/name="role"/), [17], 'who you are in the tourism picture'); assert.deepEqual(has(/name="sector"/), [18]); assert.deepEqual(has(/name="goal"/), [19], '"why you are here" is its own page');
+  assert.deepEqual(has(/name="memory"/), [20], 'the optional creative-past question'); assert.deepEqual(has(/name="email"/), [21]); assert.deepEqual(has(/name="consent_aggregate"/), [22]);
   for (const gone of ['name="project"', 'name="values"', 'name="contact_opt_in"']) assert.ok(!html.includes(gone), `${gone} is no longer asked`);
-  assert.ok(/data-auto/.test(screens[18]) && !/data-skippable/.test(screens[18]) && /required/.test(screens[18]), '"why" cannot be skipped');
+  assert.ok(/data-auto/.test(screens[19]) && !/data-skippable/.test(screens[19]) && /required/.test(screens[19]), '"why" cannot be skipped');
   screens.forEach((x, i) => assert.ok(((x.match(/<input[^>]*type="(text|email)"|<select|<textarea/g) || []).length) <= (i === 16 ? 2 : 1), `screen ${i}`));
-  assert.equal((html.match(/data-auto/g) || []).length, 17, '15 statement taps + sector + why');
+  assert.equal((html.match(/data-auto/g) || []).length, 18, '15 statement taps + role + sector + why');
   assert.equal((html.match(/data-optional/g) || []).length, 2, 'only the memory and the email are skippable');
   const door = (await (await c.call('/door')).text()).split('<section class="step"').slice(1);
-  assert.equal(door.length, 22);
+  assert.equal(door.length, 23);
   c.close();
 });
 
@@ -217,5 +217,18 @@ test('country list: the whole world is offered; the old catch-all is not shown; 
   const r = await c.call('/start', { body: reg({ country: 'Spain', email: 's@example.com' }) });
   assert.equal(r.status, 303, 'a delegate from Spain registers fine');
   assert.equal(c.db.prepare("SELECT country FROM participants WHERE email='s@example.com'").get().country, 'Spain');
+  c.close();
+});
+
+test('role question: required, saved, and admin shows what each group thinks per take (small groups hidden)', async () => {
+  const c = await boot();
+  assert.equal((await c.call('/start', { body: { ...reg({}), role: '' } })).status, 422, 'role is required');
+  for (let i = 0; i < 6; i++) await c.call('/start', { body: reg({ email: `g${i}@example.com`, role: 'government', t_T5_stance: i < 4 ? 'agree' : 'disagree' }) });
+  await c.call('/start', { body: reg({ email: 'v@example.com', role: 'visitor' }) });
+  assert.equal(c.db.prepare("SELECT COUNT(*) c FROM participants WHERE role='government'").get().c, 6);
+  const html = await (await c.call('/admin', { auth: true })).text();
+  assert.match(html, /What each group thinks/); assert.match(html, /Government or public body/);
+  assert.match(html, /67%/, '4 of 6 government delegates chose the first option on the tourism take');
+  assert.match(html, /few/, 'the single visitor is hidden, not shown');
   c.close();
 });

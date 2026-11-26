@@ -1,7 +1,7 @@
 import { h, raw, str } from './html.js';
 import { layout } from './pages.js';
 import { loadData, getSetting, setSetting, lockTakes } from './db.js';
-import { SECTORS, FACTS, sidesOf } from './content.js';
+import { SECTORS, FACTS, ROLES, sidesOf } from './content.js';
 import { timings } from './service.js';
 import { retryOutbox } from './mail.js';
 import { privateCsv, aggregateCsv } from './exports.js';
@@ -44,6 +44,19 @@ function takeTable(d) {
     <td>${c.n ? `${c.agreePre} → ${c.agreeFinal} (n=${c.n})` : '–'}</td><td>${fmt(c.meanNetChange)}</td><td>${c.n ? c.flips : '–'}</td></tr>`; })}</table>`;
 }
 
+// The key reading: for each take, how each kind of delegate answered (government, tourism managers, experience makers, independent creatives, visitors).
+// Cells under MIN_CELL are suppressed, and these are people who chose to answer: directional only.
+function roleByTake(d) {
+  const roleOf = new Map(d.participants.map((p) => [p.id, p.role || '']));
+  const label = (id) => ROLES.find((r) => r.id === id)?.en ?? (id || 'Not asked');
+  const ids = [...new Set([...ROLES.map((r) => r.id), ...d.participants.map((p) => p.role || '')])];
+  return h`<h2>What each group thinks (before the event)</h2><p class="hint">Share choosing the first option, by who they are. Groups under ${M.MIN_CELL} people are hidden.</p>
+  <table><tr><th>Take</th>${ids.map((id) => h`<th>${label(id)}</th>`)}</tr>
+  ${d.takes.map((t) => { const sd = sidesOf(t.id); const rs = d.responses.filter((r) => r.phase === 'pre' && r.take_id === t.id);
+    return h`<tr><td><b>${t.id}</b> ${sd ? sd.agree : 'Agree'} vs ${sd ? sd.disagree : 'Disagree'}</td>${ids.map((id) => { const g = rs.filter((r) => roleOf.get(r.participant_id) === id);
+      return g.length < M.MIN_CELL ? h`<td class="hint">${g.length ? 'few' : '–'}</td>` : h`<td>${Math.round((100 * g.filter((r) => r.stance === 'agree').length) / g.length)}% <span class="hint">(n=${g.length})</span></td>`; })}</tr>`; })}</table>`;
+}
+
 function dashboard(ctx, csrf) {
   const { db, env } = ctx, d = loadData(db), tm = timings(db, env);
   const unsent = db.prepare("SELECT COUNT(*) c FROM outbox WHERE status='unsent'").get().c;
@@ -58,7 +71,7 @@ function dashboard(ctx, csrf) {
   return page('Dashboard', h`
   ${warns.length ? h`<div class="consent">${warns.map((w) => h`<p class="err">${w}</p>`)}${unsent ? postBtn('/admin/outbox/retry', csrf, 'Retry unsent emails', {}, 'btn ghost') : ''}</div>` : ''}
   <h2>Participation</h2>${participationTable(M.participation(d))}
-  <h2>Per take</h2>${takeTable(d)}
+  <h2>Per take</h2>${takeTable(d)}${roleByTake(d)}
   <h2>Settings (times are UTC = Accra time)</h2>
   <form method="post" action="/admin/settings">${csrfField(csrf)}
    <div class="field"><label>Event starts (pre-event edits stop)<input type="datetime-local" name="event_starts_at" value="${dtLocal(tm.eventStartsAt)}"></label></div>
