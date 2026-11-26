@@ -37,7 +37,9 @@
   // the opening: "Sound on · Tap here for the full experience". Tapping plays the welcome motif so people can check their phone is ready.
   var sl = doc.querySelector('[data-soundline]');
   if (sl && SFX) {
-    var slLabel = function () { sl.textContent = SFX.isOn() ? 'Sound on \u00b7 Tap here for the full experience' : 'Turn sound on \u00b7 Tap here for the full experience'; };
+    // honest label: until the music is really playing (phones wait for a first touch) it says so; once it plays it says Sound on
+    var slLabel = function () { sl.textContent = !SFX.isOn() ? 'Turn sound on \u00b7 Tap here for the full experience' : (SFX.themePlaying() ? 'Sound on \u00b7 Tap here for the full experience' : 'Tap anywhere to start the music'); };
+    setInterval(function () { if (doc.querySelector('main.landing')) slLabel(); }, 300);
     slLabel(); sl.addEventListener('click', function () { SFX.set(true); if (SFX.themePlaying()) { slLabel(); return; } SFX.welcome(); slLabel(); startSong(); });
   }
   // the welcome song plays as soon as the link opens. Phones usually refuse sound before a touch, so if it is refused it starts on the very first touch anywhere
