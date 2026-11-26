@@ -1,4 +1,5 @@
-// All UI copy lives under keys. Only English ships; add fr.js and register it in LANGS.
+// All UI copy lives under keys. English and French (fr.js, a draft awaiting a native read).
+import { fr } from './fr.js';
 // Take text is NOT here: it is locked in the DB and needs a human-checked translation.
 export const en = {
   'brand.name': 'Gold Coast Games',
@@ -136,9 +137,12 @@ export const en = {
   'err.summary': 'Please fix the highlighted items.',
   'err.network': 'Could not send. Your answers are saved on this phone. Tap Submit again to retry.',
   'err.server': 'Something went wrong. Please try again.',
+  'err.invalid': 'Please check this entry.',
+  'goal.write': 'Write it here', 'goal.other': 'Something else',
+  'lang.q': 'Do you want to continue in French?', 'lang.q.fr': 'Voulez-vous continuer en fran\u00e7ais ?',
 };
 
-export const LANGS = { en };
+export const LANGS = { en, fr };
 export function t(lang, key, vars = {}) {
   const dict = LANGS[lang] || en;
   let s = dict[key] ?? en[key] ?? key;

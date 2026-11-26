@@ -6,6 +6,9 @@ export const EVENT = {
   startsAtDefault: '2026-11-30T08:00:00Z',
 };
 
+import { FR_ROLES, FR_GOALS, FR_ACTIVITIES, FR_TAKES, FRENCH_COUNTRIES } from './fr.js';
+export { FRENCH_COUNTRIES };
+
 const opt = (id, en, fr) => ({ id, en, ...(fr ? { fr } : {}) });
 
 export const SECTORS = [
@@ -179,6 +182,10 @@ export const GOALS = [
   opt('ideas', 'Get ideas and inspiration'), opt('decision_makers', 'Meet decision-makers'), opt('visibility', 'Get my work seen'), opt('story', 'Share my story'), opt('other', 'Something else'),
 ];
 
+for (const r of ROLES) if (FR_ROLES[r.id]) r.fr = FR_ROLES[r.id];
+for (const g of GOALS) if (FR_GOALS[g.id]) g.fr = FR_GOALS[g.id];
+for (const a of ACTIVITIES) if (FR_ACTIVITIES[a.id]) a.fr = FR_ACTIVITIES[a.id];
+
 // ASSUMPTION: the spec says "pick 3 values" without a list. Edit freely before launch.
 export const VALUES = [
   opt('community', 'Community'), opt('craft', 'Craft'), opt('heritage', 'Heritage'),
@@ -207,6 +214,17 @@ export const AFRICAN_COUNTRIES = Object.values(REGION_MAP).flat().sort((a, b) =>
 const REST_OF_WORLD = ['Saint Kitts and Nevis', 'Saint Vincent and the Grenadines', 'Kiribati', 'Marshall Islands', 'Micronesia', 'Nauru', 'Palau', 'Solomon Islands', 'Tonga', 'Tuvalu', 'Vanuatu', 'Timor-Leste', 'San Marino', 'Kosovo', 'Hong Kong', 'Afghanistan', 'Albania', 'Andorra', 'Antigua and Barbuda', 'Argentina', 'Armenia', 'Australia', 'Austria', 'Azerbaijan', 'Bahamas', 'Bahrain', 'Bangladesh', 'Barbados', 'Belarus', 'Belgium', 'Belize', 'Bhutan', 'Bolivia', 'Bosnia and Herzegovina', 'Brazil', 'Brunei', 'Bulgaria', 'Cambodia', 'Canada', 'Chile', 'China', 'Colombia', 'Costa Rica', 'Croatia', 'Cuba', 'Cyprus', 'Czechia', 'Denmark', 'Dominica', 'Dominican Republic', 'Ecuador', 'El Salvador', 'Estonia', 'Fiji', 'Finland', 'France', 'Georgia', 'Germany', 'Greece', 'Grenada', 'Guatemala', 'Guyana', 'Haiti', 'Honduras', 'Hungary', 'Iceland', 'India', 'Indonesia', 'Iran', 'Iraq', 'Ireland', 'Israel', 'Italy', 'Jamaica', 'Japan', 'Jordan', 'Kazakhstan', 'Kuwait', 'Kyrgyzstan', 'Laos', 'Latvia', 'Lebanon', 'Liechtenstein', 'Lithuania', 'Luxembourg', 'Malaysia', 'Maldives', 'Malta', 'Mexico', 'Moldova', 'Monaco', 'Mongolia', 'Montenegro', 'Myanmar', 'Nepal', 'Netherlands', 'New Zealand', 'Nicaragua', 'North Korea', 'North Macedonia', 'Norway', 'Oman', 'Pakistan', 'Palestine', 'Panama', 'Papua New Guinea', 'Paraguay', 'Peru', 'Philippines', 'Poland', 'Portugal', 'Qatar', 'Romania', 'Russia', 'Saint Lucia', 'Samoa', 'Saudi Arabia', 'Serbia', 'Singapore', 'Slovakia', 'Slovenia', 'South Korea', 'Spain', 'Sri Lanka', 'Suriname', 'Sweden', 'Switzerland', 'Syria', 'Taiwan', 'Tajikistan', 'Thailand', 'Trinidad and Tobago', 'Turkey', 'Turkmenistan', 'Ukraine', 'United Arab Emirates', 'United Kingdom', 'United States', 'Uruguay', 'Uzbekistan', 'Vatican City', 'Venezuela', 'Vietnam', 'Yemen'];
 export const COUNTRIES = [...AFRICAN_COUNTRIES, ...REST_OF_WORLD, OUTSIDE_AFRICA];
 export const PICKABLE_COUNTRIES = [...AFRICAN_COUNTRIES, ...REST_OF_WORLD].sort((a, b) => a.localeCompare(b));
+// Country names in French for the picker (the stored value stays the English name). Intl does the translating; a few names need their code spelled out.
+const CODE_FIX = { 'Antigua and Barbuda': 'AG', 'Bosnia and Herzegovina': 'BA', 'Cabo Verde': 'CV', 'Congo (Republic)': 'CG', "C\u00f4te d'Ivoire": 'CI', 'DR Congo': 'CD', 'Hong Kong': 'HK', Myanmar: 'MM', Palestine: 'PS', 'Saint Kitts and Nevis': 'KN', 'Saint Lucia': 'LC', 'Saint Vincent and the Grenadines': 'VC', 'S\u00e3o Tom\u00e9 and Pr\u00edncipe': 'ST', 'Trinidad and Tobago': 'TT', Turkey: 'TR' };
+let _codes = null;
+export function countryLabel(name, lang = 'en') {
+  if (lang !== 'fr') return name;
+  try {
+    if (!_codes) { _codes = {}; const en = new Intl.DisplayNames(['en'], { type: 'region' }); for (let a = 65; a < 91; a++) for (let b = 65; b < 91; b++) { const c = String.fromCharCode(a, b); try { const n = en.of(c); if (n && n !== c) _codes[n] = c; } catch (e) { /* not a region */ } } }
+    const code = CODE_FIX[name] || _codes[name];
+    return code ? new Intl.DisplayNames(['fr'], { type: 'region' }).of(code) : name;
+  } catch (e) { return name; }
+}
 export function regionOf(country) {
   for (const [r, list] of Object.entries(REGION_MAP)) if (list.includes(country)) return r;
   return COUNTRIES.includes(country) ? 'Outside Africa' : 'Unknown';
@@ -220,7 +238,7 @@ export const TAKE_SIDES = {
   T3: { agree: 'Do it for free', disagree: 'Stand by your price' },
   T5: { agree: 'People and social experiences', disagree: 'Places and spaces' },
 };
-export const sidesOf = (id) => TAKE_SIDES[id] || null;
+export const sidesOf = (id, lang = 'en') => (lang === 'fr' && FR_TAKES[id]?.sides) || TAKE_SIDES[id] || null;
 // What a phone shows for those takes: a short question, then the good and the bad of BOTH options on the two tiles.
 export const TAKE_DETAIL = {
   T1: { setup: 'Looking back at the end of your life.', stem: 'Which life would you rather have lived?',
@@ -237,7 +255,9 @@ export const TAKE_DETAIL = {
     agree: { eg: 'Artists, storytellers, singers, dancers, guides, craftspeople, staff', good: ['People make a place unique: their stories, music and welcome are what visitors remember', 'Social experiences turn visitors into guests, and guests into people who return'] },
     disagree: { eg: 'Nature, architecture, cultural spaces, venues, airports', good: ['Places carry culture too: heritage, architecture and living spaces tell a country\u2019s story', 'Great spaces draw visitors and let them enjoy it their own way, with or without the crowd'] } },
 };
-export const detailOf = (id) => TAKE_DETAIL[id] || null;
+export const detailOf = (id, lang = 'en') => (lang === 'fr' && FR_TAKES[id]?.stem ? FR_TAKES[id] : TAKE_DETAIL[id]) || null;
+// The statement as shown to a delegate: the stored English text, or its French display version.
+export const takeText = (take, lang = 'en') => (lang === 'fr' && FR_TAKES[take.id]?.text) || take.text;
 
 // LOCKED once launched. Never reword after locked = 1. theme_tag: TBD per spec.
 export const TAKES = [

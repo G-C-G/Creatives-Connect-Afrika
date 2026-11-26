@@ -45,12 +45,14 @@ const get = async (p) => (await fetch(base + p)).text();
 // ---- rewrite server paths to relative file paths ----
 const rel = (html) => html
   .replaceAll('href="/static/', 'href="static/').replaceAll('src="/static/', 'src="static/').replaceAll('data-theme="/static/', 'data-theme="static/').replaceAll('data-next-theme="/static/', 'data-next-theme="static/').replaceAll('data-audio="/static/', 'data-audio="static/').replaceAll('data-fx="/static/', 'data-fx="static/')
-  .replace('href="/start"', 'href="start.html"').replace('data-deck="/play/deck.json"', 'data-deck="deck.json"').replace('data-join="/door"', 'data-join="start.html"')
+  .replace('data-fr-url="/start?lang=fr"', 'data-fr-url="start.fr.html"').replace('href="/start"', 'href="start.html"').replace('data-deck="/play/deck.json"', 'data-deck="deck.json"').replace('data-join="/door"', 'data-join="start.html"')
   .replace(/<script src="static\/sfx\.js" defer>/, '<script src="static/mock.js" defer></script><script src="static/sfx.js" defer>');
 
 const page = async (path, name, patch = (x) => x) => writeFileSync(join(out, name), patch(rel(await get(path))));
-await page('/start', 'start.html'); await page('/play', 'play.html');
-await page(`/done?t=${dummy.magic_token}`, 'done.html', (x) => x.replace(/(<div class="cl c6 codecard">[\s\S]*?<p class="bignum"[^>]*>)\d{4}(<\/p>)/, '$1<span data-code>----</span>$2'));
+await page('/start', 'start.html'); await page('/start?lang=fr', 'start.fr.html'); await page('/play', 'play.html');
+const codeSwap = (x) => x.replace(/(<div class="cl c6 codecard">[\s\S]*?<p class="bignum"[^>]*>)\d{4}(<\/p>)/, '$1<span data-code>----</span>$2');
+await page(`/done?t=${dummy.magic_token}`, 'done.html', codeSwap);
+await page(`/done?t=${dummy.magic_token}&lang=fr`, 'done.fr.html', codeSwap);
 
 // landing = the artifact's main page: a fragment (the host adds the document skeleton)
 if (SITE) {

@@ -16,7 +16,7 @@
       if (/\/(start|door)$/.test(path)) {
         var p = new URLSearchParams(opts.body), code = String(1000 + Math.floor(Math.random() * 9000));
         set(KEY, JSON.stringify({ name: (p.get('first_name') || '').trim(), code: code }));
-        return json({ ok: true, redirect: 'done.html' });
+        return json({ ok: true, redirect: p.get('lang') === 'fr' ? 'done.fr.html' : 'done.html' });
       }
       if (/\/play\/check$/.test(path)) {
         var b = JSON.parse(opts.body), me = reg();
@@ -38,16 +38,23 @@
     return realFetch(url, opts);
   };
 
-  document.addEventListener('DOMContentLoaded', function () {
+  // the ending: show the code and a way into the game. Runs on a page load AND when the ending is swapped in place after the questions.
+  function pvEnding() {
     var me = reg();
-    // after onboarding: show the code, and a way into the game
     [].slice.call(document.querySelectorAll('[data-code]')).forEach(function (e) { e.textContent = me ? me.code : '1234'; });
     var cliff = document.querySelector('main.cliff');
-    if (cliff) {
+    if (cliff && !cliff.getAttribute('data-pv')) {
+      cliff.setAttribute('data-pv', '1');
       var band = cliff.querySelector('.end-band .hint'); if (band) band.textContent = 'Preview: nothing is emailed or saved.';
       var host = cliff.querySelector('.end-band');
       if (host) { var go = document.createElement('a'); go.href = 'play.html'; go.textContent = 'Preview the welcome game \u2192'; go.style.cssText = 'display:inline-block;margin-top:8px;color:#E2AC4A;font:700 13px/1.3 system-ui,sans-serif;letter-spacing:.04em;text-decoration:underline'; host.appendChild(go); }
     }
+  }
+  new MutationObserver(function () { if (document.querySelector('main.cliff:not([data-pv])')) pvEnding(); }).observe(document.documentElement, { childList: true, subtree: true });
+
+  document.addEventListener('DOMContentLoaded', function () {
+    var me = reg();
+    pvEnding();
     // the welcome game: skip retyping if you just did the onboarding
     var play = document.getElementById('play');
     if (play) {

@@ -1,7 +1,10 @@
 // Progressive enhancement. Without JS the whole form is one long page and still submits.
 (function () {
   var doc = document, root = doc.documentElement;
-  var T = { network: 'Could not send. Your answers are saved on this phone. Tap Submit again to retry.', fix: 'Please complete the highlighted question.', max3: 'You can pick 3 at most.' };
+  var IS_FR = doc.documentElement.lang === 'fr';
+  var T = IS_FR ? { network: 'Envoi impossible. Vos r\u00e9ponses sont enregistr\u00e9es sur ce t\u00e9l\u00e9phone. Appuyez de nouveau sur Valider pour r\u00e9essayer.', fix: 'Veuillez compl\u00e9ter la question surlign\u00e9e.', max3: 'Vous pouvez en choisir 3 au maximum.' }
+    : { network: 'Could not send. Your answers are saved on this phone. Tap Submit again to retry.', fix: 'Please complete the highlighted question.', max3: 'You can pick 3 at most.' };
+  function fold(x) { return String(x || '').normalize ? String(x || '').normalize('NFD').replace(/[\u0300-\u036f]/g, '') : String(x || ''); }
   function store(k, v) { try { if (v === null) localStorage.removeItem(k); else localStorage.setItem(k, v); } catch (e) {} }
   function load(k) { try { return localStorage.getItem(k); } catch (e) { return null; } }
 
@@ -55,7 +58,44 @@
     ['touchend', 'pointerup', 'click', 'keydown'].forEach(function (ev) { doc.addEventListener(ev, first, true); });
   }
   // the ending: a low note as it starts, one hit as the big question lands
-  if (SFX && doc.querySelector('main.cliff') && !calm) { setTimeout(function () { SFX.cliff(); }, 250); setTimeout(function () { SFX.boom(); }, 2800); }
+  // the ending: a low note as it starts, one hit as the big question lands, and a burst of confetti in the CCA colours with it. Runs on load and after the in-place swap.
+  function confetti() {
+    var cv = doc.createElement('canvas'); cv.setAttribute('aria-hidden', 'true'); cv.style.cssText = 'position:fixed;left:0;top:0;width:100%;height:100%;pointer-events:none;z-index:9999';
+    var dpr = Math.min(window.devicePixelRatio || 1, 2), W = window.innerWidth, H = window.innerHeight; cv.width = W * dpr; cv.height = H * dpr; doc.body.appendChild(cv);
+    var ctx = cv.getContext('2d'); if (!ctx) { cv.remove(); return; } ctx.scale(dpr, dpr);
+    var cols = ['#D9252B', '#CC3C3C', '#4F8B4F', '#E2AC4A', '#CC9C54', '#111111'], P = [], i;
+    for (i = 0; i < 160; i++) {
+      var side = i % 3, x = side === 0 ? W * 0.12 : side === 1 ? W * 0.88 : W * 0.5, a = -Math.PI / 2 + (Math.random() - 0.5) * 1.7, sp = 8 + Math.random() * 9;
+      P.push({ x: x, y: H * 0.6, vx: Math.cos(a) * sp * (side === 0 ? 1.15 : side === 1 ? -1.15 : (Math.random() - 0.5) * 1.5), vy: Math.sin(a) * sp, w: 6 + Math.random() * 7, h: 9 + Math.random() * 9, r: Math.random() * 6.28, vr: (Math.random() - 0.5) * 0.4, c: cols[i % cols.length] });
+    }
+    var t0 = Date.now(), DUR = 3800;
+    (function frame() {
+      var el = Date.now() - t0, alive = false; ctx.clearRect(0, 0, W, H);
+      P.forEach(function (p) {
+        p.vy += 0.28; p.vx *= 0.992; p.x += p.vx; p.y += p.vy; p.r += p.vr;
+        var fade = el > DUR - 900 ? Math.max(0, (DUR - el) / 900) : 1;
+        if (p.y < H + 30 && fade > 0) { alive = true; ctx.save(); ctx.globalAlpha = fade; ctx.translate(p.x, p.y); ctx.rotate(p.r); ctx.fillStyle = p.c; ctx.fillRect(-p.w / 2, -p.h / 2, p.w, p.h); ctx.restore(); }
+      });
+      if (alive && el < DUR) requestAnimationFrame(frame); else if (cv.parentNode) cv.parentNode.removeChild(cv);
+    })();
+  }
+  function initEnding() {
+    if (!doc.querySelector('main.cliff') || calm) return;
+    if (SFX) { setTimeout(function () { SFX.cliff(); }, 250); setTimeout(function () { SFX.boom(); }, 2800); }
+    setTimeout(confetti, 2800);
+  }
+  initEnding();
+  // after "Lock it in" the ending replaces the questions in the SAME page, so the music keeps playing right through (it only stops when they leave the page)
+  function goDone(url) {
+    fetch(url, { credentials: 'same-origin' }).then(function (r) { if (!r.ok) throw new Error('x'); return r.text(); }).then(function (t) {
+      var d = new DOMParser().parseFromString(t, 'text/html'), m = d.querySelector('main'), cur = doc.querySelector('main');
+      if (!m || !cur) throw new Error('x');
+      cur.className = m.className; cur.innerHTML = m.innerHTML; doc.body.className = d.body.className; doc.title = d.title;
+      var lg = d.querySelector('.logos.top'); if (lg && !doc.querySelector('.logos.top')) doc.body.insertBefore(doc.importNode(lg, true), cur);
+      try { history.pushState({}, '', url); } catch (x) {}
+      window.scrollTo(0, 0); ensurePill(); initEnding();
+    }).catch(function () { location.href = url; });
+  }
 
   function initWizard() {
   var form = doc.querySelector('form[data-wizard]');
@@ -99,6 +139,27 @@
   function slug(c) { return String(c).normalize('NFD').replace(/[\u0300-\u036f]/g, '').toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, ''); }
   var AFRICAN = {"algeria":1,"angola":1,"benin":1,"botswana":1,"burkina-faso":1,"burundi":1,"cabo-verde":1,"cameroon":1,"central-african-republic":1,"chad":1,"comoros":1,"congo-republic":1,"cote-d-ivoire":1,"djibouti":1,"dr-congo":1,"egypt":1,"equatorial-guinea":1,"eritrea":1,"eswatini":1,"ethiopia":1,"gabon":1,"gambia":1,"ghana":1,"guinea":1,"guinea-bissau":1,"kenya":1,"lesotho":1,"liberia":1,"libya":1,"madagascar":1,"malawi":1,"mali":1,"mauritania":1,"mauritius":1,"morocco":1,"mozambique":1,"namibia":1,"niger":1,"nigeria":1,"rwanda":1,"sao-tome-and-principe":1,"senegal":1,"seychelles":1,"sierra-leone":1,"somalia":1,"south-africa":1,"south-sudan":1,"sudan":1,"tanzania":1,"togo":1,"tunisia":1,"uganda":1,"zambia":1,"zimbabwe":1};
   if (countrySel && SFX && audioBase) countrySel.addEventListener('change', function () { if (countrySel.value) SFX.snippet(audioBase + (AFRICAN[slug(countrySel.value)] ? slug(countrySel.value) : 'ghana') + '.mp3'); else SFX.stopSnippet(); });   // non-African countries quietly get the Ghana clip
+
+  // ---- "Continue in French?": offered under the country when it is a French-speaking one; yes swaps the rest of the onboarding to French without a reload (the music keeps playing) ----
+  var offer = form.querySelector('[data-lang-offer]');
+  if (offer && countrySel) {
+    var FRC = []; try { FRC = JSON.parse(offer.getAttribute('data-fr') || '[]'); } catch (x) {}
+    var declined = '';
+    countrySel.addEventListener('change', function () { offer.hidden = FRC.indexOf(countrySel.value) < 0 || declined === countrySel.value; });
+    offer.querySelector('[data-lang-no]').addEventListener('click', function () { declined = countrySel.value; offer.hidden = true; });
+    offer.querySelector('[data-lang-yes]').addEventListener('click', function () {
+      var country = countrySel.value, btn = this; btn.disabled = true;
+      fetch(offer.getAttribute('data-fr-url'), { credentials: 'same-origin' }).then(function (r) { if (!r.ok) throw new Error('x'); return r.text(); }).then(function (t) {
+        var d = new DOMParser().parseFromString(t, 'text/html'), m = d.querySelector('main'), cur = doc.querySelector('main');
+        if (!m || !cur) throw new Error('x');
+        doc.documentElement.lang = 'fr'; IS_FR = true; T = { network: 'Envoi impossible. Vos r\u00e9ponses sont enregistr\u00e9es sur ce t\u00e9l\u00e9phone. Appuyez de nouveau sur Valider pour r\u00e9essayer.', fix: 'Veuillez compl\u00e9ter la question surlign\u00e9e.', max3: 'Vous pouvez en choisir 3 au maximum.' };
+        cur.className = m.className; cur.innerHTML = m.innerHTML; doc.body.className = d.body.className; doc.title = d.title;
+        window.scrollTo(0, 0); initWizard(); ensurePill();
+        var sel = doc.querySelector('form[data-wizard] select[name=country]'), nx = doc.querySelector('form[data-wizard] [data-next]');
+        if (sel) { sel.value = country; if (nx) nx.click(); }
+      }).catch(function () { btn.disabled = false; });
+    });
+  }
 
   // ---- values: max 3 ----
   [].slice.call(form.querySelectorAll('[data-maxcheck]')).forEach(function (g) {
@@ -148,16 +209,16 @@
       q.value = ''; filter(); refresh(); form.dispatchEvent(new Event('change', { bubbles: true }));
     }
     function filter() {
-      var v = norm(q.value).toLowerCase(), shown = 0, exact = false;
+      var v = fold(norm(q.value).toLowerCase()), shown = 0, exact = false;
       rows.forEach(function (r) { var l = r.getAttribute('data-label'), m = !v || l.indexOf(v) > -1; r.hidden = !m; if (m) shown++; if (l === v) exact = true; });
       heads.forEach(function (h) { var any = false, n = h.nextElementSibling; while (n && !n.classList.contains('acts-h')) { if (n.classList.contains('act') && !n.hidden) any = true; n = n.nextElementSibling; } h.hidden = !any; });
       none.hidden = true; az.style.visibility = v ? 'hidden' : 'visible';
-      if (v && !exact) { addRow.hidden = false; addRow.textContent = 'Add \u201c' + norm(q.value) + '\u201d as your own'; } else addRow.hidden = true;
+      if (v && !exact) { addRow.hidden = false; addRow.textContent = IS_FR ? 'Ajouter \u00ab ' + norm(q.value) + ' \u00bb comme votre propre r\u00e9ponse' : 'Add \u201c' + norm(q.value) + '\u201d as your own'; } else addRow.hidden = true;
     }
     q.addEventListener('input', filter);
     q.addEventListener('keydown', function (e) {
       if (e.key !== 'Enter') return; e.preventDefault(); e.stopPropagation();
-      var v = norm(q.value).toLowerCase(); if (!v) return;
+      var v = fold(norm(q.value).toLowerCase()); if (!v) return;
       var first = rows.filter(function (r) { return !r.hidden; })[0];
       if (first && first.getAttribute('data-label') === v) { var c = first.querySelector('input'); c.checked = !c.checked; c.dispatchEvent(new Event('change', { bubbles: true })); q.value = ''; filter(); }
       else addCustom(q.value);
@@ -262,7 +323,7 @@
     sending = true; submit.disabled = true;
     var body = new URLSearchParams(new FormData(form)).toString();
     post(body, 3).then(function (j) {
-      if (j && j.ok) { store(key, null); location.href = j.redirect; return; }
+      if (j && j.ok) { store(key, null); goDone(j.redirect); return; }
       if (j && j.errors) { var first = Object.keys(j.errors)[0], si = stepOf(first); if (si > -1) show(si);
         errBox.textContent = (j.message || T.fix); errBox.hidden = false; return; }
       errBox.textContent = (j && j.message) || T.network; errBox.hidden = false;

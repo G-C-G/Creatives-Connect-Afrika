@@ -63,7 +63,7 @@ export function createApp({ db, env = process.env, now = () => new Date(), fetch
   }
 
   const wantsJson = (req) => (req.headers.accept || '').includes('application/json');
-  const lang = () => 'en';
+  const lang = (v) => (v === 'fr' ? 'fr' : 'en');   // French is chosen on the first screen of the onboarding and carried by ?lang=fr / a hidden field
 
   async function route(req, url) {
     const p = url.pathname, method = req.method;
@@ -120,14 +120,14 @@ export function createApp({ db, env = process.env, now = () => new Date(), fetch
 
     if ((p === '/start' || p === '/door') && method === 'GET') {
       const short = p === '/door';
-      return html(P.preForm({ takes, facts: getVerifiedFacts(db), short, lang: lang() }));
+      return html(P.preForm({ takes, facts: getVerifiedFacts(db), short, lang: lang(url.searchParams.get('lang')) }));
     }
     if ((p === '/start' || p === '/door') && method === 'POST') {
       if (!writeLimit(ip(req))) return json({ ok: false, message: 'Too many requests. Wait a minute.' }, 429);
-      const short = p === '/door', form = await readForm(req);
+      const short = p === '/door', form = await readForm(req), L = lang(form.get('lang'));
       const { errors, clean } = S.validatePre(form, { short, takes });
       if (Object.keys(errors).length) {
-        return wantsJson(req) ? json({ ok: false, errors }, 422) : html(P.preForm({ takes, facts: getVerifiedFacts(db), S: form, E: errors, short, lang: lang() }), 422);
+        return wantsJson(req) ? json({ ok: false, errors }, 422) : html(P.preForm({ takes, facts: getVerifiedFacts(db), S: form, E: errors, short, lang: L }), 422);
       }
       const r = S.registerPre(db, clean, { source: short ? 'door' : 'pre_event', env, now: now(), factAnswers: S.factAnswersFrom(form, db) });
       let queued = false;
@@ -136,7 +136,7 @@ export function createApp({ db, env = process.env, now = () => new Date(), fetch
         queued = true;
         sendOutboxRow(db, id, env, fetchImpl).catch(() => {}); // fire and forget; failure stays in outbox
       }
-      const to = `/done?t=${r.participant.magic_token}${r.existing ? '&existing=1' : ''}${short ? '&next=play' : ''}`;
+      const to = `/done?t=${r.participant.magic_token}${r.existing ? '&existing=1' : ''}${short ? '&next=play' : ''}${L === 'fr' ? '&lang=fr' : ''}`;
       return wantsJson(req) ? json({ ok: true, redirect: to }) : redirect(to);
     }
 
@@ -145,8 +145,8 @@ export function createApp({ db, env = process.env, now = () => new Date(), fetch
       if (!pt) return html(P.messagePage('Link not found', 'Please check the link in your email.'), 404);
       const pending = !!pt.email && !!db.prepare("SELECT 1 FROM outbox WHERE participant_id=? AND status='unsent'").get(pt.id);
       const start = S.timings(db, env).eventStartsAt ? new Date(S.timings(db, env).eventStartsAt) : null;
-      const comeBack = start && now() < start ? start.toLocaleDateString('en-GB', { weekday: 'long', timeZone: 'UTC' }) : null;
-      return html(P.donePage({ participant: pt, comeBack, existing: url.searchParams.get('existing') === '1', emailQueued: pending, nextPlay: url.searchParams.get('next') === 'play' ? (playOpen(db) && !!latestDeck(db) ? 'open' : 'wait') : null, lang: lang() }));
+      const L = lang(url.searchParams.get('lang')), comeBack = start && now() < start ? start.toLocaleDateString(L === 'fr' ? 'fr-FR' : 'en-GB', { weekday: 'long', timeZone: 'UTC' }) : null;
+      return html(P.donePage({ participant: pt, comeBack, existing: url.searchParams.get('existing') === '1', emailQueued: pending, nextPlay: url.searchParams.get('next') === 'play' ? (playOpen(db) && !!latestDeck(db) ? 'open' : 'wait') : null, lang: L }));
     }
 
     // ---------- "what did I say?": optional, off until the host switches it on (it shows people their own earlier answers) ----------

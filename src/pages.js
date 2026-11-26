@@ -1,6 +1,6 @@
 import { h } from './html.js';
 import { t, label } from './i18n.js';
-import { COUNTRIES, SECTORS, GOALS, VALUES, FACT_SLOTS, LOGOS, GCG_LOGO, CCA_HERO, sidesOf, detailOf, PICKABLE_COUNTRIES, ROLES, ACTIVITIES } from './content.js';
+import { COUNTRIES, SECTORS, GOALS, VALUES, FACT_SLOTS, LOGOS, GCG_LOGO, CCA_HERO, sidesOf, detailOf, PICKABLE_COUNTRIES, ROLES, ACTIVITIES, takeText, countryLabel, FRENCH_COUNTRIES } from './content.js';
 
 let showLogos = true;
 export const configure = ({ logos }) => { showLogos = logos; };
@@ -25,12 +25,12 @@ export function layout({ title, body, lang = 'en', main = '', script = '', logos
 </body></html>`;
 }
 
-const msg = (lang, code) => (code === 'invalid' ? 'Please check this entry.' : code === 'max3' ? t(lang, 'work.values_max') : t(lang, 'err.required'));
+const msg = (lang, code) => (code === 'invalid' ? t(lang, 'err.invalid') : code === 'max3' ? t(lang, 'work.values_max') : t(lang, 'err.required'));
 const fieldErr = (E, k, lang) => (E[k] ? h`<p class="err" role="alert">${msg(lang, E[k])}</p>` : '');
 
 function select(name, options, S, lang, E, required = true) {
   return h`<select id="f_${name}" name="${name}" ${required ? 'required' : ''}><option value="">${t(lang, 'about.choose')}</option>
-  ${options.map((o) => { const id = o.id ?? o; const lab = o.id ? label(o, lang) : o;
+  ${(lang === 'fr' && typeof options[0] === 'string' ? options.map((o) => [o, countryLabel(o, lang)]).sort((a, b) => a[1].localeCompare(b[1], 'fr')).map((x) => x[0]) : options).map((o) => { const id = o.id ?? o; const lab = o.id ? label(o, lang) : countryLabel(o, lang);
     return h`<option value="${id}" ${S.get(name) === id ? 'selected' : ''}>${lab}</option>`; })}</select>`;
 }
 
@@ -55,12 +55,12 @@ function takeSteps(take, n, total, S, lang, phase = 'pre') {
   const meta = h`<div class="meta"><span class="count">${pad(n)}<i> / ${pad(total)}</i></span>
     <span class="ticks" aria-hidden="true">${Array.from({ length: total }, (_, i) => h`<i class="${i < n - 1 ? 'done' : i === n - 1 ? 'now' : ''}"></i>`)}</span></div>`;
   const opener = t(lang, `opener.${phase}.${n}`);
-  const dt = detailOf(take.id), shown = dt ? dt.stem : take.text;   // two-option takes show a short question; the good and bad sit on the tiles
-  const tile = (side) => dt ? [side === 'agree' ? 'agree' : 'disagree', sidesOf(take.id)[side], h`${dt[side].eg ? h`<i class="eg">${dt[side].eg}</i>` : ''}${[].concat(dt[side].good).map((g) => h`<i class="g">${g}</i>`)}${dt[side].bad ? h`<i class="b">${dt[side].bad}</i>` : ''}`] : null;
+  const dt = detailOf(take.id, lang), shown = dt ? dt.stem : takeText(take, lang);   // two-option takes show a short question; the good and bad sit on the tiles
+  const tile = (side) => dt ? [side === 'agree' ? 'agree' : 'disagree', sidesOf(take.id, lang)[side], h`${dt[side].eg ? h`<i class="eg">${dt[side].eg}</i>` : ''}${[].concat(dt[side].good).map((g) => h`<i class="g">${g}</i>`)}${dt[side].bad ? h`<i class="b">${dt[side].bad}</i>` : ''}`] : null;
   const ackLevel = t(lang, n === total ? 'ack.level.last' : 'ack.level');
   return [
     h`<section class="step" data-step data-auto data-ack="${t(lang, 'ack.stance')}" data-title="${kick}">${meta}<p class="opener">${opener}</p>${dt?.setup ? h`<p class="setup">${dt.setup}</p>` : ''}<h2 class="take">${shown}</h2>
-      <fieldset><legend class="sr">${take.text}</legend>${pick(`${k}_stance`, dt ? [tile('agree'), tile('disagree')] : [['agree', sidesOf(take.id)?.agree ?? t(lang, 'take.agree')], ['disagree', sidesOf(take.id)?.disagree ?? t(lang, 'take.disagree')]], S, `two big serif${sidesOf(take.id) ? ' lab' : ''}${dt ? ' detail' : ''}`)}</fieldset><p class="ack" aria-live="polite"></p></section>`,
+      <fieldset><legend class="sr">${takeText(take, lang)}</legend>${pick(`${k}_stance`, dt ? [tile('agree'), tile('disagree')] : [['agree', sidesOf(take.id, lang)?.agree ?? t(lang, 'take.agree')], ['disagree', sidesOf(take.id, lang)?.disagree ?? t(lang, 'take.disagree')]], S, `two big serif${sidesOf(take.id, lang) ? ' lab' : ''}${dt ? ' detail' : ''}`)}</fieldset><p class="ack" aria-live="polite"></p></section>`,
     h`<section class="step" data-step data-auto data-ack="${t(lang, 'ack.strength')}" data-acks="${JSON.stringify(Object.fromEntries([2, 3, 4, 5].map((i) => [String(i), t(lang, `ack.str.${i}`)])))}" data-title="${kick}">${meta}<p class="echo">${shown}</p>
       <h2 class="ask">${t(lang, 'strength.ask')}</h2>
       <fieldset><legend class="sr">${t(lang, 'strength.ask')}</legend>${pick(`${k}_strength`, [2, 3, 4, 5].map((i) => [String(i), t(lang, `strength.${i}`)]), S, 'stack words')}</fieldset><p class="ack" aria-live="polite"></p></section>`,
@@ -77,7 +77,7 @@ function ask({ k, title, hint = '', body, optional = false, auto = false, skip =
 }
 const bigInput = (name, S, E, lang, { type = 'text', required = false, max = 80, autocomplete = '', label: lab = '' } = {}) => h`<div class="field">
   ${lab ? h`<label for="f_${name}">${lab}</label>` : ''}<input id="f_${name}" name="${name}" type="${type}" maxlength="${max}" value="${S.get(name) ?? ''}" ${required ? 'required' : ''} ${autocomplete ? `autocomplete="${autocomplete}"` : ''}>${fieldErr(E, name, lang)}</div>`;
-const chipMulti = (name, options, S) => h`<div class="chips">${options.map((o) => h`<label class="chip"><input type="checkbox" name="${name}" value="${o.id}" ${(S.getAll ? S.getAll(name) : []).includes(o.id) ? 'checked' : ''}><span>${o.en}</span></label>`)}</div>`;
+const chipMulti = (name, options, S, lang = 'en') => h`<div class="chips">${options.map((o) => h`<label class="chip"><input type="checkbox" name="${name}" value="${o.id}" ${(S.getAll ? S.getAll(name) : []).includes(o.id) ? 'checked' : ''}><span>${label(o, lang)}</span></label>`)}</div>`;
 const chipPick = (name, options, S, lang, required = true) => h`<div class="chips">${options.map((o, i) => h`<label class="chip"><input type="radio" name="${name}" value="${o.id}" ${S.get(name) === o.id ? 'checked' : ''} ${required && i === 0 ? 'required' : ''}><span>${label(o, lang)}</span></label>`)}</div>`;
 
 function factStep(f, S, lang) {
@@ -128,11 +128,14 @@ export function landingPage(lang = 'en') {
 // "Where do you play?": a searchable A to Z list of specific things people do, pick as many as you like. Works with no JavaScript (plain checkboxes); the script adds search, picked chips and "add your own".
 function activitiesPicker(S, E, lang) {
   const picked = new Set(S.getAll ? S.getAll('activity') : []);
-  const letters = [...new Set(ACTIVITIES.map((a) => a.en[0].toUpperCase()))];
+  const fold = (x) => x.normalize('NFD').replace(/[\u0300-\u036f]/g, '');
+  const list = ACTIVITIES.map((a) => ({ ...a, lab: label(a, lang) })); if (lang === 'fr') list.sort((a, b) => a.lab.localeCompare(b.lab, 'fr'));
+  const first = (a) => fold(a.lab)[0].toUpperCase();
+  const letters = [...new Set(list.map(first))];
   return h`<div class="acts" data-acts>
     <input class="acts-q" type="search" autocomplete="off" placeholder="${t(lang, 'q.sector.ph')}" aria-label="${t(lang, 'q.sector.ph')}" data-acts-q>
     <div class="acts-sel" data-acts-sel aria-live="polite"></div>
-    <div class="acts-body"><div class="acts-list" data-acts-list>${letters.map((L) => h`<p class="acts-h" data-letter="${L}">${L}</p>${ACTIVITIES.filter((a) => a.en[0].toUpperCase() === L).map((a) => h`<label class="act" data-label="${a.en.toLowerCase()}"><input type="checkbox" name="activity" value="${a.id}" ${picked.has(a.id) ? 'checked' : ''}><span>${a.en}</span></label>`)}`)}
+    <div class="acts-body"><div class="acts-list" data-acts-list>${letters.map((L) => h`<p class="acts-h" data-letter="${L}">${L}</p>${list.filter((a) => first(a) === L).map((a) => h`<label class="act" data-label="${fold(a.lab).toLowerCase()}"><input type="checkbox" name="activity" value="${a.id}" ${picked.has(a.id) ? 'checked' : ''}><span>${a.lab}</span></label>`)}`)}
       <p class="acts-none" data-acts-none hidden>${t(lang, 'q.sector.none')}</p></div>
       <div class="acts-az" data-acts-az aria-hidden="true">${letters.map((L) => h`<button type="button" data-jump="${L}" tabindex="-1">${L}</button>`)}</div></div>
     <div data-acts-custom></div>${fieldErr(E, 'activity', lang)}</div>`;
@@ -147,7 +150,7 @@ export function preForm({ takes, facts = [], S = new URLSearchParams(), E = {}, 
         ${bigInput('surname', S, E, lang, { required: true, autocomplete: 'family-name', label: t(lang, 'about.surname') })}` }, lang),
     ask({ k: t(lang, 'q.role.k'), title: t(lang, 'q.role.t'), hint: t(lang, 'q.role.h'), auto: true, body: h`<div class="roles">${chipPick('role', ROLES, S, lang)}</div>${fieldErr(E, 'role', lang)}` }, lang),
     ask({ k: t(lang, 'q.sector.k'), title: t(lang, 'q.sector.t'), hint: t(lang, 'q.sector.h'), body: activitiesPicker(S, E, lang) }, lang),
-    ask({ k: t(lang, 'q.goal.k'), title: t(lang, 'q.goal.t'), hint: t(lang, 'q.goal.h'), body: h`<div class="goals" data-atleast>${chipMulti('goal', GOALS, S)}<div class="goal-other" data-goal-other ${(S.getAll ? S.getAll('goal') : []).includes('other') ? '' : 'hidden'}><input type="text" name="goal_other" maxlength="80" placeholder="Write it here" value="${S.get ? (S.get('goal_other') ?? '') : ''}" aria-label="Something else"></div></div>` }, lang),
+    ask({ k: t(lang, 'q.goal.k'), title: t(lang, 'q.goal.t'), hint: t(lang, 'q.goal.h'), body: h`<div class="goals" data-atleast>${chipMulti('goal', GOALS, S, lang)}<div class="goal-other" data-goal-other ${(S.getAll ? S.getAll('goal') : []).includes('other') ? '' : 'hidden'}><input type="text" name="goal_other" maxlength="80" placeholder="${t(lang, 'goal.write')}" value="${S.get ? (S.get('goal_other') ?? '') : ''}" aria-label="${t(lang, 'goal.other')}"></div></div>` }, lang),
     ask({ k: t(lang, 'q.memory.k'), title: t(lang, 'q.memory.t'), hint: t(lang, 'q.memory.h'), optional: true, body: bigInput('memory', S, E, lang, { max: 140, label: t(lang, 'about.memory') }) }, lang),
     ask({ k: t(lang, 'q.email.k'), title: t(lang, 'q.email.t'), hint: t(lang, 'q.email.h'), optional: true, body: bigInput('email', S, E, lang, { type: 'email', max: 254, autocomplete: 'email', label: t(lang, 'about.email') }) }, lang),
   ];
@@ -155,7 +158,7 @@ export function preForm({ takes, facts = [], S = new URLSearchParams(), E = {}, 
     <label class="check"><input type="checkbox" name="consent_aggregate" value="1" required ${S.get('consent_aggregate') === '1' ? 'checked' : ''}><span>${t(lang, 'consent.aggregate')}</span></label>${fieldErr(E, 'consent_aggregate', lang)}` }, lang);
   const byId = new Map(facts.map((f) => [f.id, f]));
   const steps = [ask({ k: t(lang, 'q.country.k'), title: t(lang, 'q.country.t'), hint: t(lang, 'q.country.h'),
-    body: h`<div class="field"><label for="f_country" class="sr">${t(lang, 'about.country')}</label>${select('country', PICKABLE_COUNTRIES, S, lang, E)}${fieldErr(E, 'country', lang)}</div>` }, lang)];
+    body: h`<div class="field"><label for="f_country" class="sr">${t(lang, 'about.country')}</label>${select('country', PICKABLE_COUNTRIES, S, lang, E)}${fieldErr(E, 'country', lang)}</div>${lang === 'en' && !short ? h`<div class="lang-offer" data-lang-offer data-fr-url="/start?lang=fr" data-fr="${JSON.stringify(FRENCH_COUNTRIES)}" hidden><p class="lq"><b>${t('en', 'lang.q')}</b><br>${t('fr', 'lang.q.fr')}</p><div class="lang-btns"><button type="button" class="btn" data-lang-yes>Oui, en fran\u00e7ais</button><button type="button" class="btn ghost" data-lang-no>No, English</button></div></div>` : ''}` }, lang)];
   takes.forEach((tk, i) => {
     steps.push(...takeSteps(tk, i + 1, takes.length, S, lang));
     const f = !short && byId.get(FACT_SLOTS[i + 1]);
@@ -164,7 +167,7 @@ export function preForm({ takes, facts = [], S = new URLSearchParams(), E = {}, 
   steps.push(...q, consent);
   const top = short ? h`<h1>${t(lang, 'door.title')}</h1><p class="lead">${t(lang, 'door.lead')}</p>
     ${facts.length ? h`<div class="cards"><h2>${t(lang, 'door.facts')}</h2>${facts.map((f) => h`<p class="card">${f.text}</p>`)}</div>` : ''}` : '';
-  return layout({ lang, bodyClass: 'q', title: 'Creatives Connect Afrika | Game', main: 'narrow wizard', body: wizard({ action, id: short ? 'door' : 'pre', steps, lang, E, extraTop: top }) });
+  return layout({ lang, bodyClass: 'q', title: 'Creatives Connect Afrika | Game', main: 'narrow wizard', body: wizard({ action, id: short ? 'door' : 'pre', steps, lang, E, extraTop: top, hidden: lang === 'fr' ? { lang: 'fr' } : {} }) });
 }
 
 export function donePage({ participant, existing = false, emailQueued = false, nextPlay = null, comeBack = null, lang = 'en' }) {
