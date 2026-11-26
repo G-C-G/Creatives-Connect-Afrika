@@ -54,7 +54,7 @@ export function regionOf(country) {
 // Takes that are a choice between two options instead of Agree / Disagree. The answer is still stored as agree (first option) or disagree (second option);
 // only the words shown to people change (the buttons, the stage deck, the welcome game).
 export const TAKE_SIDES = {
-  T1: { agree: 'Reshape it to earn', disagree: 'Keep it true, and struggle' },
+  T1: { agree: 'Change it to make money', disagree: 'Keep it as it is' },
   T2: { agree: 'Build Africa first', disagree: 'Go global now' },
   T3: { agree: 'Do it for free', disagree: 'Stand by your price' },
   T5: { agree: 'The artists and experience makers', disagree: 'The host country and its institutions' },
@@ -62,9 +62,9 @@ export const TAKE_SIDES = {
 export const sidesOf = (id) => TAKE_SIDES[id] || null;
 // What a phone shows for those takes: a short question, then the good and the bad of BOTH options on the two tiles.
 export const TAKE_DETAIL = {
-  T1: { stem: 'Your work could shape generations, but it will not pay. What should an artist do?',
-    agree: { eg: 'Build a plan that pays the bills', good: 'You stay sustainable, and can keep creating', bad: 'You may lose the heart and essence that made the work matter' },
-    disagree: { eg: 'Keep doing the work, whatever it pays', good: 'Its heart and impact stay whole, and can last for generations', bad: 'You struggle to survive, and may have to stop altogether' } },
+  T1: { stem: 'You make work that could change lives. But it does not pay the bills. What do you do?',
+    agree: { eg: 'Add a business plan. Give people what sells.', good: 'You can pay your rent and keep creating', bad: 'It may stop being the work you believed in' },
+    disagree: { eg: 'Do the work you believe in, even if it pays little.', good: 'The work stays true, and its impact can last for generations', bad: 'You may struggle to survive, or have to stop' } },
   T2: { stem: 'One budget, one year. Where does it go?',
     agree: { good: 'A loyal home audience nobody can take away', bad: 'Slower money, and the world may move on' },
     disagree: { good: 'A bigger audience and bigger money', bad: 'Without a home base, you are a guest everywhere' } },
@@ -79,7 +79,7 @@ export const detailOf = (id) => TAKE_DETAIL[id] || null;
 
 // LOCKED once launched. Never reword after locked = 1. theme_tag: TBD per spec.
 export const TAKES = [
-  { id: 'T1', position: 4, theme_tag: null, text: 'Your work could shape generations, but it will not pay. Reshape it into a business that earns, and you stay sustainable but may lose its heart and impact. Keep doing the work as it is, and its impact stays whole, but you may struggle to survive. What should an artist do?' },
+  { id: 'T1', position: 4, theme_tag: null, text: 'You make work that could change lives, but it does not pay the bills. Change it to make money, and you can keep going, but it may stop being the work you believed in. Keep it as it is, and the work stays true, but you may struggle, or have to stop. What do you do?' },
   { id: 'T2', position: 5, theme_tag: null, text: 'One budget, one year. Where does it go? Build Africa first for a loyal home audience nobody can take away, but slower money and the world may move on. Go global now for a bigger audience and bigger money, but without a home base you are a guest everywhere.' },
   { id: 'T3', position: 2, theme_tag: null, text: 'Someone wants your work but cannot pay. Do it free and more people see your work, but you may not grow, as clients start expecting it cheap. Stand by your price and your work is respected, but you may not grow either, with less work behind you and few clients who can afford you. What should creatives do?' },
   { id: 'T4', position: 3, theme_tag: null, text: 'I\u2019d rather see African work go global under foreign ownership than stay 100% African-owned and unseen.' },
