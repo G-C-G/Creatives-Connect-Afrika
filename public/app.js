@@ -37,7 +37,7 @@
   // the opening: "Sound on · Tap here for the full experience". Tapping plays the welcome motif so people can check their phone is ready.
   var sl = doc.querySelector('[data-soundline]');
   if (sl && SFX) {
-    var slLabel = function () { sl.textContent = (SFX.isOn() ? 'Sound on' : 'Sound off') + ' \u00b7 Tap here for the full experience'; };
+    var slLabel = function () { sl.textContent = SFX.isOn() ? 'Sound on \u00b7 Tap here for the full experience' : 'Turn sound on \u00b7 Tap here for the full experience'; };
     slLabel(); sl.addEventListener('click', function () { SFX.set(true); SFX.welcome(); slLabel(); });
   }
   // the ending: a low note as it starts, one hit as the big question lands
