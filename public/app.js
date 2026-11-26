@@ -46,7 +46,7 @@
   function startSong() { if (SFX && theme && SFX.isOn() && !SFX.themePlaying()) SFX.theme(theme.getAttribute('data-theme'), true); }
   if (SFX && theme) {
     SFX.prepare(theme.getAttribute('data-theme')); SFX.prepare(theme.getAttribute('data-next-theme'));
-    var fxb = (theme.getAttribute('data-next-theme') || '').replace(/questions\.mp3$/, 'fx/'); if (fxb) { SFX.prepareFx(fxb + 'level-quiet.mp3'); SFX.prepareFx(fxb + 'wealth.mp3'); SFX.prepareFx(fxb + 'strength-5.mp3'); }
+    var fxb = (theme.getAttribute('data-next-theme') || '').replace(/questions\.mp3$/, 'fx/'); if (fxb) { SFX.prepareFx(fxb + 'level-quiet.mp3'); SFX.prepareFx(fxb + 'level-stage.mp3'); SFX.prepareFx(fxb + 'wealth.mp3'); SFX.prepareFx(fxb + 'strength-5.mp3'); }
     startSong();
     // phones only count a finger LIFTING (touchend / pointerup / click) or a key as permission for sound, not the finger going down; keep trying until it is playing
     var first = function (e) { if (e.target && e.target.closest && e.target.closest('a.go')) return; startSong(); if (SFX.themePlaying()) ['touchend', 'pointerup', 'click', 'keydown'].forEach(function (ev) { doc.removeEventListener(ev, first, true); }); };
@@ -233,15 +233,15 @@
     if (st.getAttribute('data-last') && amap[e.target.value]) line = amap[e.target.value] + ' ' + st.getAttribute('data-last');
     if (ack) ack.textContent = line;
     // a small sound for how strongly they mean it, and for saying it on the stage
-    if (SFX) { var nm0 = e.target.name; if (/_level$/.test(nm0) && e.target.value === 'stage') setTimeout(function () { SFX.drum(); }, 60); }
-    var FX_HAVE = ['level-quiet', 'wealth', 'strength-5'];   // the voice clips that exist (public/audio/fx/): add a name here when you add a file, so other answers play the tap sound with no wait
+    if (SFX) { var nm0 = e.target.name; }
+    var FX_HAVE = ['level-quiet', 'level-stage', 'wealth', 'strength-5'];   // the voice clips that exist (public/audio/fx/): add a name here when you add a file, so other answers play the tap sound with no wait
     if (SFX) {   // a voice expression for this answer if you added one (public/audio/fx/<slot>.mp3), otherwise the synthesised lock sound
       var nm = e.target.name.replace(/^t_T\d+_/, ''), slot = /^(role|sector|goal)$/.test(nm) ? nm : nm + '-' + e.target.value, fxBase = form.getAttribute('data-fx');
       if (e.target.name === 't_T1_stance' && e.target.value === 'disagree') slot = 'wealth';   // choosing a life of wealth over meaning has its own sound
       SFX.answer(fxBase && FX_HAVE.indexOf(slot) > -1 ? fxBase + slot + '.mp3' : null);
     }
     try { if (navigator.vibrate) navigator.vibrate(12); } catch (x) {}
-    var hold = (SFX && SFX.isOn() ? (slot === 'level-quiet' ? 3300 : slot === 'wealth' ? 3900 : slot === 'strength-5' ? 3900 : 0) : 0);   // the two voice clips get to finish (about 3 s) before the next screen
+    var hold = (SFX && SFX.isOn() ? (slot === 'level-quiet' ? 3300 : slot === 'level-stage' ? 4600 : slot === 'wealth' ? 3900 : slot === 'strength-5' ? 3900 : 0) : 0);   // the two voice clips get to finish (about 3 s) before the next screen
     setTimeout(function () { st.classList.remove('locking'); if (steps[cur] === st && !valid(st)) show(cur + 1); }, calm ? 160 : (hold || (/_(strength|level)$/.test(e.target.name) ? 1000 : 750)));
   });
   next.addEventListener('click', function () {

@@ -65,7 +65,7 @@ function takeSteps(take, n, total, S, lang, phase = 'pre') {
       <h2 class="ask">${t(lang, 'strength.ask')}</h2>
       <fieldset><legend class="sr">${t(lang, 'strength.ask')}</legend>${pick(`${k}_strength`, [2, 3, 4, 5].map((i) => [String(i), t(lang, `strength.${i}`)]), S, 'stack words')}</fieldset><p class="ack" aria-live="polite"></p></section>`,
     h`<section class="step" data-step data-auto data-ack="${ackLevel}" data-acks="${JSON.stringify({ quiet: t(lang, 'ack.lvl.quiet'), aloud: t(lang, 'ack.lvl.aloud'), stage: t(lang, 'ack.lvl.stage') })}" data-last="${n === total ? t(lang, 'ack.level.last') : ''}" data-title="${kick}">${meta}<p class="echo">${shown}</p>
-      <h2 class="ask">${t(lang, 'level.ask')}</h2>
+      <h2 class="ask">${t(lang, 'level.ask')}</h2><p class="level-hint">${t(lang, 'level.hint')}</p>
       <fieldset><legend class="sr">${t(lang, 'level.ask')}</legend>${pick(`${k}_level`, [['quiet', t(lang, 'level.quiet')], ['aloud', t(lang, 'level.aloud')], ['stage', t(lang, 'level.stage')]], S2, 'stack words')}</fieldset><p class="ack" aria-live="polite"></p></section>`,
   ];
 }

@@ -13,6 +13,7 @@ Files are MP3, short, and named exactly as below. Keep them small: many delegate
 | `fx/level-quiet.mp3`, `fx/level-aloud.mp3`, `fx/level-stage.mp3` | "Keeping that to myself" / "I'd say it out loud" / "Give me the microphone" |
 | `fx/wealth.mp3` | Choosing "A life of wealth" over "A life of meaning" (the meaning-vs-wealth take) |
 | `fx/strength-5.mp3` | "I'd fight you on this" (the strongest answer on every take) |
+| `fx/level-stage.mp3` | "Give me the microphone" (the person may genuinely be called on to speak) |
 | `fx/role.mp3`, `fx/sector.mp3`, `fx/goal.mp3` | Picking who you are / a sector / why you are here |
 
 Rights: recordings and voice clips belong to whoever made them. Crediting the source is good practice but is not permission. Do not commit a file to the repository, or host it, until you have the right to. Stage cues are a separate mechanism: `cues/<name>.mp3` next to the downloaded stage deck.

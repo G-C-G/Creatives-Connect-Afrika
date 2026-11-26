@@ -450,3 +450,5 @@ body.q .goals{max-height:calc(100svh - 268px);overflow-y:auto;-webkit-overflow-s
 body.q .goals{position:relative}
 body.q .goal-other{margin-top:8px}body.q .goal-other input{width:100%;box-sizing:border-box;font:600 16px/1.2 system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;padding:12px 14px;border:0;border-radius:0;background:#fff;color:#111;border-bottom:3px solid #111}
 body.q .country-react{font:italic 400 clamp(26px,7.4vw,34px)/1.1 var(--display);color:#111;margin:14px 0 0;min-height:1.2em}body.q .country-react.pop{animation:fadein .35s ease-out}
+
+body.q .level-hint{font:600 14px/1.3 system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;color:#111;margin:0 0 10px;padding:8px 10px;border-left:4px solid #111;background:rgba(255,255,255,.35)}
