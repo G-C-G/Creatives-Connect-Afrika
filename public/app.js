@@ -55,7 +55,7 @@
   // picking a country plays a short clip of its song (a file you add: public/audio/countries/<country>.mp3). No file, no sound. Moving on stops it.
   var countrySel = form.querySelector('select[name=country]'), audioBase = form.getAttribute('data-audio');
   function slug(c) { return String(c).normalize('NFD').replace(/[\u0300-\u036f]/g, '').toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, ''); }
-  if (countrySel && SFX && audioBase) countrySel.addEventListener('change', function () { if (countrySel.value) SFX.snippet(audioBase + slug(countrySel.value) + '.mp3'); else SFX.stopSnippet(); });
+  if (countrySel && SFX && audioBase) countrySel.addEventListener('change', function () { if (countrySel.value) SFX.snippet(audioBase + (/^outside-africa/.test(slug(countrySel.value)) ? 'ghana' : slug(countrySel.value)) + '.mp3'); else SFX.stopSnippet(); });
 
   // ---- values: max 3 ----
   [].slice.call(form.querySelectorAll('[data-maxcheck]')).forEach(function (g) {

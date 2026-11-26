@@ -12,10 +12,27 @@
     var onboarding = !!(document.querySelector && document.querySelector('main.wizard, main.landing, main.cliff'));
     on = pref === '1' || (pref === null && onboarding);
   }
+  var master = null, unlocked = false;
   function ac() {
     if (!ctx) { var C = window.AudioContext || window.webkitAudioContext; if (!C) return null; ctx = new C(); }
     if (ctx.state === 'suspended') ctx.resume();
+    if (!unlocked) { unlocked = true; iosUnlock(); }
     return ctx;
+  }
+  // everything goes through one louder, limited bus: phone speakers are small, and these sounds are short and soft
+  function bus(c) {
+    if (!master) { master = c.createGain(); master.gain.value = 2.6; var lim = c.createDynamicsCompressor(); lim.threshold.value = -14; lim.knee.value = 12; lim.ratio.value = 10; lim.attack.value = 0.003; lim.release.value = 0.2; master.connect(lim); lim.connect(c.destination); }
+    return master;
+  }
+  // iPhones silence in-page (WebAudio) sound when the ringer switch is on silent, unless the page counts as media playback.
+  // Two known workarounds: the audio-session setting where it exists, and a silent looping <audio> element started from a tap.
+  function iosUnlock() {
+    try { if (navigator.audioSession) navigator.audioSession.type = 'playback'; } catch (e) {}
+    try {
+      var a = document.createElement('audio'); a.setAttribute('playsinline', ''); a.loop = true; a.volume = 0.01;
+      a.src = 'data:audio/wav;base64,UklGRiQAAABXQVZFZm10IBAAAAABAAEAQB8AAIA+AAACABAAZGF0YQAAAAA=';
+      var p = a.play(); if (p && p.catch) p.catch(function () {});
+    } catch (e) {}
   }
   function noise(c) {
     if (!noiseBuf) { noiseBuf = c.createBuffer(1, c.sampleRate, c.sampleRate); var d = noiseBuf.getChannelData(0); for (var i = 0; i < d.length; i++) d[i] = Math.random() * 2 - 1; }
@@ -27,7 +44,7 @@
     var o = c.createOscillator(), g = c.createGain(), t = c.currentTime + t0;
     o.type = type || 'sine'; o.frequency.value = f;
     g.gain.setValueAtTime(0.0001, t); g.gain.linearRampToValueAtTime(vol || 0.12, t + 0.012); g.gain.exponentialRampToValueAtTime(0.0001, t + d);
-    o.connect(g); g.connect(c.destination); o.start(t); o.stop(t + d + 0.05);
+    o.connect(g); g.connect(bus(c)); o.start(t); o.stop(t + d + 0.05);
   }
   // talking drum: a skin tone whose pitch bends (squeezing the cords), f0 -> f1
   function tdrum(f0, f1, t0, d, vol) {
@@ -35,7 +52,7 @@
     var o = c.createOscillator(), g = c.createGain(), t = c.currentTime + t0;
     o.type = 'sine'; o.frequency.setValueAtTime(f0, t); o.frequency.exponentialRampToValueAtTime(Math.max(30, f1), t + d * 0.7);
     g.gain.setValueAtTime(0.0001, t); g.gain.linearRampToValueAtTime(vol || 0.2, t + 0.006); g.gain.exponentialRampToValueAtTime(0.0001, t + d);
-    o.connect(g); g.connect(c.destination); o.start(t); o.stop(t + d + 0.05);
+    o.connect(g); g.connect(bus(c)); o.start(t); o.stop(t + d + 0.05);
     tone(f0 * 2.4, t0, 0.03, 'triangle', (vol || 0.2) * 0.3); // the slap
   }
   // filtered noise burst (shaker, static, tape)
@@ -44,7 +61,7 @@
     var s = c.createBufferSource(), f = c.createBiquadFilter(), g = c.createGain(), t = c.currentTime + t0;
     s.buffer = noise(c); f.type = type; f.frequency.setValueAtTime(freq, t); if (f1) f.frequency.exponentialRampToValueAtTime(f1, t + d); f.Q.value = q || 1;
     g.gain.setValueAtTime(0.0001, t); g.gain.linearRampToValueAtTime(vol, t + Math.min(0.012, d / 3)); g.gain.exponentialRampToValueAtTime(0.0001, t + d);
-    s.connect(f); f.connect(g); g.connect(c.destination); s.start(t); s.stop(t + d + 0.05);
+    s.connect(f); f.connect(g); g.connect(bus(c)); s.start(t); s.stop(t + d + 0.05);
   }
   // agogo: two bell tones at an inharmonic ratio, very short
   function agogo(f, t0, vol) { tone(f, t0, 0.22, 'sine', vol); tone(f * 1.504, t0, 0.17, 'sine', vol * 0.8); tone(f * 2.76, t0, 0.07, 'triangle', vol * 0.3); }
@@ -56,7 +73,7 @@
     var sr = c.sampleRate, len = Math.floor(sr * 0.7), n = Math.max(2, Math.round(sr / f)), buf = c.createBuffer(1, len, sr), d = buf.getChannelData(0);
     for (var i = 0; i < n; i++) d[i] = Math.random() * 2 - 1;
     for (var j = n; j < len; j++) d[j] = 0.5 * (d[j - n] + d[j - n + 1 < j ? j - n + 1 : j - n]) * 0.997;
-    var s = c.createBufferSource(), g = c.createGain(); s.buffer = buf; g.gain.value = vol; s.connect(g); g.connect(c.destination); s.start(c.currentTime + t0);
+    var s = c.createBufferSource(), g = c.createGain(); s.buffer = buf; g.gain.value = vol; s.connect(g); g.connect(bus(c)); s.start(c.currentTime + t0);
   }
   // play a named sound: on the stage, a file cues/<name>.mp3 wins if it exists; otherwise the synthesised version
   function play(name, synth) {

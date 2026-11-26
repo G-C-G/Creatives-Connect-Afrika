@@ -68,5 +68,12 @@ const ascii = (t) => t.replace(/[\u0080-\uffff]/g, (c) => '\\u' + c.charCodeAt(0
 for (const f of ['app.js', 'play.js', 'sfx.js']) writeFileSync(join(out, 'static', f), ascii(readFileSync(join(ROOT, 'public', f), 'utf8')));
 for (const f of ['instrument-serif-400.woff2', 'instrument-serif-400-italic.woff2']) copyFileSync(join(ROOT, 'public/fonts', f), join(out, 'static/fonts', f));
 for (const f of ['gcg.png', 'cca-hero.png', 'creatives-connect-afrika.png', 'africa-accent.png', 'ghana-arms.png', 'black-star.png', 'africa-tourism-partners.png', 'afcfta.png']) copyFileSync(join(ROOT, 'public/logos', f), join(out, 'static/logos', f));
+// a plain page to LISTEN to every sound on its own (and to check the phone is not on silent)
+const names = [['tick', 'Tick (kalimba)'], ['lock', 'Lock-in (agogo + drum)'], ['rise', 'Countdown (shekere)'], ['cliff', 'Ending, start'], ['boom', 'Ending, big hit'], ['chime', 'Right answer'], ['miss', 'Wrong answer (talking drum)'], ['drum', 'Drum roll'], ['sting', 'Nollywood-style stinger'], ['pluck', 'Highlife-style pluck'], ['cassette', 'Cassette'], ['static', 'Old TV static'], ['beep', 'Beep'], ['buzzer', 'Buzzer']];
+writeFileSync(join(out, 'sounds.html'), `<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Sound test</title><link rel="stylesheet" href="static/app.css"><script src="static/sfx.js" defer></script></head><body><main class="narrow"><p class="kicker">Sound test</p><h2 class="ask">Tap each one</h2>
+<p class="hint">Nothing here is a recording: all original, made in your browser. If you hear nothing: turn the volume up, switch the phone's ringer to ring (not silent), and tap again. Tell me which ones feel wrong.</p>
+<div style="display:grid;gap:10px;margin-top:18px">${names.map(([k, l]) => `<button class="btn ghost" type="button" data-s="${k}">${l}</button>`).join('')}</div>
+<p style="margin-top:22px"><a href="index.html">Back to the preview</a></p></main>
+<script>document.addEventListener('click',function(e){var b=e.target.closest&&e.target.closest('[data-s]');if(!b)return;var S=window.CCASfx;if(!S)return;if(!S.isOn())S.set(true);S[b.getAttribute('data-s')]();});</script></body></html>`);
 writeFileSync(join(out, 'static/mock.js'), ascii(readFileSync(join(ROOT, 'scripts/preview-mock.js'), 'utf8')));
 console.log('preview built in', out);
