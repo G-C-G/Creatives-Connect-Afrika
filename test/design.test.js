@@ -158,8 +158,8 @@ test('stage final: theatre order (smallest shift first, biggest mover last), cou
   assert.match(html, /The room shifted on/); assert.ok(html.includes('data-count="1"'), 'exactly 1 statement moved: T3 (T1 changed for one person only, average under the 0.5 threshold)');
   const idx = (txt) => html.indexOf(txt);
   const mover = idx('BIGGEST MOVER'), t3 = idx('Someone wants your work but cannot pay');
-  assert.ok(mover > 0 && t3 > 0 && mover < t3 && t3 > idx('People love your work'), 'biggest mover (T3) is the last statement revealed');
-  assert.ok(html.indexOf('People love your work') < t3 && html.indexOf('You can only back one') < t3);
+  assert.ok(mover > 0 && t3 > 0 && mover < t3 && t3 > idx('Everyone loves your work'), 'biggest mover (T3) is the last statement revealed');
+  assert.ok(html.indexOf('Everyone loves your work') < t3 && html.indexOf('You can only back one') < t3);
   assert.ok(html.includes('CCA_SFX_STAGE') && html.includes('AudioContext'));
   assert.ok(html.includes('<svg class="field flow"') && html.includes('class="a-d"'), 'the imagery: dots, with the people who crossed the room');
   assert.ok(!/https?:\/\//.test(html), 'no network references');
