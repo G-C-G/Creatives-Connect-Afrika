@@ -7,6 +7,7 @@ export const EVENT = {
 };
 
 import { FR_ROLES, FR_GOALS, FR_ACTIVITIES, FR_TAKES, FRENCH_COUNTRIES } from './fr.js';
+import { MORE_ACTIVITIES } from './activities-more.js';
 export { FRENCH_COUNTRIES };
 
 const opt = (id, en, fr) => ({ id, en, ...(fr ? { fr } : {}) });
@@ -173,6 +174,9 @@ export const ACTIVITIES = [
   { id: 'web_designer', en: 'Web designer', sector: 'tech' },
   { id: 'woodcarver', en: 'Woodcarver', sector: 'design_craft' },
 ];
+// the wider range of people (see activities-more.js); the whole list stays A to Z
+for (const a of MORE_ACTIVITIES) if (!ACTIVITIES.some((x) => x.id === a.id)) ACTIVITIES.push(a);
+ACTIVITIES.sort((a, b) => a.en.localeCompare(b.en, 'en', { sensitivity: 'base' }));
 export const activityById = new Map(ACTIVITIES.map((a) => [a.id, a]));
 
 export const GOALS = [
