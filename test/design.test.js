@@ -81,7 +81,7 @@ test('wizard: country first (a short clip of its song can play); then the statem
   const screens = html.split('<section class="step"').slice(1);
   assert.equal(screens.length, 22, 'country + 15 statement screens + who + sector + why + memory + email + consent: nothing else');
   const has = (re) => screens.map((x, i) => (re.test(x) ? i : -1)).filter((i) => i >= 0);
-  assert.deepEqual(has(/name="country"/), [0], 'country is the very first question'); assert.deepEqual(has(/t_T1_stance/), [1]);
+  assert.deepEqual(has(/name="country"/), [0], 'country is the very first question'); assert.deepEqual(has(/t_T5_stance/), [1]);
   assert.deepEqual(has(/name="first_name"/), [16]); assert.deepEqual(has(/name="surname"/), [16], 'name and surname on one page');
   assert.deepEqual(has(/name="sector"/), [17]); assert.deepEqual(has(/name="goal"/), [18], '"why you are here" is its own page');
   assert.deepEqual(has(/name="memory"/), [19], 'the optional creative-past question'); assert.deepEqual(has(/name="email"/), [20]); assert.deepEqual(has(/name="consent_aggregate"/), [21]);
@@ -158,8 +158,8 @@ test('stage final: theatre order (smallest shift first, biggest mover last), cou
   assert.match(html, /The room shifted on/); assert.ok(html.includes('data-count="1"'), 'exactly 1 statement moved: T3 (T1 changed for one person only, average under the 0.5 threshold)');
   const idx = (txt) => html.indexOf(txt);
   const mover = idx('BIGGEST MOVER'), t3 = idx('Someone wants your work but cannot pay');
-  assert.ok(mover > 0 && t3 > 0 && mover < t3 && t3 > idx('A creative business that can'), 'biggest mover (T3) is the last statement revealed');
-  assert.ok(html.indexOf('A creative business that can') < t3 && html.indexOf('You can only back one') < t3);
+  assert.ok(mover > 0 && t3 > 0 && mover < t3 && t3 > idx('Your work is loved but loses money'), 'biggest mover (T3) is the last statement revealed');
+  assert.ok(html.indexOf('Your work is loved but loses money') < t3 && html.indexOf('You can only back one') < t3);
   assert.ok(html.includes('CCA_SFX_STAGE') && html.includes('AudioContext'));
   assert.ok(html.includes('<svg class="field flow"') && html.includes('class="a-d"'), 'the imagery: dots, with the people who crossed the room');
   assert.ok(!/https?:\/\//.test(html), 'no network references');
@@ -197,7 +197,7 @@ test('take 3 is a two-option choice: its own words on the phone buttons, the sta
   const t3 = html.split('<section class="step"').slice(1).find((x) => /name="t_T3_stance"/.test(x));
   assert.match(t3, /Do it for free/); assert.match(t3, /Stand by your price/); assert.doesNotMatch(t3.replace(/<legend[^>]*>.*?<\/legend>/s, ''), />Agree</, 'no Agree / Disagree on this take');
   assert.match(t3, /value="agree"/); assert.match(t3, /value="disagree"/);
-  const t1 = html.split('<section class="step"').slice(1).find((x) => /name="t_T1_stance"/.test(x));
+  const t1 = html.split('<section class="step"').slice(1).find((x) => /name="t_T4_stance"/.test(x));
   assert.match(t1, />Agree</); assert.match(t1, />Disagree</);
   c.close();
 });
