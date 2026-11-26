@@ -163,7 +163,8 @@ export function donePage({ participant, existing = false, emailQueued = false, n
     ${nextPlay === 'wait' ? h`<p class="lead">The welcome game opens shortly. Keep this number: it is your code.</p>` : ''}` });
   }
   const day = comeBack;
-  return layout({ lang, bodyClass: 'night', title: 'Locked in', main: 'narrow cliff', body: h`
+  return layout({ lang, logos: 'opening', bodyClass: 'end', title: 'Locked in', main: 'narrow cliff', body: h`
+    <img class="end-mark" src="/static/logos/${CCA_HERO.file}" alt="${CCA_HERO.alt}">
     ${existing ? h`<p class="cl hint c0">${t(lang, 'cliff.existing')}</p>` : ''}
     <p class="cl c1 display">${t(lang, 'cliff.1a')} <em>${t(lang, 'cliff.1b')}</em></p>
     <p class="cl c2 lead">${t(lang, 'cliff.2')}</p>
