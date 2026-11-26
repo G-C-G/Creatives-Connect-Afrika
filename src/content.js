@@ -54,7 +54,7 @@ export function regionOf(country) {
 // Takes that are a choice between two options instead of Agree / Disagree. The answer is still stored as agree (first option) or disagree (second option);
 // only the words shown to people change (the buttons, the stage deck, the welcome game).
 export const TAKE_SIDES = {
-  T1: { agree: 'Yes, the impact counts', disagree: 'No, a business must pay' },
+  T1: { agree: 'The work is the problem', disagree: 'The economy is the problem' },
   T2: { agree: 'Build Africa first', disagree: 'Go global now' },
   T3: { agree: 'Do it for free', disagree: 'Stand by your price' },
   T5: { agree: 'The artists and experience makers', disagree: 'The host country and its institutions' },
@@ -62,9 +62,9 @@ export const TAKE_SIDES = {
 export const sidesOf = (id) => TAKE_SIDES[id] || null;
 // What a phone shows for those takes: a short question, then the good and the bad of BOTH options on the two tiles.
 export const TAKE_DETAIL = {
-  T1: { stem: 'Your work is loved but loses money. Is it a success?',
-    agree: { good: 'Culture and influence last longer than profit', bad: 'Without income it cannot grow' },
-    disagree: { good: 'Money keeps you independent and able to hire', bad: 'You may chase what sells and lose what made it special' } },
+  T1: { stem: 'People love your work, but they do not pay for it. Whose problem is that?',
+    agree: { eg: 'If they truly valued it, they would pay', good: 'The market tells you the truth, so you improve or change what you offer', bad: 'You may blame yourself for a tight economy, and quit work that matters' },
+    disagree: { eg: 'When money is tight, food comes before a film ticket or an album', good: 'It protects work and culture people truly value, even if they cannot pay yet', bad: 'It can become an excuse, so no one builds a way to earn' } },
   T2: { stem: 'One budget, one year. Where does it go?',
     agree: { good: 'A loyal home audience nobody can take away', bad: 'Slower money, and the world may move on' },
     disagree: { good: 'A bigger audience and bigger money', bad: 'Without a home base, you are a guest everywhere' } },
@@ -79,7 +79,7 @@ export const detailOf = (id) => TAKE_DETAIL[id] || null;
 
 // LOCKED once launched. Never reword after locked = 1. theme_tag: TBD per spec.
 export const TAKES = [
-  { id: 'T1', position: 4, theme_tag: null, text: 'Your work is loved but loses money. Is it a success? Say yes, and the impact counts, but without income it cannot grow. Say no, and money keeps you independent, but you may chase what sells and lose what made it special.' },
+  { id: 'T1', position: 4, theme_tag: null, text: 'People love your work, but they do not pay for it. Whose problem is that? If they truly valued it they would pay, so the work is the problem. Or when money is tight, food comes before a film ticket or an album, so the economy is the problem.' },
   { id: 'T2', position: 5, theme_tag: null, text: 'One budget, one year. Where does it go? Build Africa first for a loyal home audience nobody can take away, but slower money and the world may move on. Go global now for a bigger audience and bigger money, but without a home base you are a guest everywhere.' },
   { id: 'T3', position: 2, theme_tag: null, text: 'Someone wants your work but cannot pay. Do it free and more people see your work, but you may not grow, as clients start expecting it cheap. Stand by your price and your work is respected, but you may not grow either, with less work behind you and few clients who can afford you. What should creatives do?' },
   { id: 'T4', position: 3, theme_tag: null, text: 'I\u2019d rather see African work go global under foreign ownership than stay 100% African-owned and unseen.' },
