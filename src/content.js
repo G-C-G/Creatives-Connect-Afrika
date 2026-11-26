@@ -54,7 +54,7 @@ export function regionOf(country) {
 // Takes that are a choice between two options instead of Agree / Disagree. The answer is still stored as agree (first option) or disagree (second option);
 // only the words shown to people change (the buttons, the stage deck, the welcome game).
 export const TAKE_SIDES = {
-  T1: { agree: 'Make it sell', disagree: 'Keep it true' },
+  T1: { agree: 'Create to live', disagree: 'Create what matters' },
   T2: { agree: 'Build Africa first', disagree: 'Go global now' },
   T3: { agree: 'Do it for free', disagree: 'Stand by your price' },
   T5: { agree: 'The artists and experience makers', disagree: 'The host country and its institutions' },
@@ -62,9 +62,9 @@ export const TAKE_SIDES = {
 export const sidesOf = (id) => TAKE_SIDES[id] || null;
 // What a phone shows for those takes: a short question, then the good and the bad of BOTH options on the two tiles.
 export const TAKE_DETAIL = {
-  T1: { stem: 'Your art could outlive you. School fees are due, and it earns nothing. What do you do?',
-    agree: { eg: 'Change it into what people will pay for', good: 'The fees are paid, and your family is safe', bad: 'The work stops being yours, and the part that mattered is gone' },
-    disagree: { eg: 'Do the work you believe in, whatever it pays', good: 'The work stays whole, and may outlive you', bad: 'Your family pays the price, and you may have to quit anyway' } },
+  T1: { setup: 'You cannot always do both.', stem: 'Create to make a living, or create what matters?',
+    agree: { eg: 'Make what pays, so you can eat and keep going', good: 'You have a livelihood, and you keep creating', bad: 'You may never make the work that matters most' },
+    disagree: { eg: 'Make the work that matters, even if it costs you your livelihood', good: 'The work stays whole, and can outlive you', bad: 'You may struggle to survive, or have to stop' } },
   T2: { stem: 'One budget, one year. Where does it go?',
     agree: { good: 'A loyal home audience nobody can take away', bad: 'Slower money, and the world may move on' },
     disagree: { good: 'A bigger audience and bigger money', bad: 'Without a home base, you are a guest everywhere' } },
@@ -79,7 +79,7 @@ export const detailOf = (id) => TAKE_DETAIL[id] || null;
 
 // LOCKED once launched. Never reword after locked = 1. theme_tag: TBD per spec.
 export const TAKES = [
-  { id: 'T1', position: 4, theme_tag: null, text: 'Your art could outlive you. School fees are due, and it earns nothing. Make it sell, and your family is safe, but the work stops being yours. Keep it true, and the work lives, but your family pays the price. What do you do?' },
+  { id: 'T1', position: 4, theme_tag: null, text: 'You cannot always do both. Create to make a living, and you can keep going, but you may never make the work that matters most. Create what matters, and the work stays whole, but you may lose your livelihood. Which do you choose?' },
   { id: 'T2', position: 5, theme_tag: null, text: 'One budget, one year. Where does it go? Build Africa first for a loyal home audience nobody can take away, but slower money and the world may move on. Go global now for a bigger audience and bigger money, but without a home base you are a guest everywhere.' },
   { id: 'T3', position: 2, theme_tag: null, text: 'Someone wants your work but cannot pay. Do it free and more people see your work, but you may not grow, as clients start expecting it cheap. Stand by your price and your work is respected, but you may not grow either, with less work behind you and few clients who can afford you. What should creatives do?' },
   { id: 'T4', position: 3, theme_tag: null, text: 'I\u2019d rather see African work go global under foreign ownership than stay 100% African-owned and unseen.' },
