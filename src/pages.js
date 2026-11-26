@@ -164,13 +164,13 @@ export function donePage({ participant, existing = false, emailQueued = false, n
   }
   const day = comeBack;
   return layout({ lang, logos: 'opening', bodyClass: 'end', title: 'Locked in', main: 'narrow cliff', body: h`
-    <img class="end-mark" src="/static/logos/${CCA_HERO.file}" alt="${CCA_HERO.alt}">
-    ${existing ? h`<p class="cl hint c0">${t(lang, 'cliff.existing')}</p>` : ''}
-    <p class="cl c1 display">${t(lang, 'cliff.1a')} <em>${t(lang, 'cliff.1b')}</em></p>
-    <p class="cl c4 ask-line">${t(lang, 'cliff.4')}</p>
+    ${existing ? h`<p class="cl hint c0 exist">${t(lang, 'cliff.existing')}</p>` : ''}
+    <div class="end-top"><img class="end-mark" src="/static/logos/${CCA_HERO.file}" alt="${CCA_HERO.alt}">
+      <p class="cl c1 display">${t(lang, 'cliff.1a')} <em>${t(lang, 'cliff.1b')}</em></p>
+      <p class="cl c4 ask-line">${t(lang, 'cliff.4')}</p></div>
     <div class="cl c6 codecard"><p class="kicker">${t(lang, 'cliff.code')}</p><p class="bignum" aria-label="${t(lang, 'cliff.code')}">${participant.number}</p><p class="keep">${t(lang, 'cliff.keep')}</p></div>
-    <p class="cl c5 lead">${day ? t(lang, 'cliff.5', { day }) : t(lang, 'cliff.5.now')}</p>
-    <p class="cl c7 hint">${participant.email ? (emailQueued ? t(lang, 'done.email_pending') : t(lang, 'cliff.email')) : t(lang, 'done.no_email')}</p>` });
+    <div class="cl c5 end-band"><p class="lead">${day ? t(lang, 'cliff.5', { day }) : t(lang, 'cliff.5.now')}</p>
+      <p class="hint">${participant.email ? (emailQueued ? t(lang, 'done.email_pending') : t(lang, 'cliff.email')) : t(lang, 'done.no_email')}</p></div>` });
 }
 
 export function finalIdentityPage({ fails = 0, error = false, lang = 'en', state = 'open' }) {

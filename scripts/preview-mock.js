@@ -44,9 +44,9 @@
     [].slice.call(document.querySelectorAll('[data-code]')).forEach(function (e) { e.textContent = me ? me.code : '1234'; });
     var cliff = document.querySelector('main.cliff');
     if (cliff) {
-      var c7 = cliff.querySelector('.c7'); if (c7) c7.textContent = 'Preview: nothing is emailed or saved. Screenshot your code.';
-      var go = document.createElement('p'); go.className = 'cl c8'; go.style.animationDelay = '6.6s';
-      go.innerHTML = '<a class="btn big" href="play.html">Preview the welcome game &rarr;</a>'; cliff.appendChild(go);
+      var band = cliff.querySelector('.end-band .hint'); if (band) band.textContent = 'Preview: nothing is emailed or saved.';
+      var host = cliff.querySelector('.end-band');
+      if (host) { var go = document.createElement('a'); go.href = 'play.html'; go.textContent = 'Preview the welcome game \u2192'; go.style.cssText = 'display:inline-block;margin-top:8px;color:#E2AC4A;font:700 13px/1.3 system-ui,sans-serif;letter-spacing:.04em;text-decoration:underline'; host.appendChild(go); }
     }
     // the welcome game: skip retyping if you just did the onboarding
     var play = document.getElementById('play');
