@@ -76,7 +76,7 @@ export const TAKE_DETAIL = {
   T2: { stem: 'One budget, one year. Where does it go?',
     agree: { eg: 'Win your home market before the world', good: 'A loyal home audience nobody can take away', bad: 'Slower money, and the world may move on without you' },
     disagree: { eg: 'Take the work to the world now', good: 'A bigger audience and bigger money', bad: 'Without a home base, you are a guest everywhere' } },
-  T3: { stem: 'A big opportunity comes, but they cannot pay for your work. Do you still do it?',
+  T3: { stem: 'A big opportunity comes, but they cannot pay for your work. Do you do it for free, or stand by your price?',
     agree: { good: 'A big audience sees your work, and doors may open', bad: 'You may not grow: clients start expecting it cheap, and it gets hard to charge more later' },
     disagree: { good: 'People respect your work and your price', bad: 'You walk away from the opportunity, and may not grow either: less work behind you, fewer referrals, a smaller network' } },
   // Take 5 shows reasons only (no costs): both sides can be culturally relevant, and it is a matter of what each person values.
@@ -90,7 +90,7 @@ export const detailOf = (id) => TAKE_DETAIL[id] || null;
 export const TAKES = [
   { id: 'T1', position: 4, theme_tag: null, text: 'Looking back at the end of your life, which would you rather have lived? A life of meaning: you made work that mattered and lived comfortably, but never became rich. Or a life of wealth: you went commercial and became wealthy, but the work that mattered never got made.' },
   { id: 'T2', position: 5, theme_tag: null, text: 'One budget, one year. Where does it go? Build Africa first for a loyal home audience nobody can take away, but slower money and the world may move on. Go global now for a bigger audience and bigger money, but without a home base you are a guest everywhere.' },
-  { id: 'T3', position: 2, theme_tag: null, text: 'A big opportunity comes, but they cannot pay for your work. Do it free and a big audience sees your work, but you may not grow, as clients start expecting it cheap. Stand by your price and your work is respected, but you walk away from the opportunity, and may not grow either, with less work behind you, fewer referrals and a smaller network. What should creatives do?' },
+  { id: 'T3', position: 2, theme_tag: null, text: 'A big opportunity comes, but they cannot pay for your work. Do you do it for free, or stand by your price? Do it free and a big audience sees your work, but you may not grow, as clients start expecting it cheap. Stand by your price and your work is respected, but you walk away from the opportunity, and may not grow either, with less work behind you, fewer referrals and a smaller network.' },
   { id: 'T4', position: 3, theme_tag: null, text: 'I\u2019d rather see African work go global under foreign ownership than stay 100% African-owned and unseen.' },
   { id: 'T5', position: 1, theme_tag: null, text: 'Which is more valuable to tourism and cultural experiences: the people and social experiences (artists, storytellers, guides, craftspeople, staff), or the places and spaces (nature, architecture, cultural spaces, venues, airports)?' },
 ];
