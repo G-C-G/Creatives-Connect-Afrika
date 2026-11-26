@@ -88,7 +88,7 @@ export function createApp({ db, env = process.env, now = () => new Date(), fetch
       }
       return { status: 200, type: 'audio/mpeg', headers: { 'Accept-Ranges': 'bytes', 'Cache-Control': 'public, max-age=3600' }, body: buf };
     }
-    const fm = /^\/static\/fonts\/(instrument-serif-400(?:-italic)?\.woff2)$/.exec(p);
+    const fm = /^\/static\/fonts\/(instrument-serif-400(?:-italic)?\.woff2|barlow-cond-800\.woff2|barlow-cond-ext-800\.woff2)$/.exec(p);
     if (fm) return { status: 200, type: 'font/woff2', headers: { 'Cache-Control': 'public, max-age=31536000, immutable' }, body: readFileSync(join(PUBLIC, 'fonts', fm[1])) };
     if (STATIC[p]) return { status: 200, type: STATIC[p][0], headers: { 'Cache-Control': 'public, max-age=3600' }, body: readFileSync(join(PUBLIC, STATIC[p][1])) };
 

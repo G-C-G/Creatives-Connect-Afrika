@@ -101,6 +101,7 @@
     chime: function () { [523, 659, 784, 1047].forEach(function (f, i) { kalimba(f, i * 0.085, 0.12); }); },
     miss: function () { tdrum(300, 120, 0, 0.42, 0.18); },
     boom: function () { tdrum(110, 38, 0, 0.7, 0.34); tone(70, 0, 0.5, 'sine', 0.2); },
+    welcome: function () { welcomeMotif(); },
     static: function () { burst(0, 0.28, 'bandpass', 2400, 0.7, 0.16); },
     cassette: function () { burst(0, 0.03, 'highpass', 3000, 1, 0.22); tone(90, 0.0, 0.05, 'sine', 0.12); burst(0.05, 0.45, 'bandpass', 700, 2, 0.1, 3200); },
     pluck: function () { pluck(196, 0, 0.45); pluck(247, 0.14, 0.4); pluck(294, 0.28, 0.4); }

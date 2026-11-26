@@ -66,7 +66,7 @@ writeFileSync(join(out, 'static/app.css'), '@charset "utf-8";\n' + css);
 // static hosts may serve scripts without a charset: escape every non-ASCII character so nothing can be mis-decoded
 const ascii = (t) => t.replace(/[\u0080-\uffff]/g, (c) => '\\u' + c.charCodeAt(0).toString(16).padStart(4, '0'));
 for (const f of ['app.js', 'play.js', 'sfx.js']) writeFileSync(join(out, 'static', f), ascii(readFileSync(join(ROOT, 'public', f), 'utf8')));
-for (const f of ['instrument-serif-400.woff2', 'instrument-serif-400-italic.woff2']) copyFileSync(join(ROOT, 'public/fonts', f), join(out, 'static/fonts', f));
+for (const f of ['instrument-serif-400.woff2', 'instrument-serif-400-italic.woff2', 'barlow-cond-800.woff2', 'barlow-cond-ext-800.woff2']) copyFileSync(join(ROOT, 'public/fonts', f), join(out, 'static/fonts', f));
 for (const f of ['gcg.png', 'cca-hero.png', 'creatives-connect-afrika.png', 'africa-accent.png', 'ghana-arms.png', 'black-star.png', 'africa-tourism-partners.png', 'afcfta.png']) copyFileSync(join(ROOT, 'public/logos', f), join(out, 'static/logos', f));
 // a plain page to LISTEN to every sound on its own (and to check the phone is not on silent)
 const names = [['tick', 'Tick (kalimba)'], ['lock', 'Lock-in (agogo + drum)'], ['rise', 'Countdown (shekere)'], ['cliff', 'Ending, start'], ['boom', 'Ending, big hit'], ['chime', 'Right answer'], ['miss', 'Wrong answer (talking drum)'], ['drum', 'Drum roll'], ['sting', 'Nollywood-style stinger'], ['pluck', 'Highlife-style pluck'], ['cassette', 'Cassette'], ['static', 'Old TV static'], ['beep', 'Beep'], ['buzzer', 'Buzzer']];
