@@ -53,14 +53,14 @@ export function regionOf(country) {
 
 // Takes that are a choice between two options instead of Agree / Disagree. The answer is still stored as agree (first option) or disagree (second option);
 // only the words shown to people change (the buttons, the stage deck, the welcome game).
-export const TAKE_SIDES = { T3: { agree: 'Do it for free', disagree: 'Stand by your price' }, T5: { agree: 'Shape it for the world', disagree: 'Keep it authentic and pure' } };
+export const TAKE_SIDES = { T3: { agree: 'Do it for free', disagree: 'Stand by your price' }, T5: { agree: 'Shape African culture for the world', disagree: 'Keep African culture authentic and pure' } };
 export const sidesOf = (id) => TAKE_SIDES[id] || null;
 // What a phone shows for those takes: a short question, then the good and the bad of BOTH options on the two tiles.
 export const TAKE_DETAIL = {
   T3: { stem: 'Someone wants your work but cannot pay. Do you still do it?',
     agree: { good: 'More people get to see your work', bad: 'You may not grow: clients start expecting it cheap, and it gets hard to charge more later' },
     disagree: { good: 'People respect your work and your price', bad: 'You may not grow either: less work behind you, and few clients who can afford you' } },
-  T5: { stem: 'Shape it for the world, or keep it authentic and pure?',
+  T5: { stem: 'Shape African culture for the world, or keep it authentic and pure?',
     agree: { good: 'More people buy it and get to know it', bad: 'It gets watered down, losing its original form and true story' },
     disagree: { good: 'Its authenticity stays intact', bad: 'Fewer people will ever find it' } },
 };
