@@ -67,4 +67,10 @@
       try { Object.keys(localStorage).filter(function (k) { return /^cca-/.test(k); }).forEach(function (k) { localStorage.removeItem(k); }); } catch (e) {}
     });
   });
+  // PREVIEW ONLY: a tiny readout of what the phone says about the song, so a silent preview can be diagnosed from a screenshot
+  window.addEventListener('load', function () {
+    var d = document.createElement('div'); d.style.cssText = 'position:fixed;left:0;right:0;bottom:0;z-index:99999;background:rgba(0,0,0,.78);color:#7CFC9A;font:10px/1.3 monospace;padding:3px 6px;pointer-events:none';
+    document.body.appendChild(d);
+    setInterval(function () { try { d.textContent = window.CCASfx && window.CCASfx.debug ? window.CCASfx.debug() : 'no sfx'; } catch (e) { d.textContent = 'debug error'; } }, 400);
+  });
 })();

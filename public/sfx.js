@@ -107,7 +107,7 @@
     pluck: function () { pluck(196, 0, 0.45); pluck(247, 0.14, 0.4); pluck(294, 0.28, 0.4); }
   };
   // the welcome song: starts from the opening tap, fades in, loops softly under the questions. No file yet (or not cleared): a short original welcome motif instead.
-  var song = null, clip = null, songVol = 0.8;
+  var song = null, clip = null, songVol = 0.8, lastErr = '';
   function welcomeMotif() { kalimba(392, 0, 0.1); kalimba(494, 0.22, 0.1); kalimba(587, 0.44, 0.1); kalimba(784, 0.7, 0.11); pluck(196, 0.9, 0.35); }
   var songLevel = 0.8, LOW = 0.4, sGain = null;
   // sets the song's loudness. iPhones ignore audio.volume (it stays at 1), so there the song goes through a gain node instead.
@@ -128,7 +128,7 @@
     theme: function (url, soft) {
       if (!on || song || stage) return;
       if (!url || typeof Audio === 'undefined') { if (!soft) welcomeMotif(); return; }
-      var failed = false, el = null, fb = function () { if (failed) return; failed = true; if (el) ready[url] = el; song = null; if (!soft) welcomeMotif(); };   // a refused element is kept (already downloading) for the next try
+      var failed = false, el = null, fb = function (err) { lastErr = (err && err.name) || (el && el.error && ('media error ' + el.error.code)) || 'refused'; if (failed) return; failed = true; if (el) ready[url] = el; song = null; if (!soft) welcomeMotif(); };   // a refused element is kept (already downloading) for the next try
       try { el = song = getEl(url); song.volume = 0; song.addEventListener('error', fb, { once: true });
         var p = song.play(); if (p && p.then) p.then(function () { fadeTo(song, songVol); }, fb); } catch (e) { fb(); }
     },
@@ -146,6 +146,8 @@
         var p = a.play(); if (p && p.then) p.then(function () { fadeTo(a, LOW); }, function () { if (song === a) song = null; }); } catch (e) { song = null; }
     },
     prepare: function (url) { if (!url || ready[url] || typeof Audio === 'undefined') return; try { var a = new Audio(); a.preload = 'auto'; a.loop = true; a.src = url; a.load(); ready[url] = a; } catch (e) {} },
+    // for the preview's on-screen readout only
+    debug: function () { var r = Object.keys(ready).length, s = song; return 'sound ' + (on ? 'on' : 'OFF') + ' | ctx ' + (ctx ? ctx.state : 'none') + ' | song ' + (s ? ((s.paused ? 'PAUSED' : 'playing') + ' t=' + s.currentTime.toFixed(1) + ' vol=' + s.volume.toFixed(2) + ' ready=' + s.readyState + (s.error ? ' ERR' + s.error.code : '')) : 'none') + ' | queued ' + r + ' | last error: ' + (lastErr || 'none'); },
     themePlaying: function () { return !!song; },
     // a short clip (about 10 seconds) of the picked country's song: the welcome song steps back while it plays and returns after
     snippet: function (url) {
