@@ -157,9 +157,9 @@ test('stage final: theatre order (smallest shift first, biggest mover last), cou
   assert.match(visibleText(html), /Did we move\?/); assert.ok(html.includes('data-count="6"'));
   assert.match(html, /The room shifted on/); assert.ok(html.includes('data-count="1"'), 'exactly 1 statement moved: T3 (T1 changed for one person only, average under the 0.5 threshold)');
   const idx = (txt) => html.indexOf(txt);
-  const mover = idx('BIGGEST MOVER'), t3 = idx('Someone wants your work but cannot pay');
-  assert.ok(mover > 0 && t3 > 0 && mover < t3 && t3 > idx('A creative business that can'), 'biggest mover (T3) is the last statement revealed');
-  assert.ok(html.indexOf('A creative business that can') < t3 && html.indexOf('Shape African culture for the world') < t3);
+  const mover = idx('BIGGEST MOVER'), t3 = idx('A good client lands with you');
+  assert.ok(mover > 0 && t3 > 0 && mover < t3 && t3 > idx('You can only back one'), 'biggest mover (T3) is the last statement revealed');
+  assert.ok(html.indexOf('You can only back one') < t3 && html.indexOf('AI can do in minutes') < t3);
   assert.ok(html.includes('CCA_SFX_STAGE') && html.includes('AudioContext'));
   assert.ok(html.includes('<svg class="field flow"') && html.includes('class="a-d"'), 'the imagery: dots, with the people who crossed the room');
   assert.ok(!/https?:\/\//.test(html), 'no network references');
@@ -191,13 +191,13 @@ test('the welcome song file is served only if present, with byte ranges (iPhones
   c.close();
 });
 
-test('take 3 is a two-option choice: its own words on the phone buttons, the stage deck and the game; still stored as agree / disagree', async () => {
+test('take 2 is a two-option choice: its own words on the phone buttons, the stage deck and the game; still stored as agree / disagree', async () => {
   const c = await boot();
   const html = await (await c.call('/start')).text();
-  const t3 = html.split('<section class="step"').slice(1).find((x) => /name="t_T3_stance"/.test(x));
+  const t3 = html.split('<section class="step"').slice(1).find((x) => /name="t_T2_stance"/.test(x));
   assert.match(t3, /Do it for free/); assert.match(t3, /Stand by your price/); assert.doesNotMatch(t3.replace(/<legend[^>]*>.*?<\/legend>/s, ''), />Agree</, 'no Agree / Disagree on this take');
   assert.match(t3, /value="agree"/); assert.match(t3, /value="disagree"/);
-  const t1 = html.split('<section class="step"').slice(1).find((x) => /name="t_T1_stance"/.test(x));
+  const t1 = html.split('<section class="step"').slice(1).find((x) => /name="t_T4_stance"/.test(x));
   assert.match(t1, />Agree</); assert.match(t1, />Disagree</);
   c.close();
 });
