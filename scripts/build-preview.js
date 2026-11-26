@@ -59,7 +59,7 @@ if (SITE) {
   html = html.replace('<meta name="robots" content="noindex">', '<meta name="robots" content="noindex">\n' + ogTags(SITE, 'index.html') + '\n<link rel="icon" href="static/logos/africa-accent.png">').replace(/<title>[^<]*<\/title>/, '<title>Creatives Connect Afrika 2026: Welcome game (team preview)</title>');
   writeFileSync(join(out, 'index.html'), html);
   writeFileSync(join(out, 'team.html'), teamPage(SITE));
-  copyFileSync(join(ROOT, 'public/og-card.png'), join(out, 'static/og-card.png'));
+  copyFileSync(join(ROOT, 'public/og-card.jpg'), join(out, 'static/og-card.jpg'));
 } else {
   const html = rel(await get('/'));
   const head = html.match(/<head>([\s\S]*?)<\/head>/)[1], body = html.match(/<body[^>]*>([\s\S]*?)<\/body>/)[1];

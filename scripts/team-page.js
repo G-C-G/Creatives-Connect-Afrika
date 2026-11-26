@@ -4,10 +4,10 @@ export const OG_TITLE = 'Creatives Connect Afrika 2026: Welcome game (team previ
 export const OG_DESC = 'Five questions, no right answers. A first look at the CCA 2026 onboarding game, 30 Nov to 3 Dec, Accra. Open it on your phone and tap through.';
 
 export function ogTags(base, page) {
-  const u = base.replace(/\/?$/, '/'), img = u + 'static/og-card.png';
+  const u = base.replace(/\/?$/, '/'), img = u + 'static/og-card.jpg';
   return `<meta property="og:type" content="website"><meta property="og:site_name" content="Creatives Connect Afrika 2026">
 <meta property="og:title" content="${OG_TITLE}"><meta property="og:description" content="${OG_DESC}">
-<meta property="og:image" content="${img}"><meta property="og:image:width" content="1200"><meta property="og:image:height" content="630"><meta property="og:image:alt" content="Creatives Connect Afrika: Before we begin. Five questions, no right answers.">
+<meta property="og:image" content="${img}"><meta property="og:image:secure_url" content="${img}"><meta property="og:image:type" content="image/jpeg"><meta property="og:image:width" content="1200"><meta property="og:image:height" content="630"><meta property="og:image:alt" content="Creatives Connect Afrika: Before we begin. Five questions, no right answers.">
 <meta property="og:url" content="${u}${page}"><meta name="twitter:card" content="summary_large_image"><meta name="twitter:title" content="${OG_TITLE}"><meta name="twitter:description" content="${OG_DESC}"><meta name="twitter:image" content="${img}">
 <meta name="description" content="${OG_DESC}"><meta name="theme-color" content="#111111">`;
 }
