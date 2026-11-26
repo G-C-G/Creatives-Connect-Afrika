@@ -1,10 +1,10 @@
 // The "team preview" page: what the shared link opens on, so the Creatives Connect team understands what they are looking at before they tap through.
 // Plain facts only. Everything here is already decided or already built; anything still being designed says so.
-export const OG_TITLE = 'Creatives Connect Afrika 2026: Welcome game (team preview)';
-export const OG_DESC = 'Five questions, no right answers. A first look at the CCA 2026 onboarding game, 30 Nov to 3 Dec, Accra. Open it on your phone and tap through.';
+export const OG_TITLE = 'Creatives Connect Afrika 2026: try the welcome game';
+export const OG_DESC = 'Five questions, no right answers. Open it on your phone and play. Creatives Connect Afrika 2026, Accra, 30 Nov to 3 Dec.';
 
 export function ogTags(base, page) {
-  const u = base.replace(/\/?$/, '/'), img = u + 'static/og-card.jpg';
+  const u = base.replace(/\/?$/, '/'), img = u + 'static/og-card-v2.jpg';
   return `<meta property="og:type" content="website"><meta property="og:site_name" content="Creatives Connect Afrika 2026">
 <meta property="og:title" content="${OG_TITLE}"><meta property="og:description" content="${OG_DESC}">
 <meta property="og:image" content="${img}"><meta property="og:image:secure_url" content="${img}"><meta property="og:image:type" content="image/jpeg"><meta property="og:image:width" content="1200"><meta property="og:image:height" content="630"><meta property="og:image:alt" content="Creatives Connect Afrika: Before we begin. Five questions, no right answers.">

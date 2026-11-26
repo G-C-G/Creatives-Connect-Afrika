@@ -56,10 +56,10 @@ await page(`/done?t=${dummy.magic_token}`, 'done.html', (x) => x.replace(/(<div 
 if (SITE) {
   // a real website: the full opening page, with the link-preview tags, plus the team page the shared link can open on
   let html = rel(await get('/'));
-  html = html.replace('<meta name="robots" content="noindex">', '<meta name="robots" content="noindex">\n' + ogTags(SITE, 'index.html') + '\n<link rel="icon" href="static/logos/africa-accent.png">').replace(/<title>[^<]*<\/title>/, '<title>Creatives Connect Afrika 2026: Welcome game (team preview)</title>');
+  html = html.replace('<meta name="robots" content="noindex">', '<meta name="robots" content="noindex">\n' + ogTags(SITE, 'index.html') + '\n<link rel="icon" href="static/logos/africa-accent.png">').replace(/<title>[^<]*<\/title>/, '<title>Creatives Connect Afrika 2026: try the welcome game</title>');
   writeFileSync(join(out, 'index.html'), html);
   writeFileSync(join(out, 'team.html'), teamPage(SITE));
-  copyFileSync(join(ROOT, 'public/og-card.jpg'), join(out, 'static/og-card.jpg'));
+  copyFileSync(join(ROOT, 'public/og-card-v2.jpg'), join(out, 'static/og-card-v2.jpg'));
 } else {
   const html = rel(await get('/'));
   const head = html.match(/<head>([\s\S]*?)<\/head>/)[1], body = html.match(/<body[^>]*>([\s\S]*?)<\/body>/)[1];
