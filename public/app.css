@@ -267,7 +267,7 @@ main.landing h1.open{margin:0;text-align:center;color:var(--ink)}
 .cyc-lang{display:block;font:600 12px/1 system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;letter-spacing:.18em;text-transform:uppercase;color:var(--red-ink)}
 main.landing .btn.go{width:min(70%,260px);align-self:center}
 .stage{padding:0 0 44px;gap:0}
-.stage .cca-hero{margin:10px 0 60px}
+.stage .cca-hero{margin:34px 0 46px}
 main.landing .lead{margin-top:2px}
 .soundline{align-self:center;margin:14px 0 0;background:none;border:0;padding:6px 8px;font:600 13px/1.3 system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;letter-spacing:.02em;color:var(--muted);cursor:pointer}
 .soundline:hover,.soundline:focus-visible{color:var(--ink);text-decoration:underline}
