@@ -55,7 +55,7 @@ export function regionOf(country) {
 export const TAKES = [
   { id: 'T1', position: 1, theme_tag: null, text: 'A creative business that can\u2019t make money isn\u2019t a successful creative business.' },
   { id: 'T2', position: 2, theme_tag: null, text: 'African creatives should win Africa before they go after the world.' },
-  { id: 'T3', position: 3, theme_tag: null, text: 'African creatives would earn more if they got better at valuing and negotiating their own work.' },
+  { id: 'T3', position: 3, theme_tag: null, text: 'Creatives should take the free work, even if it\u2019s a trap, rather than stand by their rate and lose the opportunity.' },
   { id: 'T4', position: 4, theme_tag: null, text: 'I\u2019d rather see African work go global under foreign ownership than stay 100% African-owned and unseen.' },
   { id: 'T5', position: 5, theme_tag: null, text: 'If international audiences will pay for African culture, it\u2019s fine to repackage it for them.' },
 ];
