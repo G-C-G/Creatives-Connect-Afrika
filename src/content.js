@@ -72,8 +72,8 @@ export const TAKE_DETAIL = {
     agree: { good: 'A big audience sees your work', bad: 'Clients expect it cheap after' },
     disagree: { good: 'People respect your work', bad: 'Fewer referrals, a smaller network' } },
   T5: { stem: 'What is worth more to tourism and cultural experiences?',
-    agree: { eg: 'Artists, guides, craftspeople, hotel staff, the social buzz', good: 'People are why visitors come back', bad: 'A great crowd in a poor place falls flat' },
-    disagree: { eg: 'Natural beauty, living spaces, good entertainment venues', good: 'A great place draws visitors by itself', bad: 'A great place with no people is empty' } },
+    agree: { eg: 'Artists, guides, craftspeople, staff, the social buzz', good: 'People are why visitors come back', bad: 'A great crowd in a poor place falls flat' },
+    disagree: { eg: 'Nature, hotels, restaurants, venues', good: 'A great place draws visitors by itself', bad: 'A great place with no people is empty' } },
 };
 export const detailOf = (id) => TAKE_DETAIL[id] || null;
 
@@ -83,7 +83,7 @@ export const TAKES = [
   { id: 'T2', position: 5, theme_tag: null, text: 'One budget, one year. Where does it go? Build Africa first for a loyal home audience nobody can take away, but slower money and the world may move on. Go global now for a bigger audience and bigger money, but without a home base you are a guest everywhere.' },
   { id: 'T3', position: 2, theme_tag: null, text: 'A big opportunity comes, but they cannot pay for your work. Do it free and a big audience sees your work, but you may not grow, as clients start expecting it cheap. Stand by your price and your work is respected, but you walk away from the opportunity, and may not grow either, with less work behind you, fewer referrals and a smaller network. What should creatives do?' },
   { id: 'T4', position: 3, theme_tag: null, text: 'I\u2019d rather see African work go global under foreign ownership than stay 100% African-owned and unseen.' },
-  { id: 'T5', position: 1, theme_tag: null, text: 'What is worth more to tourism and cultural experiences: the people and social experiences (artists, guides, craftspeople, hotel staff, the social buzz), or the place and natural surroundings (natural beauty, living spaces, good entertainment venues)?' },
+  { id: 'T5', position: 1, theme_tag: null, text: 'What is worth more to tourism and cultural experiences: the people and social experiences (artists, guides, craftspeople, hotel and restaurant staff, the social buzz), or the place and natural surroundings (natural beauty, hotels, restaurants, entertainment venues)?' },
 ];
 
 // ALL verified:false until Hinda confirms (flip in /admin). Unverified facts are never shown anywhere.
