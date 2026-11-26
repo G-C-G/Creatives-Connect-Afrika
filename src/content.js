@@ -53,37 +53,26 @@ export function regionOf(country) {
 
 // Takes that are a choice between two options instead of Agree / Disagree. The answer is still stored as agree (first option) or disagree (second option);
 // only the words shown to people change (the buttons, the stage deck, the welcome game).
-export const TAKE_SIDES = {
-  T1: { agree: 'The artists and their crew', disagree: 'The host country and its hotels' },
-  T2: { agree: 'Do it for free', disagree: 'Stand by your price' },
-  T3: { agree: 'Pass it on', disagree: 'Keep the door closed' },
-  T5: { agree: 'Use it', disagree: 'Refuse it' },
-};
+export const TAKE_SIDES = { T3: { agree: 'Do it for free', disagree: 'Stand by your price' }, T5: { agree: 'The artists and their crew', disagree: 'The host country and its hotels' } };
 export const sidesOf = (id) => TAKE_SIDES[id] || null;
 // What a phone shows for those takes: a short question, then the good and the bad of BOTH options on the two tiles.
 export const TAKE_DETAIL = {
-  T1: { stem: 'You can only back one. Who adds more value to a cultural experience?',
-    agree: { good: 'They are the reason people travel, and the reason people remember', bad: 'Without a safe, welcoming place to stay, the best show still loses the crowd' },
-    disagree: { good: 'Its welcome, its values and its comfort make the experience possible', bad: 'Without the artists, a beautiful hotel is just a hotel, and nobody makes the trip' } },
-  T2: { stem: 'Someone wants your work but cannot pay. Do you still do it?',
+  T3: { stem: 'Someone wants your work but cannot pay. Do you still do it?',
     agree: { good: 'More people get to see your work', bad: 'You may not grow: clients start expecting it cheap, and it gets hard to charge more later' },
     disagree: { good: 'People respect your work and your price', bad: 'You may not grow either: less work behind you, and few clients who can afford you' } },
-  T3: { stem: 'A good client lands with you. Do you pass the lead on, or keep the door closed?',
-    agree: { good: 'Opportunities multiply, and work finds its way back to you', bad: 'Someone you helped can take your client' },
-    disagree: { good: 'Your clients, your edge, your income: you earned it', bad: 'A closed circle keeps the whole market small, and you stay small with it' } },
-  T5: { setup: 'AI is already making music, images and film.', stem: 'AI can do in minutes what takes you days. Do you use it?',
-    agree: { good: 'You deliver more, faster and cheaper, and can compete with anyone anywhere', bad: 'Everyone can do it, so your skill is worth less and prices fall' },
-    disagree: { good: 'Human-made work becomes rare and valuable, and your voice stays yours', bad: 'You get undercut by people who use it, and the market moves on without you' } },
+  T5: { stem: 'You can only back one. Who adds more value to a cultural experience?',
+    agree: { good: 'They are the reason people travel, and the reason people remember', bad: 'Without a safe, welcoming place to stay, the best show still loses the crowd' },
+    disagree: { good: 'Its welcome, its values and its comfort make the experience possible', bad: 'Without the artists, a beautiful hotel is just a hotel, and nobody makes the trip' } },
 };
 export const detailOf = (id) => TAKE_DETAIL[id] || null;
 
 // LOCKED once launched. Never reword after locked = 1. theme_tag: TBD per spec.
 export const TAKES = [
-  { id: 'T1', position: 1, theme_tag: null, text: 'You can only back one. Who adds more value to a cultural experience: the artists and their crew, or the host country and its hotels?' },
-  { id: 'T2', position: 2, theme_tag: null, text: 'Someone wants your work but cannot pay. Do it free and more people see your work, but you may not grow, as clients start expecting it cheap. Stand by your price and your work is respected, but you may not grow either, with less work behind you and few clients who can afford you. What should creatives do?' },
-  { id: 'T3', position: 3, theme_tag: null, text: 'A good client lands with you. Do you pass the lead on, or keep the door closed?' },
+  { id: 'T1', position: 1, theme_tag: null, text: 'A creative business that can\u2019t make money isn\u2019t a successful creative business.' },
+  { id: 'T2', position: 2, theme_tag: null, text: 'African creatives should win Africa before they go after the world.' },
+  { id: 'T3', position: 3, theme_tag: null, text: 'Someone wants your work but cannot pay. Do it free and more people see your work, but you may not grow, as clients start expecting it cheap. Stand by your price and your work is respected, but you may not grow either, with less work behind you and few clients who can afford you. What should creatives do?' },
   { id: 'T4', position: 4, theme_tag: null, text: 'I\u2019d rather see African work go global under foreign ownership than stay 100% African-owned and unseen.' },
-  { id: 'T5', position: 5, theme_tag: null, text: 'AI can do in minutes what takes you days. Do you use it, or refuse it?' },
+  { id: 'T5', position: 5, theme_tag: null, text: 'You can only back one. Who adds more value to a cultural experience: the artists and their crew, or the host country and its hotels?' },
 ];
 
 // ALL verified:false until Hinda confirms (flip in /admin). Unverified facts are never shown anywhere.

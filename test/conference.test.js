@@ -78,7 +78,7 @@ test('conference stage deck: aggregates only (no names), most divisive first, op
   assert.ok(!/https?:\/\//.test(html), 'no network references');
   assert.ok(html.includes('Do it for free') && html.includes('Stand by your price') && html.includes('Mostly: do it for free'), 'take 3 shows its own two options on the stage, not agreed / disagreed');
   // T1 (a perfect 3/3 split) is the first statement shown; T2..T5 (6/0) follow
-  assert.ok(first.includes('You can only back one') && /<span class="num">3<\/span><span class="lab">The artists and their crew/.test(first), 'most divisive statement first (its own two options as the labels)');
+  assert.ok(first.includes('A creative business that can') && /<span class="num">3<\/span><span class="lab">agreed/.test(first), 'most divisive statement first');
   assert.equal(c.db.prepare("SELECT COUNT(*) c FROM snapshots WHERE kind='conference'").get().c, 1);
 });
 
@@ -91,7 +91,7 @@ test('/me ("what did I say?") is closed until switched on, then shows only your 
   assert.ok(html.includes('What you said') && html.includes('Agree') && html.includes('Give me the microphone'));
   assert.ok(!html.includes('Eli') && !html.includes('tok-e'), 'never anyone else');
   html = await (await c.call('/me?t=tok-d')).text();
-  assert.ok(html.includes('The host country and its hotels') && html.includes('Pretty sure'), 'Di chose the second option, strength 3');
+  assert.ok(html.includes('Disagree') && html.includes('Pretty sure'), 'Di said Disagree, strength 3');
   const form = async (n, num) => (await c.call('/me/lookup', { body: { first_name: n, number: String(num) } })).text();
   assert.ok((await form(' eli ', 1005)).includes('fight you on this'), 'name + code works, case and spaces ignored (Eli: strength 5)');
   assert.match(await form('Eli', 9999), /could not match/i);
