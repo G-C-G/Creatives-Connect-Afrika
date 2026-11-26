@@ -448,3 +448,4 @@ body.q .acts-q::placeholder{color:#666}
 body.q .goals .chips{gap:6px}body.q .goals .chip span{min-height:40px;padding:8px 13px;font:700 15px/1.15 system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;border-radius:0;background:#fff;color:#111;border:0}body.q .goals .chip input:checked+span{background:var(--red);color:#fff}
 body.q .goals{max-height:calc(100svh - 268px);overflow-y:auto;-webkit-overflow-scrolling:touch}body.q .goals .chip span{min-height:38px;padding:7px 12px;font-size:14.5px}
 body.q .goals{position:relative}
+body.q .goal-other{margin-top:8px}body.q .goal-other input{width:100%;box-sizing:border-box;font:600 16px/1.2 system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;padding:12px 14px;border:0;border-radius:0;background:#fff;color:#111;border-bottom:3px solid #111}

@@ -100,7 +100,8 @@ export function validatePre(p, { short = false, takes }) {
   const role = p.get('role') || '';
   if (!ROLE_IDS.has(role)) errors.role = 'required';
   if (p.get('consent_aggregate') !== '1') errors.consent_aggregate = 'required';
-  const goals = [...new Set(p.getAll('goal'))].filter((g) => GOAL_IDS.has(g));   // pick as many as you like
+  const goalOther = clip(p.get('goal_other'), 80);
+  const goals = [...new Set(p.getAll('goal'))].filter((g) => GOAL_IDS.has(g)).map((g) => (g === 'other' && goalOther ? 'other:' + goalOther : g));   // pick as many as you like; 'Something else' carries what they wrote
   if (p.getAll('goal').some((g) => g && !GOAL_IDS.has(g))) errors.goal = 'invalid';
   const goal = goals[0] || '';
   const values = short ? [] : [...new Set(p.getAll('values'))].filter((v) => VALUE_IDS.has(v));

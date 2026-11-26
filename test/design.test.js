@@ -255,9 +255,9 @@ test('goals: pick as many as you like, all saved, friendly options include meeti
   const c = await boot();
   const html = await (await c.call('/start')).text();
   assert.ok(html.includes('Meet Pan-African creatives') && html.includes('Learn what is happening right now') && html.includes('Pick as many as you like.'));
-  const form = new URLSearchParams(); for (const [k, v] of Object.entries(reg({ email: 'g@example.com' }))) form.set(k, v); ['pan_african', 'funding', 'insight'].forEach((g) => form.append('goal', g));
+  const form = new URLSearchParams(); for (const [k, v] of Object.entries(reg({ email: 'g@example.com' }))) form.set(k, v); ['pan_african', 'funding', 'insight', 'other'].forEach((g) => form.append('goal', g)); form.set('goal_other', '  Meet my future co-founder  ');
   assert.equal((await fetch(c.base + '/start', { method: 'POST', redirect: 'manual', headers: { 'Content-Type': 'application/x-www-form-urlencoded' }, body: form })).status, 303);
   const row = c.db.prepare("SELECT goal, goals_json FROM participants WHERE email='g@example.com'").get();
-  assert.deepEqual(JSON.parse(row.goals_json), ['pan_african', 'funding', 'insight']); assert.equal(row.goal, 'pan_african');
+  assert.deepEqual(JSON.parse(row.goals_json), ['pan_african', 'funding', 'insight', 'other:Meet my future co-founder']); assert.equal(row.goal, 'pan_african');
   c.close();
 });

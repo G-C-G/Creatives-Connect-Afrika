@@ -159,6 +159,8 @@
     var ok = doc.createElement('input'); ok.type = 'text'; ok.className = 'sr'; ok.tabIndex = -1; ok.setAttribute('aria-hidden', 'true'); ok.required = true; ok.name = '_atleast'; box.appendChild(ok);
     function upd() { ok.value = box.querySelector('input[type=checkbox]:checked') ? '1' : ''; }
     box.addEventListener('change', upd); upd();
+    var other = box.querySelector('[data-goal-other]'), oc = box.querySelector('input[name=goal][value=other]');
+    if (other && oc) oc.addEventListener('change', function () { other.hidden = !oc.checked; if (oc.checked) { var t = other.querySelector('input'); if (t) setTimeout(function () { t.focus(); try { other.scrollIntoView({ block: 'nearest' }); } catch (e) {} }, 50); } });
   });
 
   // ---- wizard ----

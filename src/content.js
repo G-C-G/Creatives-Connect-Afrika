@@ -176,7 +176,7 @@ export const GOALS = [
   opt('pan_african', 'Meet Pan-African creatives'), opt('partners', 'Find partners'), opt('collaborators', 'Find people to create with'),
   opt('funding', 'Find funding or investors'), opt('audience', 'Reach a new audience'), opt('market', 'Open new markets'),
   opt('clients', 'Win clients or customers'), opt('insight', 'Learn what is happening right now'), opt('knowledge', 'Gain knowledge and skills'),
-  opt('ideas', 'Get ideas and inspiration'), opt('decision_makers', 'Meet decision-makers'), opt('visibility', 'Get my work seen'), opt('story', 'Share my story'),
+  opt('ideas', 'Get ideas and inspiration'), opt('decision_makers', 'Meet decision-makers'), opt('visibility', 'Get my work seen'), opt('story', 'Share my story'), opt('other', 'Something else'),
 ];
 
 // ASSUMPTION: the spec says "pick 3 values" without a list. Edit freely before launch.
@@ -227,8 +227,8 @@ export const TAKE_DETAIL = {
     agree: { eg: 'You made meaningful work that touched many lives, and lived comfortably, but never became rich', good: 'Your work mattered, and reached people for generations', bad: 'You lived unappreciated and undervalued, and never reached the wealth you could have had' },
     disagree: { eg: 'You built the business side, and made real money', good: ['You shared it: you looked after your family and the people you love at the highest level, and then some', 'A comfort and luxury most people never see'], bad: 'You never felt completely fulfilled: you gave up your inner calling for a business that paid well but did not feel meaningful to you, and your impact stayed small' } },
   T2: { stem: 'One budget, one year. Where does it go?',
-    agree: { good: 'Build an audience that knows you, backs you and grows with you', bad: 'It may take longer to reach the money and scale you\u2019re looking for' },
-    disagree: { good: 'Go where the audience, money and opportunity already are', bad: 'Without a home base, you are a guest everywhere' } },
+    agree: { good: 'Build an audience that knows you, backs you and grows with you', bad: 'It may take longer to reach the money and scale you\u2019re looking for: the market that values creatives is less prioritised here than in other countries' },
+    disagree: { good: 'Go where creatives are valued and prioritised, and the audience, money and opportunity already are', bad: 'Without a home base, you are a guest everywhere' } },
   T3: { stem: 'A big opportunity comes, but they cannot pay for your work. Do you do it for free, or stand by your price?',
     agree: { good: 'You get in the rooms where you can be recognised globally', bad: 'You may not grow: clients start expecting it cheap, and it gets hard to charge more later' },
     disagree: { good: 'People respect your work and your price', bad: 'Global recognition comes slower, because people are not willing to pay Africans for their work, and you may not grow: fewer referrals, a smaller network' } },
@@ -245,7 +245,7 @@ export const TAKES = [
   { id: 'T1', position: 2, theme_tag: null, text: 'Looking back at the end of your life, which life would you rather have lived? A life of meaning: you made meaningful work that touched many lives, and lived comfortably, but unappreciated and undervalued, and never rich. Or a life of wealth: you built the business side and made real money, and you shared it, looking after your family and the people you love at the highest level, but you never felt completely fulfilled: you gave up your inner calling for a business that paid well but did not feel meaningful to you, and your impact stayed small.' },
   { id: 'T4', position: 3, theme_tag: null, text: 'I\u2019d rather see African work go global under foreign ownership than stay 100% African-owned and unseen.' },
   { id: 'T3', position: 4, theme_tag: null, text: 'A big opportunity comes, but they cannot pay for your work. Do you do it for free, or stand by your price? Do it free and you get in the rooms where you can be recognised globally, but you may not grow, as clients start expecting it cheap. Stand by your price and your work is respected, but global recognition comes slower, because people are not willing to pay Africans for their work.' },
-  { id: 'T2', position: 5, theme_tag: null, text: 'One budget, one year. Where does it go? Build Africa first: build an audience that knows you, backs you and grows with you, but it may take longer to reach the money and scale you\u2019re looking for. Or go global now: go where the audience, money and opportunity already are, but without a home base, you are a guest everywhere.' },
+  { id: 'T2', position: 5, theme_tag: null, text: 'One budget, one year. Where does it go? Build Africa first: build an audience that knows you, backs you and grows with you, but it may take longer to reach the money and scale you\u2019re looking for, because the market that values creatives is less prioritised here than in other countries. Or go global now: go where creatives are valued and prioritised, and the audience, money and opportunity already are, but without a home base, you are a guest everywhere.' },
 ];
 
 // ALL verified:false until Hinda confirms (flip in /admin). Unverified facts are never shown anywhere.

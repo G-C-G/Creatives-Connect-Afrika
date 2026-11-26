@@ -146,7 +146,7 @@ export function preForm({ takes, facts = [], S = new URLSearchParams(), E = {}, 
         ${bigInput('surname', S, E, lang, { required: true, autocomplete: 'family-name', label: t(lang, 'about.surname') })}` }, lang),
     ask({ k: t(lang, 'q.role.k'), title: t(lang, 'q.role.t'), hint: t(lang, 'q.role.h'), auto: true, body: h`<div class="roles">${chipPick('role', ROLES, S, lang)}</div>${fieldErr(E, 'role', lang)}` }, lang),
     ask({ k: t(lang, 'q.sector.k'), title: t(lang, 'q.sector.t'), hint: t(lang, 'q.sector.h'), body: activitiesPicker(S, E, lang) }, lang),
-    ask({ k: t(lang, 'q.goal.k'), title: t(lang, 'q.goal.t'), hint: t(lang, 'q.goal.h'), body: h`<div class="goals" data-atleast>${chipMulti('goal', GOALS, S)}</div>` }, lang),
+    ask({ k: t(lang, 'q.goal.k'), title: t(lang, 'q.goal.t'), hint: t(lang, 'q.goal.h'), body: h`<div class="goals" data-atleast>${chipMulti('goal', GOALS, S)}<div class="goal-other" data-goal-other ${(S.getAll ? S.getAll('goal') : []).includes('other') ? '' : 'hidden'}><input type="text" name="goal_other" maxlength="80" placeholder="Write it here" value="${S.get ? (S.get('goal_other') ?? '') : ''}" aria-label="Something else"></div></div>` }, lang),
     ask({ k: t(lang, 'q.memory.k'), title: t(lang, 'q.memory.t'), hint: t(lang, 'q.memory.h'), optional: true, body: bigInput('memory', S, E, lang, { max: 140, label: t(lang, 'about.memory') }) }, lang),
     ask({ k: t(lang, 'q.email.k'), title: t(lang, 'q.email.t'), hint: t(lang, 'q.email.h'), optional: true, body: bigInput('email', S, E, lang, { type: 'email', max: 254, autocomplete: 'email', label: t(lang, 'about.email') }) }, lang),
   ];
