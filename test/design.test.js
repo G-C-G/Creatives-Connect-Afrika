@@ -45,7 +45,7 @@ test('the older say/stage fields still work (no-JS and existing clients)', async
 test('logos: first page is CCA only, game screens are clean, and the ending breathes (no logos, no footer mark)', async () => {
   const c = await boot();
   const landing = await (await c.call('/')).text();
-  assert.match(landing, /class="logos top"/); assert.match(landing, /class="cca-hero"/, 'the CCA mark sits clear in the middle');
+  assert.match(landing, /class="logos top band"/); assert.match(landing, /class="cca-hero"/, 'the CCA mark sits clear in the middle');
   assert.ok(landing.indexOf('gcg.png') < landing.indexOf('ghana-arms.png') && landing.indexOf('ghana-arms.png') < landing.indexOf('cca-hero.png') && landing.indexOf('cca-hero.png') < landing.indexOf('class="open"'), 'top row: GCG left then the partners; then the CCA mark; then the headline');
   assert.equal((landing.match(/gcg\.png/g) || []).length, 1, 'GCG appears once on the opening (top-left, not repeated in the footer)');
   assert.doesNotMatch(landing.replace(/<[^>]*>/g, ' '), /gold coast games/i, 'no written GCG name in the visible text (the logo carries it)');

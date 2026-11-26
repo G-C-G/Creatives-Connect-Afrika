@@ -21,7 +21,7 @@
     ['Balaa nu t\u00e0mbalee', 'Wolof', 'wo'], ['Ka hor intaynaan bilaabin', 'Soomaali', 'so'], ['Mbere yo gutangira', 'Kinyarwanda', 'rw'], ['Voordat ons begin', 'Afrikaans', 'af'], ['Liboso ya kobanda', 'Ling\u00e1la', 'ln'], ['Pele re qala', 'Sesotho', 'st']];
   var cyc = doc.querySelector('.cyc');
   if (cyc && !calm) {
-    var ct = cyc.querySelector('.cyc-text'), cl = cyc.querySelector('.cyc-lang'), gi = 0;
+    var ct = cyc.querySelector('.cyc-text'), gi = 0;
     // every language stays on ONE line: shrink the type a little until it fits
     var fit = function () { ct.style.fontSize = ''; var fs = parseFloat(getComputedStyle(ct).fontSize); while (ct.getBoundingClientRect().width > cyc.clientWidth && fs > 15) { fs -= 1; ct.style.fontSize = fs + 'px'; } };
     if (doc.fonts && doc.fonts.ready) doc.fonts.ready.then(fit); fit();
@@ -29,7 +29,7 @@
       cyc.classList.add('out');
       setTimeout(function () {
         gi = (gi + 1) % GREET.length; var g = GREET[gi];
-        ct.textContent = g[0]; cl.textContent = g[1]; ct.setAttribute('lang', g[2]); ct.setAttribute('dir', g[3] ? 'rtl' : 'ltr');
+        ct.textContent = g[0]; ct.setAttribute('lang', g[2]); ct.setAttribute('dir', g[3] ? 'rtl' : 'ltr');
         fit(); cyc.classList.remove('out');
       }, 380);
     }, 2600);

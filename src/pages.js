@@ -7,7 +7,7 @@ export const configure = ({ logos }) => { showLogos = logos; };
 
 const logoRow = (cls = '') => h`<div class="logos ${cls}">${LOGOS.map((l) => h`<img src="/static/logos/${l.file}" alt="${l.alt}">`)}</div>`;
 // opening screen: Gold Coast Games top-left, the partners top-right, all the same height
-const topLogos = () => h`<div class="logos top"><img src="/static/logos/${GCG_LOGO.file}" alt="${GCG_LOGO.alt}"><span class="tp">${showLogos ? LOGOS.slice(1).map((l) => h`<img src="/static/logos/${l.file}" alt="${l.alt}">`) : ''}</span></div>`;
+const topLogos = () => h`<div class="logos top band"><img src="/static/logos/${GCG_LOGO.file}" alt="${GCG_LOGO.alt}"><span class="tp">${showLogos ? LOGOS.slice(1).map((l) => h`<img src="/static/logos/${l.file}" alt="${l.alt}">`) : ''}</span></div>`;
 const heroLogo = () => h`<div class="logos hero"><img src="/static/logos/${LOGOS[0].file}" alt="${LOGOS[0].alt}"></div>`;
 
 // logos: 'none' (game screens stay clean) | 'hero' (opening page: CCA only) | 'row' (opening/closing: CCA first, then partners)
@@ -113,11 +113,13 @@ const consentStep = (S, E, lang) => h`<section class="step" data-step data-title
 
 export function landingPage(lang = 'en') {
   return layout({ lang, logos: 'opening', title: 'Before we begin | CCA 2026', main: 'narrow landing', body: h`
-  <div class="stage"><img class="cca-hero" src="/static/logos/${CCA_HERO.file}" alt="${CCA_HERO.alt}">
-  <h1 class="open"><span class="sr">${t(lang, 'open.h1a')} ${t(lang, 'open.h1b')}</span><span class="cyc" aria-hidden="true"><span class="cyc-lang">English</span><span class="cyc-text">${t(lang, 'open.h1a')} ${t(lang, 'open.h1b').replace('.', '')}</span></span></h1>
-  <p class="lead">${t(lang, 'open.sub')}<br>${t(lang, 'open.sub2')}</p></div>
+  <div class="stage"><img class="cca-hero" src="/static/logos/${CCA_HERO.file}" alt="${CCA_HERO.alt}"></div>
+  <section class="panel">
+  <h1 class="open"><span class="sr">${t(lang, 'open.h1a')} ${t(lang, 'open.h1b')}</span><span class="cyc" aria-hidden="true"><span class="cyc-text">${t(lang, 'open.h1a')} ${t(lang, 'open.h1b').replace('.', '')}</span></span></h1>
+  <p class="lead">${t(lang, 'open.sub')}<br>${t(lang, 'open.sub2')}</p>
   <a class="btn big go" href="/start" data-theme="/static/audio/welcome-home.mp3">${t(lang, 'open.go')} &rarr;</a>
-  <button type="button" class="soundline" data-soundline>${t(lang, 'open.sound.on')} &middot; ${t(lang, 'open.sound.cta')}</button>` });
+  <button type="button" class="soundline" data-soundline>${t(lang, 'open.sound.on')} &middot; ${t(lang, 'open.sound.cta')}</button>
+  </section>` });
 }
 
 export function preForm({ takes, facts = [], S = new URLSearchParams(), E = {}, short = false, lang = 'en' }) {
