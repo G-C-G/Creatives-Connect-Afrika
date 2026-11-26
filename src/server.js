@@ -30,7 +30,7 @@ function limiter(max, windowMs) {
 
 const COUNTRY_SLUGS = new Set(COUNTRIES.map(countrySlug));
 // answer sounds (voice expressions for the taps): public/audio/fx/<slot>.mp3
-const FX_SLOTS = new Set(['stance-agree', 'stance-disagree', 'strength-1', 'strength-2', 'strength-3', 'strength-4', 'strength-5', 'level-quiet', 'level-aloud', 'level-stage', 'role', 'sector', 'goal']);
+const FX_SLOTS = new Set(['stance-agree', 'stance-disagree', 'strength-1', 'strength-2', 'strength-3', 'strength-4', 'strength-5', 'wealth', 'level-quiet', 'level-aloud', 'level-stage', 'role', 'sector', 'goal']);
 export function createApp({ db, env = process.env, now = () => new Date(), fetchImpl = fetch } = {}) {
   P.configure({ logos: env.SHOW_PARTNER_LOGOS !== '0' });
   const secret = env.SESSION_SECRET || env.ADMIN_PASSWORD || 'dev-secret';

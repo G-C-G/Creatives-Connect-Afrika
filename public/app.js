@@ -233,6 +233,7 @@
     if (SFX) { var nm0 = e.target.name; if (/_strength$/.test(nm0) && e.target.value === '5') setTimeout(function () { SFX.boom(); }, 60); if (/_level$/.test(nm0) && e.target.value === 'stage') setTimeout(function () { SFX.drum(); }, 60); }
     if (SFX) {   // a voice expression for this answer if you added one (public/audio/fx/<slot>.mp3), otherwise the synthesised lock sound
       var nm = e.target.name.replace(/^t_T\d+_/, ''), slot = /^(role|sector|goal)$/.test(nm) ? nm : nm + '-' + e.target.value, fxBase = form.getAttribute('data-fx');
+      if (e.target.name === 't_T1_stance' && e.target.value === 'disagree') slot = 'wealth';   // choosing a life of wealth over meaning has its own sound
       SFX.answer(fxBase ? fxBase + slot + '.mp3' : null);
     }
     try { if (navigator.vibrate) navigator.vibrate(12); } catch (x) {}
