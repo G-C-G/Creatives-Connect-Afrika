@@ -11,7 +11,7 @@ Goal: the first 2 to 3 minutes should feel like a trailer, not a registration fo
 | Opening | "Welcome to the game" + a paragraph: explained instead of intriguing. | "What do you actually think?" Five statements. No right answers. About three minutes. |
 | Rhythm | Every statement identical, so it read as form field, form field, form field. | A different build-up line per statement; a lock-in line after each tap. |
 | Interaction | A tap advanced the screen with no moment of consequence. | Tap locks the choice (fills red with a tick), the others recede, a line acknowledges it, then it moves on. |
-| Scale | Numbers 1 to 5 in boxes: abstract. | Words: Not very / A little / Pretty sure / Very sure / I'd fight you on this (still stored as 1 to 5). |
+| Scale | Numbers 1 to 5 in boxes: abstract. | Words: A mild lean / I feel it / I feel it strongly / I'd fight you on this (four options; asks how passionate, not how certain) (still stored as 1 to 5). |
 | Extras | Project, values and contact-sharing screens fed nothing in the plan. | Cut from the flow (the server still accepts them). |
 | Ending | A number and an instruction: administrative. | A staged black ending: "That's all. For now." > "What does everyone else think?" > "Come back Monday." > the code. |
 | Bug found in review | A CSS name collision made the black mood class bold and unwrappable. | Renamed (`night`). |
