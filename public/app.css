@@ -417,3 +417,31 @@ body.end .snd{background:rgba(255,255,255,.16);color:#fff;border-color:rgba(255,
 body.end .exist{position:absolute;top:50px;left:0;right:0;text-align:center}
 @media (max-height:640px){body.end .end-mark{width:min(38vw,150px);margin-bottom:8px}body.end .display{font-size:28px}body.end .ask-line{font-size:20px}body.end .codecard{margin-bottom:12px;padding:10px 12px}body.end .codecard .bignum{font-size:56px}body.end .end-band{padding-top:9px;padding-bottom:9px}}
 body.end .end-band{margin-top:auto}body.end .end-top{flex:1 1 auto}
+
+/* "Where do you play?": search, picked chips, and an A to Z list you scroll inside its own box (the page itself never scrolls) */
+.acts{display:flex;flex-direction:column;gap:8px}
+.acts-q{width:100%;box-sizing:border-box;font:600 17px/1.2 system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;padding:12px 14px;border:0;border-radius:0;background:#fff;color:#111}
+.acts-sel{display:flex;flex-wrap:wrap;gap:6px;max-height:68px;overflow:auto}
+.acts-sel:empty{display:none}
+.act-chip{font:700 13px/1 system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;background:#111;color:#fff;border:0;border-radius:0;padding:8px 10px;cursor:pointer}
+.acts-body{display:flex;gap:4px;align-items:stretch}
+.acts-list{flex:1;min-width:0;max-height:calc(100svh - 360px);min-height:150px;overflow-y:auto;background:#fff;-webkit-overflow-scrolling:touch}
+.acts-h{margin:0;padding:6px 12px;font:800 12px/1 system-ui,sans-serif;letter-spacing:.14em;background:#111;color:#E2AC4A;position:sticky;top:0;z-index:1}
+.act{display:block;margin:0}
+.act input{position:absolute;opacity:0;pointer-events:none}
+.act span{display:block;padding:11px 14px;font:600 16px/1.2 system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;color:#111;border-bottom:1px solid rgba(17,17,17,.08)}
+.act input:checked+span{background:var(--red);color:#fff}
+.act input:focus-visible+span{outline:3px solid #111;outline-offset:-3px}
+.act-add{display:block;width:100%;text-align:left;font:700 16px/1.2 system-ui,sans-serif;padding:12px 14px;background:#fdf1d6;color:#111;border:0;border-bottom:1px solid rgba(17,17,17,.12);cursor:pointer}
+.acts-none{margin:0;padding:12px 14px;color:#555;font:15px/1.3 system-ui,sans-serif}
+.acts-az{display:flex;flex-direction:column;justify-content:space-between;width:18px;max-height:calc(100svh - 360px);min-height:150px}
+.acts-az button{all:unset;cursor:pointer;font:700 9.5px/1 system-ui,sans-serif;color:#111;text-align:center;padding:0}
+body.q .acts-q::placeholder{color:#666}
+@media (max-height:640px){.acts-list,.acts-az{max-height:calc(100svh - 300px);min-height:110px}.acts-sel{max-height:44px}}
+.sr{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0);white-space:nowrap}
+
+.acts-list{position:relative}.act{position:relative}
+.act span,.acts-h,.act-add,.acts-q{text-transform:none;letter-spacing:0}
+.acts-h{letter-spacing:.14em}
+.acts-q::-webkit-search-cancel-button{-webkit-appearance:none;appearance:none;height:0;width:0}
+@media (max-height:660px){.acts-list,.acts-az{max-height:calc(100svh - 372px)}}

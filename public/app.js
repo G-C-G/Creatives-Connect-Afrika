@@ -107,6 +107,53 @@
     r.parentNode.addEventListener('change', function () { r.hidden = false; });
   });
 
+
+  // ---- "Where do you play?": search, pick many, add your own, A to Z ----
+  [].slice.call(form.querySelectorAll('[data-acts]')).forEach(function (box) {
+    var q = box.querySelector('[data-acts-q]'), list = box.querySelector('[data-acts-list]'), sel = box.querySelector('[data-acts-sel]'),
+      none = box.querySelector('[data-acts-none]'), custom = box.querySelector('[data-acts-custom]'), az = box.querySelector('[data-acts-az]');
+    var rows = [].slice.call(list.querySelectorAll('.act')), heads = [].slice.call(list.querySelectorAll('.acts-h'));
+    var ok = doc.createElement('input'); ok.type = 'text'; ok.className = 'sr'; ok.tabIndex = -1; ok.setAttribute('aria-hidden', 'true'); ok.required = true; ok.name = '_acts_ok'; box.appendChild(ok);
+    var addRow = doc.createElement('button'); addRow.type = 'button'; addRow.className = 'act-add'; addRow.hidden = true; list.insertBefore(addRow, list.firstChild);
+    function norm(x) { return (x || '').trim().replace(/\s+/g, ' '); }
+    function customs() { return [].slice.call(custom.querySelectorAll('input')); }
+    function refresh() {
+      sel.textContent = '';
+      var n = 0;
+      rows.forEach(function (r) { var c = r.querySelector('input'); if (c.checked) { n++; chip(r.getAttribute('data-label'), r.textContent, function () { c.checked = false; c.dispatchEvent(new Event('change', { bubbles: true })); }); } });
+      customs().forEach(function (i) { n++; chip(i.value, i.value.slice(7), function () { i.parentNode.removeChild(i); refresh(); form.dispatchEvent(new Event('change', { bubbles: true })); }); });
+      ok.value = n ? '1' : '';
+    }
+    function chip(key, label, remove) {
+      var b = doc.createElement('button'); b.type = 'button'; b.className = 'act-chip'; b.textContent = label.trim() + ' \u00d7'; b.setAttribute('aria-label', 'Remove ' + label.trim()); b.addEventListener('click', remove); sel.appendChild(b);
+    }
+    function addCustom(text) {
+      text = norm(text).slice(0, 60); if (!text) return;
+      var exists = customs().some(function (i) { return i.value.toLowerCase() === ('custom:' + text).toLowerCase(); });
+      if (!exists) { var i = doc.createElement('input'); i.type = 'hidden'; i.name = 'activity'; i.value = 'custom:' + text; custom.appendChild(i); }
+      q.value = ''; filter(); refresh(); form.dispatchEvent(new Event('change', { bubbles: true }));
+    }
+    function filter() {
+      var v = norm(q.value).toLowerCase(), shown = 0, exact = false;
+      rows.forEach(function (r) { var l = r.getAttribute('data-label'), m = !v || l.indexOf(v) > -1; r.hidden = !m; if (m) shown++; if (l === v) exact = true; });
+      heads.forEach(function (h) { var any = false, n = h.nextElementSibling; while (n && !n.classList.contains('acts-h')) { if (n.classList.contains('act') && !n.hidden) any = true; n = n.nextElementSibling; } h.hidden = !any; });
+      none.hidden = true; az.style.visibility = v ? 'hidden' : 'visible';
+      if (v && !exact) { addRow.hidden = false; addRow.textContent = 'Add \u201c' + norm(q.value) + '\u201d as your own'; } else addRow.hidden = true;
+    }
+    q.addEventListener('input', filter);
+    q.addEventListener('keydown', function (e) {
+      if (e.key !== 'Enter') return; e.preventDefault(); e.stopPropagation();
+      var v = norm(q.value).toLowerCase(); if (!v) return;
+      var first = rows.filter(function (r) { return !r.hidden; })[0];
+      if (first && first.getAttribute('data-label') === v) { var c = first.querySelector('input'); c.checked = !c.checked; c.dispatchEvent(new Event('change', { bubbles: true })); q.value = ''; filter(); }
+      else addCustom(q.value);
+    });
+    addRow.addEventListener('click', function () { addCustom(q.value); q.focus(); });
+    list.addEventListener('change', function () { refresh(); });
+    az.addEventListener('click', function (e) { var b = e.target.closest && e.target.closest('[data-jump]'); if (!b) return; var h = list.querySelector('[data-letter="' + b.getAttribute('data-jump') + '"]'); if (h) list.scrollTop = h.offsetTop; });
+    refresh(); filter();
+  });
+
   // ---- wizard ----
   function valid(step) {
     var bad = null;

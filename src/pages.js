@@ -1,6 +1,6 @@
 import { h } from './html.js';
 import { t, label } from './i18n.js';
-import { COUNTRIES, SECTORS, GOALS, VALUES, FACT_SLOTS, LOGOS, GCG_LOGO, CCA_HERO, sidesOf, detailOf, PICKABLE_COUNTRIES, ROLES } from './content.js';
+import { COUNTRIES, SECTORS, GOALS, VALUES, FACT_SLOTS, LOGOS, GCG_LOGO, CCA_HERO, sidesOf, detailOf, PICKABLE_COUNTRIES, ROLES, ACTIVITIES } from './content.js';
 
 let showLogos = true;
 export const configure = ({ logos }) => { showLogos = logos; };
@@ -122,6 +122,20 @@ export function landingPage(lang = 'en') {
   <div class="band-bottom"><button type="button" class="soundline" data-soundline>${t(lang, 'open.sound.on')} &middot; ${t(lang, 'open.sound.cta')}</button></div>` });
 }
 
+
+// "Where do you play?": a searchable A to Z list of specific things people do, pick as many as you like. Works with no JavaScript (plain checkboxes); the script adds search, picked chips and "add your own".
+function activitiesPicker(S, E, lang) {
+  const picked = new Set(S.getAll ? S.getAll('activity') : []);
+  const letters = [...new Set(ACTIVITIES.map((a) => a.en[0].toUpperCase()))];
+  return h`<div class="acts" data-acts>
+    <input class="acts-q" type="search" autocomplete="off" placeholder="${t(lang, 'q.sector.ph')}" aria-label="${t(lang, 'q.sector.ph')}" data-acts-q>
+    <div class="acts-sel" data-acts-sel aria-live="polite"></div>
+    <div class="acts-body"><div class="acts-list" data-acts-list>${letters.map((L) => h`<p class="acts-h" data-letter="${L}">${L}</p>${ACTIVITIES.filter((a) => a.en[0].toUpperCase() === L).map((a) => h`<label class="act" data-label="${a.en.toLowerCase()}"><input type="checkbox" name="activity" value="${a.id}" ${picked.has(a.id) ? 'checked' : ''}><span>${a.en}</span></label>`)}`)}
+      <p class="acts-none" data-acts-none hidden>${t(lang, 'q.sector.none')}</p></div>
+      <div class="acts-az" data-acts-az aria-hidden="true">${letters.map((L) => h`<button type="button" data-jump="${L}" tabindex="-1">${L}</button>`)}</div></div>
+    <div data-acts-custom></div>${fieldErr(E, 'activity', lang)}</div>`;
+}
+
 export function preForm({ takes, facts = [], S = new URLSearchParams(), E = {}, short = false, lang = 'en' }) {
   const action = short ? '/door' : '/start';
   const q = [
@@ -130,7 +144,7 @@ export function preForm({ takes, facts = [], S = new URLSearchParams(), E = {}, 
       body: h`${bigInput('first_name', S, E, lang, { required: true, autocomplete: 'given-name', label: t(lang, 'about.first') })}
         ${bigInput('surname', S, E, lang, { required: true, autocomplete: 'family-name', label: t(lang, 'about.surname') })}` }, lang),
     ask({ k: t(lang, 'q.role.k'), title: t(lang, 'q.role.t'), hint: t(lang, 'q.role.h'), auto: true, body: h`<div class="roles">${chipPick('role', ROLES, S, lang)}</div>${fieldErr(E, 'role', lang)}` }, lang),
-    ask({ k: t(lang, 'q.sector.k'), title: t(lang, 'q.sector.t'), auto: true, body: h`${chipPick('sector', SECTORS, S, lang)}${fieldErr(E, 'sector', lang)}` }, lang),
+    ask({ k: t(lang, 'q.sector.k'), title: t(lang, 'q.sector.t'), hint: t(lang, 'q.sector.h'), body: activitiesPicker(S, E, lang) }, lang),
     ask({ k: t(lang, 'q.goal.k'), title: t(lang, 'q.goal.t'), hint: t(lang, 'q.goal.h'), auto: true, body: chipPick('goal', GOALS, S, lang, true) }, lang),
     ask({ k: t(lang, 'q.memory.k'), title: t(lang, 'q.memory.t'), hint: t(lang, 'q.memory.h'), optional: true, body: bigInput('memory', S, E, lang, { max: 140, label: t(lang, 'about.memory') }) }, lang),
     ask({ k: t(lang, 'q.email.k'), title: t(lang, 'q.email.t'), hint: t(lang, 'q.email.h'), optional: true, body: bigInput('email', S, E, lang, { type: 'email', max: 254, autocomplete: 'email', label: t(lang, 'about.email') }) }, lang),

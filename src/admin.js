@@ -57,6 +57,15 @@ function roleByTake(d) {
       return g.length < M.MIN_CELL ? h`<td class="hint">${g.length ? 'few' : '–'}</td>` : h`<td>${Math.round((100 * g.filter((r) => r.stance === 'agree').length) / g.length)}% <span class="hint">(n=${g.length})</span></td>`; })}</tr>`; })}</table>`;
 }
 
+// What people say they do (many picks each, plus their own words). Counts only; anything said by one person is grouped as "others" so nobody is singled out.
+function activitiesTable(d) {
+  const n = new Map(); let people = 0;
+  for (const p of d.participants) { const a = p.activities_json ? JSON.parse(p.activities_json) : []; if (a.length) people++; for (const x of new Set(a)) n.set(x, (n.get(x) || 0) + 1); }
+  const rows = [...n].filter(([, c]) => c >= 2).sort((a, b) => b[1] - a[1] || a[0].localeCompare(b[0])), single = [...n].filter(([, c]) => c < 2).length;
+  return h`<h2>What people do</h2><p class="hint">${people} delegate(s) picked at least one. Each can pick several, so counts add up to more than the number of people.</p>
+  <table><tr><th>Activity</th><th>People</th></tr>${rows.map(([a, c]) => h`<tr><td>${a}</td><td>${c}</td></tr>`)}${single ? h`<tr><td class="hint">${single} other activities named by one person each</td><td></td></tr>` : ''}</table>`;
+}
+
 function dashboard(ctx, csrf) {
   const { db, env } = ctx, d = loadData(db), tm = timings(db, env);
   const unsent = db.prepare("SELECT COUNT(*) c FROM outbox WHERE status='unsent'").get().c;
@@ -71,7 +80,7 @@ function dashboard(ctx, csrf) {
   return page('Dashboard', h`
   ${warns.length ? h`<div class="consent">${warns.map((w) => h`<p class="err">${w}</p>`)}${unsent ? postBtn('/admin/outbox/retry', csrf, 'Retry unsent emails', {}, 'btn ghost') : ''}</div>` : ''}
   <h2>Participation</h2>${participationTable(M.participation(d))}
-  <h2>Per take</h2>${takeTable(d)}${roleByTake(d)}
+  <h2>Per take</h2>${takeTable(d)}${roleByTake(d)}${activitiesTable(d)}
   <h2>Settings (times are UTC = Accra time)</h2>
   <form method="post" action="/admin/settings">${csrfField(csrf)}
    <div class="field"><label>Event starts (pre-event edits stop)<input type="datetime-local" name="event_starts_at" value="${dtLocal(tm.eventStartsAt)}"></label></div>
