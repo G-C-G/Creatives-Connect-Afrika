@@ -101,7 +101,7 @@ test('statement screens are built like a game: count + ticks, a build-up line, l
   assert.match(html, /<span class="count">01<i> \/ 05<\/i><\/span>/); assert.ok(html.includes('class="ticks"'));
   for (const line of ['Okay. Let\u2019s start a fight.', 'No fence-sitting.', 'Pick a side.', 'Nearly there.', 'Last one. Make it count.']) assert.ok(html.includes(line), line);
   for (const ack of ['data-ack="Locked."', 'data-ack="Interesting."', 'data-ack="On to the next."', 'data-last="Five answers. One version of you."']) assert.ok(html.includes(ack), ack);
-  for (const lab of ['I feel somewhat strongly', 'I feel strongly', 'I feel very strongly', 'fight you on this', 'Keeping that to myself', 'Give me the microphone']) assert.ok(html.includes(lab), lab);
+  for (const lab of ['Not too bothered', 'I feel strongly', 'I feel very strongly', 'fight you on this', 'Keeping that to myself', 'Give me the microphone']) assert.ok(html.includes(lab), lab);
   assert.doesNotMatch(html, /<p class="kicker">Statement \d of \d/, 'no survey-style "Statement 1 of 5" label');
   // the measurement is unchanged underneath: strength stays on the 1..5 scale (2..5 offered), level still maps to say-aloud / on-stage
   assert.ok(html.includes('name="t_T1_strength" value="2"') && html.includes('name="t_T1_strength" value="5"') && html.includes('name="t_T1_level" value="stage"'));
