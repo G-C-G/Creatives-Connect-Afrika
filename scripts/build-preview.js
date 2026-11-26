@@ -1,5 +1,5 @@
 // Builds a self-contained PREVIEW of the onboarding + welcome game: static pages and a tiny in-browser stand-in for the server.
-// Nothing is saved or sent. Sample room data. Usage: node scripts/build-preview.js <outDir>
+// Nothing is saved or sent. Sample room data. Usage: node scripts/build-preview.js <outDir> [--no-audio]   (--no-audio leaves out the songs and voice clips: the page plays its own synthesised sounds instead)
 import { createServer } from 'node:http';
 import { mkdirSync, writeFileSync, readFileSync, copyFileSync, rmSync, existsSync, readdirSync } from 'node:fs';
 import { join, dirname } from 'node:path';
@@ -68,9 +68,10 @@ const ascii = (t) => t.replace(/[\u0080-\uffff]/g, (c) => '\\u' + c.charCodeAt(0
 for (const f of ['app.js', 'play.js', 'sfx.js']) writeFileSync(join(out, 'static', f), ascii(readFileSync(join(ROOT, 'public', f), 'utf8')));
 for (const f of ['instrument-serif-400.woff2', 'instrument-serif-400-italic.woff2', 'barlow-cond-800.woff2', 'barlow-cond-ext-800.woff2']) copyFileSync(join(ROOT, 'public/fonts', f), join(out, 'static/fonts', f));
 mkdirSync(join(out, 'static/audio'), { recursive: true });
+const NO_AUDIO = process.argv.includes('--no-audio');
 mkdirSync(join(out, 'static/audio/fx'), { recursive: true });
-if (existsSync(join(ROOT, 'public/audio/fx'))) for (const f of readdirSync(join(ROOT, 'public/audio/fx'))) if (f.endsWith('.mp3')) copyFileSync(join(ROOT, 'public/audio/fx', f), join(out, 'static/audio/fx', f));
-for (const f of ['welcome-home.mp3', 'questions.mp3']) if (existsSync(join(ROOT, 'public/audio', f))) copyFileSync(join(ROOT, 'public/audio', f), join(out, 'static/audio', f));
+if (!NO_AUDIO && existsSync(join(ROOT, 'public/audio/fx'))) for (const f of readdirSync(join(ROOT, 'public/audio/fx'))) if (f.endsWith('.mp3')) copyFileSync(join(ROOT, 'public/audio/fx', f), join(out, 'static/audio/fx', f));
+for (const f of ['welcome-home.mp3', 'questions.mp3']) if (!NO_AUDIO && existsSync(join(ROOT, 'public/audio', f))) copyFileSync(join(ROOT, 'public/audio', f), join(out, 'static/audio', f));
 for (const f of ['gcg.png', 'cca-hero.png', 'creatives-connect-afrika.png', 'africa-accent.png', 'ghana-arms.png', 'black-star.png', 'africa-tourism-partners.png', 'afcfta.png']) copyFileSync(join(ROOT, 'public/logos', f), join(out, 'static/logos', f));
 // a plain page to LISTEN to every sound on its own (and to check the phone is not on silent)
 const names = [['tick', 'Tick (kalimba)'], ['lock', 'Lock-in (agogo + drum)'], ['rise', 'Countdown (shekere)'], ['cliff', 'Ending, start'], ['boom', 'Ending, big hit'], ['chime', 'Right answer'], ['miss', 'Wrong answer (talking drum)'], ['drum', 'Drum roll'], ['sting', 'Nollywood-style stinger'], ['pluck', 'Highlife-style pluck'], ['cassette', 'Cassette'], ['static', 'Old TV static'], ['beep', 'Beep'], ['buzzer', 'Buzzer']];
