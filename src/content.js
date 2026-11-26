@@ -72,7 +72,7 @@ export const sidesOf = (id) => TAKE_SIDES[id] || null;
 export const TAKE_DETAIL = {
   T1: { setup: 'Looking back at the end of your life.', stem: 'Which life would you rather have lived?',
     agree: { eg: 'You made meaningful work that touched many lives, and lived comfortably, but never became rich', good: 'Your work mattered, and reached people for generations', bad: 'You never reached the wealth you could have had by going commercial' },
-    disagree: { eg: 'You built the business side, and made real money for a very good life', good: 'You reached a comfort and luxury most people never see', bad: 'The meaningful work you wanted to make never got made, and your impact stayed small' } },
+    disagree: { eg: 'You built the business side, and made real money', good: ['You shared it: you looked after your family and the people you love at the highest level, and then some', 'A comfort and luxury most people never see'], bad: 'You answered the need in front of you, not your calling: the meaningful work never got made, and your impact stayed small' } },
   T2: { stem: 'One budget, one year. Where does it go?',
     agree: { eg: 'Win your home market before the world', good: 'A loyal home audience nobody can take away', bad: 'Slower money, and the world may move on without you' },
     disagree: { eg: 'Take the work to the world now', good: 'A bigger audience and bigger money', bad: 'Without a home base, you are a guest everywhere' } },
@@ -88,7 +88,7 @@ export const detailOf = (id) => TAKE_DETAIL[id] || null;
 
 // LOCKED once launched. Never reword after locked = 1. theme_tag: TBD per spec.
 export const TAKES = [
-  { id: 'T1', position: 4, theme_tag: null, text: 'Looking back at the end of your life, which would you rather have lived? A life of meaning: you made work that mattered and lived comfortably, but never became rich. Or a life of wealth: you went commercial and became wealthy, but the work that mattered never got made.' },
+  { id: 'T1', position: 4, theme_tag: null, text: 'Looking back at the end of your life, which life would you rather have lived? A life of meaning: you made meaningful work that touched many lives, and lived comfortably, but never became rich. Or a life of wealth: you built the business side and made real money, and you shared it, looking after your family and the people you love at the highest level, but you answered the need in front of you and not your calling, so the meaningful work never got made and your impact stayed small.' },
   { id: 'T2', position: 5, theme_tag: null, text: 'One budget, one year. Where does it go? Build Africa first for a loyal home audience nobody can take away, but slower money and the world may move on. Go global now for a bigger audience and bigger money, but without a home base you are a guest everywhere.' },
   { id: 'T3', position: 2, theme_tag: null, text: 'A big opportunity comes, but they cannot pay for your work. Do you do it for free, or stand by your price? Do it free and a big audience sees your work, but you may not grow, as clients start expecting it cheap. Stand by your price and your work is respected, but you walk away from the opportunity, and may not grow either, with less work behind you, fewer referrals and a smaller network.' },
   { id: 'T4', position: 3, theme_tag: null, text: 'I\u2019d rather see African work go global under foreign ownership than stay 100% African-owned and unseen.' },
