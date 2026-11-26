@@ -91,7 +91,7 @@ test('/me ("what did I say?") is closed until switched on, then shows only your 
   assert.ok(html.includes('What you said') && html.includes('Agree') && html.includes('Give me the microphone'));
   assert.ok(!html.includes('Eli') && !html.includes('tok-e'), 'never anyone else');
   html = await (await c.call('/me?t=tok-d')).text();
-  assert.ok(html.includes('A life of wealth') && html.includes('I feel it'), 'Di chose the second option, strength 3');
+  assert.ok(html.includes('A life of wealth') && html.includes('I feel strongly'), 'Di chose the second option, strength 3');
   const form = async (n, num) => (await c.call('/me/lookup', { body: { first_name: n, number: String(num) } })).text();
   assert.ok((await form(' eli ', 1005)).includes('fight you on this'), 'name + code works, case and spaces ignored (Eli: strength 5)');
   assert.match(await form('Eli', 9999), /could not match/i);

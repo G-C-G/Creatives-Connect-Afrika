@@ -34,17 +34,6 @@
       }, 320);
     }, 2800);
   }
-  // the opening appears in one piece: held (invisible) until the fonts and the big logo are ready, never longer than 2.5 s
-  var landing = doc.querySelector('main.landing');
-  if (landing) {
-    landing.classList.add('hold');
-    var shown = false, reveal = function () { if (shown) return; shown = true; landing.classList.remove('hold'); };
-    var heroImg = landing.querySelector('.cca-hero');
-    var waits = [];
-    if (doc.fonts && doc.fonts.load) { waits.push(doc.fonts.load('800 1em "Barlow Condensed"')); waits.push(doc.fonts.load('1em "Instrument Serif"')); }
-    if (heroImg && !heroImg.complete) waits.push(new Promise(function (res) { heroImg.addEventListener('load', res, { once: true }); heroImg.addEventListener('error', res, { once: true }); }));
-    Promise.all(waits).then(reveal, reveal); setTimeout(reveal, 2500);
-  }
   // the opening: "Sound on · Tap here for the full experience". Tapping plays the welcome motif so people can check their phone is ready.
   var sl = doc.querySelector('[data-soundline]');
   if (sl && SFX) {

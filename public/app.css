@@ -450,20 +450,3 @@ body.q .goals{max-height:calc(100svh - 268px);overflow-y:auto;-webkit-overflow-s
 body.q .goals{position:relative}
 body.q .goal-other{margin-top:8px}body.q .goal-other input{width:100%;box-sizing:border-box;font:600 16px/1.2 system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;padding:12px 14px;border:0;border-radius:0;background:#fff;color:#111;border-bottom:3px solid #111}
 body.q .country-react{font:italic 400 clamp(26px,7.4vw,34px)/1.1 var(--display);color:#111;margin:14px 0 0;min-height:1.2em}body.q .country-react.pop{animation:fadein .35s ease-out}
-
-/* opening: the page appears in one piece (logo and fonts ready), with a short fade, instead of painting in strips */
-main.landing{transition:opacity .35s ease}
-main.landing.hold{opacity:0;animation:rvl .35s ease 3s forwards}
-@keyframes rvl{to{opacity:1}}   /* safety: if the script never runs, the page still appears after 3 s */
-@media (prefers-reduced-motion:reduce){main.landing{transition:none}}
-
-/* opening reveal: the mark lands first (small overshoot), then the black box rises, then the button and the sound line. About 1.3 s in all; nothing waits on it. */
-main.landing{transition:opacity .2s ease}
-main.landing:not(.hold) .cca-hero{animation:heroIn .8s cubic-bezier(.2,.9,.25,1.15) both}
-main.landing:not(.hold) .panel{animation:panelUp .6s cubic-bezier(.2,.8,.2,1) .35s both}
-main.landing:not(.hold) .btn.go{animation:fadeUp .45s ease .85s both}
-main.landing:not(.hold) .band-bottom{animation:fadeUp .5s ease 1.05s both}
-@keyframes heroIn{0%{opacity:0;transform:scale(.86)}60%{opacity:1}100%{opacity:1;transform:scale(1)}}
-@keyframes panelUp{0%{opacity:0;transform:translateY(34px)}100%{opacity:1;transform:none}}
-@keyframes fadeUp{0%{opacity:0;transform:translateY(10px)}100%{opacity:1;transform:none}}
-@media (prefers-reduced-motion:reduce){main.landing:not(.hold) .cca-hero,main.landing:not(.hold) .panel,main.landing:not(.hold) .btn.go,main.landing:not(.hold) .band-bottom{animation:none}}
