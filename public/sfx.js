@@ -107,7 +107,7 @@
     pluck: function () { pluck(196, 0, 0.45); pluck(247, 0.14, 0.4); pluck(294, 0.28, 0.4); }
   };
   // the welcome song: starts from the opening tap, fades in, loops softly under the questions. No file yet (or not cleared): a short original welcome motif instead.
-  var song = null, clip = null, songVol = 0.8, lastErr = '';
+  var song = null, clip = null, fx = null, songVol = 0.8, lastErr = '';
   function welcomeMotif() { kalimba(392, 0, 0.1); kalimba(494, 0.22, 0.1); kalimba(587, 0.44, 0.1); kalimba(784, 0.7, 0.11); pluck(196, 0.9, 0.35); }
   var songLevel = 0.8, LOW = 0.4, sGain = null;
   // sets the song's loudness. iPhones ignore audio.volume (it stays at 1), so there the song goes through a gain node instead.
@@ -159,11 +159,13 @@
       var p = a.play(); if (p && p.catch) p.catch(back);
     },
     // the sound for a tapped answer: a voice expression file if there is one (a short fun clip), otherwise the synthesised lock sound
+    // the clip for the answer just tapped belongs to that answer only: it is cut the moment they move on (or change their answer)
+    stopAnswer: function () { var a = fx; fx = null; if (!a) return; var n = 0, v = a.volume, id = setInterval(function () { n++; try { a.volume = Math.max(0, v * (1 - n / 4)); } catch (e) {} if (n >= 4) { clearInterval(id); try { a.pause(); a.currentTime = 0; } catch (e) {} } }, 30); },
     answer: function (url) {
-      if (!on) return; var self = this;
+      if (!on) return; var self = this; this.stopAnswer();
       if (!url || stage || typeof Audio === 'undefined') { self.lock(); return; }
       var done = false, fb = function () { if (done) return; done = true; self.lock(); };
-      try { var a = new Audio(url); a.volume = 1; a.addEventListener('error', fb, { once: true }); a.addEventListener('playing', function () { done = true; }, { once: true });
+      try { var a = new Audio(url); fx = a; a.volume = 1; a.addEventListener('error', fb, { once: true }); a.addEventListener('playing', function () { done = true; }, { once: true });
         var p = a.play(); if (p && p.catch) p.catch(fb); } catch (e) { fb(); }
     },
     stopSnippet: function () { if (clip) { var a = clip; clip = null; try { a.pause(); } catch (e) {} if (song && on) setSongVol(songVol); } },

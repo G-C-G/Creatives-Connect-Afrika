@@ -189,6 +189,7 @@
     return bad;
   }
   function show(i) {
+    if (SFX) SFX.stopAnswer();   // an answer's sound never carries over to the next screen
     cur = Math.max(0, Math.min(i, steps.length - 1));
     steps.forEach(function (s, j) { s.classList.toggle('on', j === cur); });
     progress.hidden = false; nav.hidden = false;
@@ -238,7 +239,8 @@
       SFX.answer(fxBase ? fxBase + slot + '.mp3' : null);
     }
     try { if (navigator.vibrate) navigator.vibrate(12); } catch (x) {}
-    setTimeout(function () { st.classList.remove('locking'); if (steps[cur] === st && !valid(st)) show(cur + 1); }, calm ? 160 : (/_(strength|level)$/.test(e.target.name) ? 1000 : 750));
+    var hold = (SFX && SFX.isOn() ? (slot === 'level-quiet' ? 3300 : slot === 'wealth' ? 3900 : 0) : 0);   // the two voice clips get to finish (about 3 s) before the next screen
+    setTimeout(function () { st.classList.remove('locking'); if (steps[cur] === st && !valid(st)) show(cur + 1); }, calm ? 160 : (hold || (/_(strength|level)$/.test(e.target.name) ? 1000 : 750)));
   });
   next.addEventListener('click', function () {
     var bad = valid(steps[cur]);
