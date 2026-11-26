@@ -265,6 +265,6 @@ test('pages render for all participant and admin routes', async () => {
   }
   assert.equal((await c.call('/stage/final')).status, 404); // no snapshot yet
   assert.equal((await c.call('/nope', { json: false })).status, 404);
-  assert.ok(COUNTRIES.length === 55);
+  assert.ok(COUNTRIES.length > 190 && COUNTRIES.includes('Spain') && COUNTRIES.includes('Ghana') && COUNTRIES.includes('Japan'), 'every country in the world can be picked');
   c.close();
 });

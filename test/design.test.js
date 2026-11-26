@@ -208,3 +208,14 @@ test('admin shows what Agree and Disagree mean for the two-option takes (so the 
   assert.match(html, /Agree = A life of meaning/); assert.match(html, /Disagree = A life of wealth/); assert.match(html, /Agree = Do it for free/);
   c.close();
 });
+
+test('country list: the whole world is offered; the old catch-all is not shown; the hint no longer mentions Outside Africa; any country is accepted', async () => {
+  const c = await boot();
+  const html = await (await c.call('/start')).text();
+  assert.ok(html.includes('>Spain<') && html.includes('>Japan<') && html.includes('>Ghana<') && html.includes('>Nigeria<'));
+  assert.ok(!/Outside Africa/i.test(html), 'the internal grouping is never shown to delegates');
+  const r = await c.call('/start', { body: reg({ country: 'Spain', email: 's@example.com' }) });
+  assert.equal(r.status, 303, 'a delegate from Spain registers fine');
+  assert.equal(c.db.prepare("SELECT country FROM participants WHERE email='s@example.com'").get().country, 'Spain');
+  c.close();
+});

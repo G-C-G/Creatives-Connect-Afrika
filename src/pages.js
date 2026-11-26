@@ -1,6 +1,6 @@
 import { h } from './html.js';
 import { t, label } from './i18n.js';
-import { COUNTRIES, SECTORS, GOALS, VALUES, FACT_SLOTS, LOGOS, GCG_LOGO, CCA_HERO, sidesOf, detailOf } from './content.js';
+import { COUNTRIES, SECTORS, GOALS, VALUES, FACT_SLOTS, LOGOS, GCG_LOGO, CCA_HERO, sidesOf, detailOf, PICKABLE_COUNTRIES } from './content.js';
 
 let showLogos = true;
 export const configure = ({ logos }) => { showLogos = logos; };
@@ -138,7 +138,7 @@ export function preForm({ takes, facts = [], S = new URLSearchParams(), E = {}, 
     <label class="check"><input type="checkbox" name="consent_aggregate" value="1" required ${S.get('consent_aggregate') === '1' ? 'checked' : ''}><span>${t(lang, 'consent.aggregate')}</span></label>${fieldErr(E, 'consent_aggregate', lang)}` }, lang);
   const byId = new Map(facts.map((f) => [f.id, f]));
   const steps = [ask({ k: t(lang, 'q.country.k'), title: t(lang, 'q.country.t'), hint: t(lang, 'q.country.h'),
-    body: h`<div class="field"><label for="f_country" class="sr">${t(lang, 'about.country')}</label>${select('country', COUNTRIES, S, lang, E)}${fieldErr(E, 'country', lang)}</div>` }, lang)];
+    body: h`<div class="field"><label for="f_country" class="sr">${t(lang, 'about.country')}</label>${select('country', PICKABLE_COUNTRIES, S, lang, E)}${fieldErr(E, 'country', lang)}</div>` }, lang)];
   takes.forEach((tk, i) => {
     steps.push(...takeSteps(tk, i + 1, takes.length, S, lang));
     const f = !short && byId.get(FACT_SLOTS[i + 1]);
@@ -204,7 +204,7 @@ export function finalForm({ takes, ticket, postOnly, S = new URLSearchParams(), 
   if (postOnly) {
     steps.push(
       ask({ k: t(lang, 'q.name.k'), title: t(lang, 'q.name.t'), body: bigInput('first_name', S, E, lang, { required: true, label: t(lang, 'about.first') }) }, lang),
-      ask({ k: t(lang, 'q.country.k'), title: t(lang, 'q.country.t'), body: h`<div class="field">${select('country', COUNTRIES, S, lang, E)}${fieldErr(E, 'country', lang)}</div>` }, lang),
+      ask({ k: t(lang, 'q.country.k'), title: t(lang, 'q.country.t'), body: h`<div class="field">${select('country', PICKABLE_COUNTRIES, S, lang, E)}${fieldErr(E, 'country', lang)}</div>` }, lang),
       ask({ k: t(lang, 'q.sector.k'), title: t(lang, 'q.sector.t'), auto: true, body: h`${chipPick('sector', SECTORS, S, lang)}${fieldErr(E, 'sector', lang)}` }, lang),
       ask({ k: t(lang, 'q.consent.k'), title: t(lang, 'q.consent.t'), body: h`<p class="consent">${t(lang, 'consent.text')}</p>
         <label class="check"><input type="checkbox" name="consent_aggregate" value="1" required ${S.get('consent_aggregate') === '1' ? 'checked' : ''}><span>${t(lang, 'consent.aggregate')}</span></label>${fieldErr(E, 'consent_aggregate', lang)}` }, lang));

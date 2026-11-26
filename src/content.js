@@ -42,13 +42,15 @@ const REGION_MAP = {
 };
 export const countrySlug = (c) => String(c).normalize('NFD').replace(/[\u0300-\u036f]/g, '').toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '');
 export const OUTSIDE_AFRICA = 'Outside Africa (diaspora / other)';
-export const COUNTRIES = [
-  ...Object.values(REGION_MAP).flat().sort((a, b) => a.localeCompare(b)),
-  OUTSIDE_AFRICA,
-];
+// Every country in the world can be picked. Only the African ones have a nudge clip (public/audio/countries/<country>.mp3); everyone else quietly gets the Ghana clip.
+// The old catch-all stays valid so earlier answers still load, but it is no longer offered.
+export const AFRICAN_COUNTRIES = Object.values(REGION_MAP).flat().sort((a, b) => a.localeCompare(b));
+const REST_OF_WORLD = ['Saint Kitts and Nevis', 'Saint Vincent and the Grenadines', 'Kiribati', 'Marshall Islands', 'Micronesia', 'Nauru', 'Palau', 'Solomon Islands', 'Tonga', 'Tuvalu', 'Vanuatu', 'Timor-Leste', 'San Marino', 'Kosovo', 'Hong Kong', 'Afghanistan', 'Albania', 'Andorra', 'Antigua and Barbuda', 'Argentina', 'Armenia', 'Australia', 'Austria', 'Azerbaijan', 'Bahamas', 'Bahrain', 'Bangladesh', 'Barbados', 'Belarus', 'Belgium', 'Belize', 'Bhutan', 'Bolivia', 'Bosnia and Herzegovina', 'Brazil', 'Brunei', 'Bulgaria', 'Cambodia', 'Canada', 'Chile', 'China', 'Colombia', 'Costa Rica', 'Croatia', 'Cuba', 'Cyprus', 'Czechia', 'Denmark', 'Dominica', 'Dominican Republic', 'Ecuador', 'El Salvador', 'Estonia', 'Fiji', 'Finland', 'France', 'Georgia', 'Germany', 'Greece', 'Grenada', 'Guatemala', 'Guyana', 'Haiti', 'Honduras', 'Hungary', 'Iceland', 'India', 'Indonesia', 'Iran', 'Iraq', 'Ireland', 'Israel', 'Italy', 'Jamaica', 'Japan', 'Jordan', 'Kazakhstan', 'Kuwait', 'Kyrgyzstan', 'Laos', 'Latvia', 'Lebanon', 'Liechtenstein', 'Lithuania', 'Luxembourg', 'Malaysia', 'Maldives', 'Malta', 'Mexico', 'Moldova', 'Monaco', 'Mongolia', 'Montenegro', 'Myanmar', 'Nepal', 'Netherlands', 'New Zealand', 'Nicaragua', 'North Korea', 'North Macedonia', 'Norway', 'Oman', 'Pakistan', 'Palestine', 'Panama', 'Papua New Guinea', 'Paraguay', 'Peru', 'Philippines', 'Poland', 'Portugal', 'Qatar', 'Romania', 'Russia', 'Saint Lucia', 'Samoa', 'Saudi Arabia', 'Serbia', 'Singapore', 'Slovakia', 'Slovenia', 'South Korea', 'Spain', 'Sri Lanka', 'Suriname', 'Sweden', 'Switzerland', 'Syria', 'Taiwan', 'Tajikistan', 'Thailand', 'Trinidad and Tobago', 'Turkey', 'Turkmenistan', 'Ukraine', 'United Arab Emirates', 'United Kingdom', 'United States', 'Uruguay', 'Uzbekistan', 'Vatican City', 'Venezuela', 'Vietnam', 'Yemen'];
+export const COUNTRIES = [...AFRICAN_COUNTRIES, ...REST_OF_WORLD, OUTSIDE_AFRICA];
+export const PICKABLE_COUNTRIES = [...AFRICAN_COUNTRIES, ...REST_OF_WORLD].sort((a, b) => a.localeCompare(b));
 export function regionOf(country) {
   for (const [r, list] of Object.entries(REGION_MAP)) if (list.includes(country)) return r;
-  return country === OUTSIDE_AFRICA ? 'Outside Africa' : 'Unknown';
+  return COUNTRIES.includes(country) ? 'Outside Africa' : 'Unknown';
 }
 
 // Takes that are a choice between two options instead of Agree / Disagree. The answer is still stored as agree (first option) or disagree (second option);
