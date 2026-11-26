@@ -1,7 +1,7 @@
 import { h, raw, str } from './html.js';
 import { layout } from './pages.js';
 import { loadData, getSetting, setSetting, lockTakes } from './db.js';
-import { SECTORS, FACTS } from './content.js';
+import { SECTORS, FACTS, sidesOf } from './content.js';
 import { timings } from './service.js';
 import { retryOutbox } from './mail.js';
 import { privateCsv, aggregateCsv } from './exports.js';
@@ -40,7 +40,7 @@ function takeTable(d) {
   return h`<table><tr><th>Take</th><th colspan="5">Pre-event</th><th colspan="3">Day 3 (matched)</th></tr>
   <tr><th></th><th>n</th><th>Agree</th><th>Disagree</th><th>Mean str.</th><th>Say aloud / On stage</th><th>Agree then&rarr;now</th><th>Mean net change</th><th>Flips</th></tr>
   ${d.takes.map((t) => { const s = M.takeSplit(d, t.id, 'pre'), c = M.takeChange(d, t.id);
-    return h`<tr><td><b>${t.id}</b> ${t.text}</td><td>${s.n}</td><td>${s.agree}</td><td>${s.disagree}</td><td>${fmt(s.meanStrength)}</td><td>${s.sayAloud} / ${s.speakOnStage}</td>
+    return h`<tr><td><b>${t.id}</b> ${t.text}${sidesOf(t.id) ? h`<br><span class="hint">Agree = ${sidesOf(t.id).agree} \u00b7 Disagree = ${sidesOf(t.id).disagree}</span>` : ''}</td><td>${s.n}</td><td>${s.agree}</td><td>${s.disagree}</td><td>${fmt(s.meanStrength)}</td><td>${s.sayAloud} / ${s.speakOnStage}</td>
     <td>${c.n ? `${c.agreePre} → ${c.agreeFinal} (n=${c.n})` : '–'}</td><td>${fmt(c.meanNetChange)}</td><td>${c.n ? c.flips : '–'}</td></tr>`; })}</table>`;
 }
 

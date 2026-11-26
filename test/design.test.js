@@ -201,3 +201,10 @@ test('take 3 is a two-option choice: its own words on the phone buttons, the sta
   assert.match(t1, />Agree</); assert.match(t1, />Disagree</);
   c.close();
 });
+
+test('admin shows what Agree and Disagree mean for the two-option takes (so the Thursday split can be read)', async () => {
+  const c = await boot();
+  const html = await (await c.call('/admin', { auth: true })).text();
+  assert.match(html, /Agree = A life of meaning/); assert.match(html, /Disagree = A life of wealth/); assert.match(html, /Agree = Do it for free/);
+  c.close();
+});
