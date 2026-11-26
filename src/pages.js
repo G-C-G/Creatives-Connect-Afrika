@@ -115,7 +115,7 @@ export function landingPage(lang = 'en') {
   return layout({ lang, logos: 'opening', title: 'Before we begin | CCA 2026', main: 'narrow landing', body: h`
   <div class="stage"><img class="cca-hero" src="/static/logos/${CCA_HERO.file}" alt="${CCA_HERO.alt}"></div>
   <section class="panel">
-  <h1 class="open"><span class="sr">${t(lang, 'open.h1a')} ${t(lang, 'open.h1b')}</span><span class="cyc" aria-hidden="true"><span class="cyc-text">${t(lang, 'open.h1a')} ${t(lang, 'open.h1b').replace('.', '')}</span></span></h1>
+  <h1 class="open"><span class="sr">${t(lang, 'open.h1a')} ${t(lang, 'open.h1b')}</span><span class="cyc" aria-hidden="true"><span class="cyc-lang">English</span><span class="cyc-text">${t(lang, 'open.h1a')} ${t(lang, 'open.h1b').replace('.', '')}</span></span></h1>
   <p class="lead">${t(lang, 'open.sub')}<br>${t(lang, 'open.sub2')}</p>
   <a class="btn big go" href="/start" data-theme="/static/audio/welcome-home.mp3">${t(lang, 'open.go')} &rarr;</a>
   </section>

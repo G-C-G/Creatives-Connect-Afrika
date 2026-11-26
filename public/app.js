@@ -15,13 +15,13 @@
   }
   ensurePill();
   // the opening title says "Before we begin" in one written African language after another. Edit this list freely; every line needs a native speaker's check before launch.
-  var GREET = [['Before we begin', 'English', 'en'], ['Kabla ya kuanza', 'Kiswahili', 'sw'], ['K\u00ed a t\u00f3 b\u1eb9\u0300r\u1eb9\u0300', 'Yor\u00f9b\u00e1', 'yo'], ['Avant de commencer', 'Fran\u00e7ais', 'fr'],
-    ['Kafin mu fara', 'Hausa', 'ha'], ['Ngaphambi kokuba siqale', 'isiZulu', 'zu'], ['\u0642\u0628\u0644 \u0623\u0646 \u0646\u0628\u062f\u0623', '\u0627\u0644\u0639\u0631\u0628\u064a\u0629', 'ar', 1], ['Ansa na y\u025br\u025bhy\u025b ase\u025b', 'Twi', 'tw'],
-    ['\u12a8\u121d\u1300\u1218\u122b\u127b\u1295 \u1260\u134a\u1275', '\u12a0\u121b\u122d\u129b', 'am'], ['Tupu any\u1ecb amalite', 'Igbo', 'ig'], ['Antes de come\u00e7armos', 'Portugu\u00eas', 'pt'], ['Phambi kokuba siqale', 'isiXhosa', 'xh'],
-    ['Balaa nu t\u00e0mbalee', 'Wolof', 'wo'], ['Ka hor intaynaan bilaabin', 'Soomaali', 'so'], ['Mbere yo gutangira', 'Kinyarwanda', 'rw'], ['Voordat ons begin', 'Afrikaans', 'af'], ['Liboso ya kobanda', 'Ling\u00e1la', 'ln'], ['Pele re qala', 'Sesotho', 'st']];
+  var GREET = [['Before we begin', 'English', 'en'], ['Kabla ya kuanza', 'Swahili', 'sw'], ['K\u00ed a t\u00f3 b\u1eb9\u0300r\u1eb9\u0300', 'Yoruba', 'yo'], ['Avant de commencer', 'French', 'fr'],
+    ['Kafin mu fara', 'Hausa', 'ha'], ['Ngaphambi kokuba siqale', 'Zulu', 'zu'], ['\u0642\u0628\u0644 \u0623\u0646 \u0646\u0628\u062f\u0623', 'Arabic', 'ar', 1], ['Ansa na y\u025br\u025bhy\u025b ase\u025b', 'Twi', 'tw'],
+    ['\u12a8\u121d\u1300\u1218\u122b\u127b\u1295 \u1260\u134a\u1275', 'Amharic', 'am'], ['Tupu any\u1ecb amalite', 'Igbo', 'ig'], ['Antes de come\u00e7armos', 'Portuguese', 'pt'], ['Phambi kokuba siqale', 'Xhosa', 'xh'],
+    ['Balaa nu t\u00e0mbalee', 'Wolof', 'wo'], ['Ka hor intaynaan bilaabin', 'Somali', 'so'], ['Mbere yo gutangira', 'Kinyarwanda', 'rw'], ['Voordat ons begin', 'Afrikaans', 'af'], ['Liboso ya kobanda', 'Lingala', 'ln'], ['Pele re qala', 'Sesotho', 'st']];
   var cyc = doc.querySelector('.cyc');
   if (cyc && !calm) {
-    var ct = cyc.querySelector('.cyc-text'), gi = 0;
+    var ct = cyc.querySelector('.cyc-text'), cl = cyc.querySelector('.cyc-lang'), gi = 0;
     // every language stays on ONE line: shrink the type a little until it fits
     var fit = function () { ct.style.fontSize = ''; var fs = parseFloat(getComputedStyle(ct).fontSize); while (ct.getBoundingClientRect().width > cyc.clientWidth && fs > 15) { fs -= 1; ct.style.fontSize = fs + 'px'; } };
     if (doc.fonts && doc.fonts.ready) doc.fonts.ready.then(fit); fit();
@@ -29,10 +29,10 @@
       cyc.classList.add('out');
       setTimeout(function () {
         gi = (gi + 1) % GREET.length; var g = GREET[gi];
-        ct.textContent = g[0]; ct.setAttribute('lang', g[2]); ct.setAttribute('dir', g[3] ? 'rtl' : 'ltr');
+        ct.textContent = g[0]; cl.textContent = g[1]; ct.setAttribute('lang', g[2]); ct.setAttribute('dir', g[3] ? 'rtl' : 'ltr');
         fit(); cyc.classList.remove('out');
-      }, 380);
-    }, 2600);
+      }, 320);
+    }, 2800);
   }
   // the opening: "Sound on · Tap here for the full experience". Tapping plays the welcome motif so people can check their phone is ready.
   var sl = doc.querySelector('[data-soundline]');
