@@ -345,3 +345,16 @@ body.q .snd{background:rgba(255,255,255,.6);color:#111;border-color:rgba(17,17,1
 body.q .snd{top:9px;bottom:auto;right:12px;background:rgba(255,255,255,.6);color:#111;border-color:rgba(17,17,17,.4)}
 body.q .meta{padding-right:92px}
 body.q .choices .choice span,body.q .choices .chip span,body.q .choices.two.big .choice span{border-radius:0}
+
+/* the Sound pill never overlaps anything: the progress ticks are shorter and stop well short of it, and the title block sits a little lower, as in the layout you sent */
+body.q .meta{padding-right:112px}
+body.q .ticks{gap:4px}body.q .ticks i{width:14px}
+body.q .snd{top:7px;right:10px}
+body.q .step.on h2.take,body.q .step.on .setup{margin-top:clamp(14px,5svh,44px)}
+body.q .step.on .setup + h2.take{margin-top:2px}
+
+/* the Sound pill lives in its own strip at the top of every question screen, so it can never sit on top of anything */
+body.q main.wizard{padding-top:42px}
+body.q .meta{padding-right:0}
+body.q .snd{top:8px;right:12px}
+@media (max-height:600px){body.q main.wizard{padding-top:38px}body.q .step.on h2.take,body.q .step.on .setup{margin-top:4px}body.q .choices.two.big.detail .choice span{padding:8px 12px;font-size:21px}body.q .choices.detail .choice span small{font-size:12.5px}body.q .choices.detail small i.eg{display:none}}
