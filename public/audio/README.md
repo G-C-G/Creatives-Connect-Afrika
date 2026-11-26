@@ -5,7 +5,8 @@ Files are MP3, short, and named exactly as below. Keep them small: many delegate
 
 | File | When it plays |
 |---|---|
-| `welcome-home.mp3` | Starts at the opening tap, fades in, loops softly under the questions |
+| `welcome-home.mp3` | Plays on the opening page (from the first touch if the phone blocks autoplay) |
+| `questions.mp3` | The calmer instrumental ("Back Outside"): takes over at "Let's go" and loops low under the questions |
 | `countries/<country>.mp3` | About 10 seconds, when a delegate picks that country on the first question. Stops when they move on. Anyone who picks a country outside Africa quietly gets `ghana.mp3` (they are never told). The full list of file names is in `docs/COUNTRY_CLIPS.md`. Names are lower-case with hyphens, e.g. `ghana.mp3`, `south-africa.mp3`, `cote-d-ivoire.mp3` (the full list is every country in `src/content.js`, run through `countrySlug`) |
 | `fx/stance-agree.mp3`, `fx/stance-disagree.mp3` | Tapping Agree / Disagree |
 | `fx/strength-1.mp3` to `fx/strength-5.mp3` | "Not very" to "I'd fight you on this" |

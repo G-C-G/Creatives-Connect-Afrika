@@ -118,7 +118,10 @@
       try { var c = ac(); if (c) { if (!sGain) { var src = c.createMediaElementSource(song); sGain = c.createGain(); src.connect(sGain); sGain.connect(c.destination); song.volume = 1; } sGain.gain.value = v; } } catch (e) {}
     }
   }
-  function fadeTo(a, v) { var n = 0, id = setInterval(function () { n++; if (a === song) setSongVol(Math.min(v, v * n / 24)); if (n >= 24) clearInterval(id); }, 90); }
+  // both songs are fetched the moment the page opens, so a tap (or the page opening) only has to press play: no download wait
+  var ready = {};
+  function getEl(url) { var a = ready[url]; if (a) { delete ready[url]; return a; } a = new Audio(url); a.loop = true; return a; }
+  function fadeTo(a, v) { var n = 0, id = setInterval(function () { n++; if (a === song) setSongVol(Math.min(v, v * n / 8)); if (n >= 8) clearInterval(id); }, 50); }
   var api = {
     isOn: function () { return on; },
     // soft = an attempt before any tap (the page was just opened): if the phone refuses, stay quiet and let the caller retry on the first touch
@@ -126,7 +129,7 @@
       if (!on || song || stage) return;
       if (!url || typeof Audio === 'undefined') { if (!soft) welcomeMotif(); return; }
       var failed = false, fb = function () { if (failed) return; failed = true; song = null; if (!soft) welcomeMotif(); };
-      try { song = new Audio(url); song.loop = true; song.volume = 0; song.addEventListener('error', fb, { once: true });
+      try { song = getEl(url); song.volume = 0; song.addEventListener('error', fb, { once: true });
         var p = song.play(); if (p && p.then) p.then(function () { fadeTo(song, songVol); }, fb); } catch (e) { fb(); }
     },
     // from "Let's go" the song carries on under the questions, but low enough not to distract
@@ -138,10 +141,11 @@
       var old = song, og = sGain;
       if (old) { var n = 0, v = songLevel, id = setInterval(function () { n++; var x = Math.max(0, v * (1 - n / 10)); if (og) og.gain.value = x; else { try { old.volume = x; } catch (e) {} } if (n >= 10) { clearInterval(id); try { old.pause(); } catch (e) {} } }, 70); }
       song = null; sGain = null; songVol = LOW; songLevel = 0;
-      try { var a = new Audio(url); a.loop = true; a.volume = 0; song = a;
+      try { var a = getEl(url); a.volume = 0; song = a;
         a.addEventListener('error', function () { if (song === a) song = null; }, { once: true });
         var p = a.play(); if (p && p.then) p.then(function () { fadeTo(a, LOW); }, function () { if (song === a) song = null; }); } catch (e) { song = null; }
     },
+    prepare: function (url) { if (!url || ready[url] || typeof Audio === 'undefined') return; try { var a = new Audio(); a.preload = 'auto'; a.loop = true; a.src = url; a.load(); ready[url] = a; } catch (e) {} },
     themePlaying: function () { return !!song; },
     // a short clip (about 10 seconds) of the picked country's song: the welcome song steps back while it plays and returns after
     snippet: function (url) {

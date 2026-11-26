@@ -1,7 +1,7 @@
 // Builds a self-contained PREVIEW of the onboarding + welcome game: static pages and a tiny in-browser stand-in for the server.
 // Nothing is saved or sent. Sample room data. Usage: node scripts/build-preview.js <outDir>
 import { createServer } from 'node:http';
-import { mkdirSync, writeFileSync, readFileSync, copyFileSync, rmSync, existsSync } from 'node:fs';
+import { mkdirSync, writeFileSync, readFileSync, copyFileSync, rmSync, existsSync, readdirSync } from 'node:fs';
 import { join, dirname } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { openDb, setSetting } from '../src/db.js';
@@ -68,6 +68,8 @@ const ascii = (t) => t.replace(/[\u0080-\uffff]/g, (c) => '\\u' + c.charCodeAt(0
 for (const f of ['app.js', 'play.js', 'sfx.js']) writeFileSync(join(out, 'static', f), ascii(readFileSync(join(ROOT, 'public', f), 'utf8')));
 for (const f of ['instrument-serif-400.woff2', 'instrument-serif-400-italic.woff2', 'barlow-cond-800.woff2', 'barlow-cond-ext-800.woff2']) copyFileSync(join(ROOT, 'public/fonts', f), join(out, 'static/fonts', f));
 mkdirSync(join(out, 'static/audio'), { recursive: true });
+mkdirSync(join(out, 'static/audio/fx'), { recursive: true });
+if (existsSync(join(ROOT, 'public/audio/fx'))) for (const f of readdirSync(join(ROOT, 'public/audio/fx'))) if (f.endsWith('.mp3')) copyFileSync(join(ROOT, 'public/audio/fx', f), join(out, 'static/audio/fx', f));
 for (const f of ['welcome-home.mp3', 'questions.mp3']) if (existsSync(join(ROOT, 'public/audio', f))) copyFileSync(join(ROOT, 'public/audio', f), join(out, 'static/audio', f));
 for (const f of ['gcg.png', 'cca-hero.png', 'creatives-connect-afrika.png', 'africa-accent.png', 'ghana-arms.png', 'black-star.png', 'africa-tourism-partners.png', 'afcfta.png']) copyFileSync(join(ROOT, 'public/logos', f), join(out, 'static/logos', f));
 // a plain page to LISTEN to every sound on its own (and to check the phone is not on silent)

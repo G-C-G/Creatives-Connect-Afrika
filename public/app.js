@@ -45,6 +45,7 @@
   var theme = doc.querySelector('main.landing a.go');
   function startSong() { if (SFX && theme && SFX.isOn() && !SFX.themePlaying()) SFX.theme(theme.getAttribute('data-theme'), true); }
   if (SFX && theme) {
+    SFX.prepare(theme.getAttribute('data-theme')); SFX.prepare(theme.getAttribute('data-next-theme'));
     startSong();
     var first = function (e) { if (e.target && e.target.closest && e.target.closest('a.go')) return; startSong(); };
     ['pointerdown', 'touchstart', 'keydown'].forEach(function (ev) { doc.addEventListener(ev, first, { once: true, capture: true }); });
