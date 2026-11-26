@@ -14,7 +14,7 @@ CREATE TABLE IF NOT EXISTS participants(
   sector TEXT NOT NULL DEFAULT '',
   role TEXT NOT NULL DEFAULT '',
   activities_json TEXT,
-  project TEXT, goal TEXT, values_json TEXT, memory TEXT,
+  project TEXT, goal TEXT, goals_json TEXT, values_json TEXT, memory TEXT,
   contact_opt_in INTEGER NOT NULL DEFAULT 0,
   consent_aggregate INTEGER NOT NULL,
   magic_token TEXT UNIQUE,
@@ -78,6 +78,7 @@ CREATE TABLE IF NOT EXISTS outbox(
 function migrate(db) {
   const pc = db.prepare("PRAGMA table_info('participants')").all();
   if (pc.length && !pc.some((c) => c.name === 'memory')) db.exec('ALTER TABLE participants ADD COLUMN memory TEXT');
+  if (pc.length && !pc.some((c) => c.name === 'goals_json')) db.exec('ALTER TABLE participants ADD COLUMN goals_json TEXT');
   if (pc.length && !pc.some((c) => c.name === 'activities_json')) db.exec('ALTER TABLE participants ADD COLUMN activities_json TEXT');
   if (pc.length && !pc.some((c) => c.name === 'role')) db.exec("ALTER TABLE participants ADD COLUMN role TEXT NOT NULL DEFAULT ''");
   const cols = db.prepare("PRAGMA table_info('facts')").all();

@@ -95,7 +95,7 @@ export const en = {
   'q.role.k': 'You, at CCA', 'q.role.t': 'Which best describes you here?', 'q.role.h': 'Pick the closest. It helps us read the room.',
   'q.sector.k': 'Your space', 'q.sector.t': 'Where do you play?', 'q.sector.h': 'Pick everything you do. Type to search, or scroll A to Z.', 'q.sector.ph': 'Type what you do, e.g. social media', 'q.sector.add': 'Add', 'q.sector.none': 'Nothing found. Add it as your own.', 'q.sector.picked': 'You picked',
   'q.project.k': 'Optional', 'q.project.t': 'What are you working on?', 'q.project.h': 'One line.',
-  'q.goal.k': 'Your reason', 'q.goal.t': 'What brought you here?', 'q.goal.h': 'Pick what you most want to leave with.',
+  'q.goal.k': 'Your goals', 'q.goal.t': 'What do you want to leave with?', 'q.goal.h': 'Pick as many as you like.',
   'q.values.k': 'Optional', 'q.values.t': 'What guides your work?', 'q.values.h': 'Pick up to three.',
   'q.contact.k': 'Optional', 'q.contact.t': 'Share your contact with other delegates?', 'q.contact.h': 'Only with delegates who also say yes.',
   'q.contact.yes': 'Yes, share', 'q.contact.no': 'Not now',

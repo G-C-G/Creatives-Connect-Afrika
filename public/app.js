@@ -154,6 +154,13 @@
     refresh(); filter();
   });
 
+  // ---- "pick as many as you like" groups that need at least one ----
+  [].slice.call(form.querySelectorAll('[data-atleast]')).forEach(function (box) {
+    var ok = doc.createElement('input'); ok.type = 'text'; ok.className = 'sr'; ok.tabIndex = -1; ok.setAttribute('aria-hidden', 'true'); ok.required = true; ok.name = '_atleast'; box.appendChild(ok);
+    function upd() { ok.value = box.querySelector('input[type=checkbox]:checked') ? '1' : ''; }
+    box.addEventListener('change', upd); upd();
+  });
+
   // ---- wizard ----
   function valid(step) {
     var bad = null;

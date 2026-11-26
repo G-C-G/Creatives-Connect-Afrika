@@ -86,9 +86,9 @@ test('wizard: country first (a short clip of its song can play); then the statem
   assert.deepEqual(has(/name="role"/), [17], 'who you are in the tourism picture'); assert.deepEqual(has(/name="activity"/), [18], 'Where do you play: pick many, A to Z'); assert.deepEqual(has(/name="goal"/), [19], '"why you are here" is its own page');
   assert.deepEqual(has(/name="memory"/), [20], 'the optional creative-past question'); assert.deepEqual(has(/name="email"/), [21]); assert.deepEqual(has(/name="consent_aggregate"/), [22]);
   for (const gone of ['name="project"', 'name="values"', 'name="contact_opt_in"']) assert.ok(!html.includes(gone), `${gone} is no longer asked`);
-  assert.ok(/data-auto/.test(screens[19]) && !/data-skippable/.test(screens[19]) && /required/.test(screens[19]), '"why" cannot be skipped');
+  assert.ok(/data-atleast/.test(screens[19]) && !/data-skippable/.test(screens[19]), '"what brought you here" is pick-as-many-as-you-like and cannot be skipped');
   screens.forEach((x, i) => assert.ok(((x.match(/<input[^>]*type="(text|email)"|<select|<textarea/g) || []).length) <= (i === 16 ? 2 : 1), `screen ${i}`));
-  assert.equal((html.match(/data-auto/g) || []).length, 17, '15 statement taps + role + why (the activity list is multi-pick, not one tap)');
+  assert.equal((html.match(/data-auto/g) || []).length, 16, '15 statement taps + role (the activity and goals screens are pick-many)');
   assert.equal((html.match(/data-optional/g) || []).length, 2, 'only the memory and the email are skippable');
   const door = (await (await c.call('/door')).text()).split('<section class="step"').slice(1);
   assert.equal(door.length, 23);
@@ -248,5 +248,16 @@ test('"Where do you play?": many specific activities (or your own) are saved; th
   const adm = await (await c.call('/admin', { auth: true })).text(); assert.match(adm, /What people do/); assert.doesNotMatch(adm, /Calabash carving/, 'something only one person said is grouped, not listed');
   const none = reg({ email: 'n@example.com' }); delete none.sector;
   assert.equal((await c.call('/start', { body: none })).status, 422, 'picking nothing is refused');
+  c.close();
+});
+
+test('goals: pick as many as you like, all saved, friendly options include meeting Pan-African creatives and learning what is happening now', async () => {
+  const c = await boot();
+  const html = await (await c.call('/start')).text();
+  assert.ok(html.includes('Meet Pan-African creatives') && html.includes('Learn what is happening right now') && html.includes('Pick as many as you like.'));
+  const form = new URLSearchParams(); for (const [k, v] of Object.entries(reg({ email: 'g@example.com' }))) form.set(k, v); ['pan_african', 'funding', 'insight'].forEach((g) => form.append('goal', g));
+  assert.equal((await fetch(c.base + '/start', { method: 'POST', redirect: 'manual', headers: { 'Content-Type': 'application/x-www-form-urlencoded' }, body: form })).status, 303);
+  const row = c.db.prepare("SELECT goal, goals_json FROM participants WHERE email='g@example.com'").get();
+  assert.deepEqual(JSON.parse(row.goals_json), ['pan_african', 'funding', 'insight']); assert.equal(row.goal, 'pan_african');
   c.close();
 });

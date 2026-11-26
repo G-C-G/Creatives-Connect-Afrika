@@ -77,6 +77,7 @@ function ask({ k, title, hint = '', body, optional = false, auto = false, skip =
 }
 const bigInput = (name, S, E, lang, { type = 'text', required = false, max = 80, autocomplete = '', label: lab = '' } = {}) => h`<div class="field">
   ${lab ? h`<label for="f_${name}">${lab}</label>` : ''}<input id="f_${name}" name="${name}" type="${type}" maxlength="${max}" value="${S.get(name) ?? ''}" ${required ? 'required' : ''} ${autocomplete ? `autocomplete="${autocomplete}"` : ''}>${fieldErr(E, name, lang)}</div>`;
+const chipMulti = (name, options, S) => h`<div class="chips">${options.map((o) => h`<label class="chip"><input type="checkbox" name="${name}" value="${o.id}" ${(S.getAll ? S.getAll(name) : []).includes(o.id) ? 'checked' : ''}><span>${o.en}</span></label>`)}</div>`;
 const chipPick = (name, options, S, lang, required = true) => h`<div class="chips">${options.map((o, i) => h`<label class="chip"><input type="radio" name="${name}" value="${o.id}" ${S.get(name) === o.id ? 'checked' : ''} ${required && i === 0 ? 'required' : ''}><span>${label(o, lang)}</span></label>`)}</div>`;
 
 function factStep(f, S, lang) {
@@ -145,7 +146,7 @@ export function preForm({ takes, facts = [], S = new URLSearchParams(), E = {}, 
         ${bigInput('surname', S, E, lang, { required: true, autocomplete: 'family-name', label: t(lang, 'about.surname') })}` }, lang),
     ask({ k: t(lang, 'q.role.k'), title: t(lang, 'q.role.t'), hint: t(lang, 'q.role.h'), auto: true, body: h`<div class="roles">${chipPick('role', ROLES, S, lang)}</div>${fieldErr(E, 'role', lang)}` }, lang),
     ask({ k: t(lang, 'q.sector.k'), title: t(lang, 'q.sector.t'), hint: t(lang, 'q.sector.h'), body: activitiesPicker(S, E, lang) }, lang),
-    ask({ k: t(lang, 'q.goal.k'), title: t(lang, 'q.goal.t'), hint: t(lang, 'q.goal.h'), auto: true, body: chipPick('goal', GOALS, S, lang, true) }, lang),
+    ask({ k: t(lang, 'q.goal.k'), title: t(lang, 'q.goal.t'), hint: t(lang, 'q.goal.h'), body: h`<div class="goals" data-atleast>${chipMulti('goal', GOALS, S)}</div>` }, lang),
     ask({ k: t(lang, 'q.memory.k'), title: t(lang, 'q.memory.t'), hint: t(lang, 'q.memory.h'), optional: true, body: bigInput('memory', S, E, lang, { max: 140, label: t(lang, 'about.memory') }) }, lang),
     ask({ k: t(lang, 'q.email.k'), title: t(lang, 'q.email.t'), hint: t(lang, 'q.email.h'), optional: true, body: bigInput('email', S, E, lang, { type: 'email', max: 254, autocomplete: 'email', label: t(lang, 'about.email') }) }, lang),
   ];
