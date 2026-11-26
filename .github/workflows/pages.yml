@@ -1,7 +1,7 @@
 # Publishes the clickable DEMO (not the real app) to GitHub Pages: nothing is saved, the room data is sample data.
 # One-time setup in GitHub: Settings > Pages > Source: "GitHub Actions". Then every push to the branches below (or "Run workflow") updates the demo.
-# The songs and voice clips are LEFT OUT of the public demo (they are other people's recordings): the demo plays its own synthesised sounds.
-# To include them for a private/trusted demo, remove "--no-audio" below, once you have the right to use them.
+# The demo INCLUDES the songs and voice clips (decided by the owner). They are other people's recordings and are served publicly with the demo:
+# clear the rights before wider sharing. To leave them out, add "--no-audio" to the build line below.
 name: Publish demo to GitHub Pages
 on:
   push:
@@ -23,7 +23,7 @@ jobs:
         with:
           node-version: 22
       - run: node --disable-warning=ExperimentalWarning --test test/*.test.js
-      - run: node --disable-warning=ExperimentalWarning scripts/build-preview.js _site --no-audio
+      - run: node --disable-warning=ExperimentalWarning scripts/build-preview.js _site
       - run: touch _site/.nojekyll
       - uses: actions/configure-pages@v5
       - uses: actions/upload-pages-artifact@v3
