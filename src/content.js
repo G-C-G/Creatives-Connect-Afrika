@@ -57,7 +57,7 @@ export const TAKE_SIDES = {
   T1: { agree: 'Yes, the impact counts', disagree: 'No, a business must pay' },
   T2: { agree: 'Build Africa first', disagree: 'Go global now' },
   T3: { agree: 'Do it for free', disagree: 'Stand by your price' },
-  T5: { agree: 'The artists and their crew', disagree: 'The host country and its hotels' },
+  T5: { agree: 'The artists and experience makers', disagree: 'The host country and its institutions' },
 };
 export const sidesOf = (id) => TAKE_SIDES[id] || null;
 // What a phone shows for those takes: a short question, then the good and the bad of BOTH options on the two tiles.
@@ -72,8 +72,8 @@ export const TAKE_DETAIL = {
     agree: { good: 'More people get to see your work', bad: 'You may not grow: clients start expecting it cheap, and it gets hard to charge more later' },
     disagree: { good: 'People respect your work and your price', bad: 'You may not grow either: less work behind you, and few clients who can afford you' } },
   T5: { stem: 'You can only back one. Who adds more value to a cultural experience?',
-    agree: { good: 'They are the reason people travel, and the reason people remember', bad: 'Without a safe, welcoming place to stay, the best show still loses the crowd' },
-    disagree: { good: 'Its welcome, its values and its comfort make the experience possible', bad: 'Without the artists, a beautiful hotel is just a hotel, and nobody makes the trip' } },
+    agree: { eg: 'Musicians, tour guides, event and workshop hosts, kids\u2019 activities', good: 'They are the reason people come, and the reason people remember', bad: 'Without a safe, well-run country to host them, the experience falls apart' },
+    disagree: { eg: 'Government, hotels, safety, roads, the welcome and the feel of the place', good: 'A safe, welcoming, well-run place is what makes any experience possible', bad: 'Without the artists and experience makers, there is little to come for' } },
 };
 export const detailOf = (id) => TAKE_DETAIL[id] || null;
 
@@ -83,7 +83,7 @@ export const TAKES = [
   { id: 'T2', position: 5, theme_tag: null, text: 'One budget, one year. Where does it go? Build Africa first for a loyal home audience nobody can take away, but slower money and the world may move on. Go global now for a bigger audience and bigger money, but without a home base you are a guest everywhere.' },
   { id: 'T3', position: 2, theme_tag: null, text: 'Someone wants your work but cannot pay. Do it free and more people see your work, but you may not grow, as clients start expecting it cheap. Stand by your price and your work is respected, but you may not grow either, with less work behind you and few clients who can afford you. What should creatives do?' },
   { id: 'T4', position: 3, theme_tag: null, text: 'I\u2019d rather see African work go global under foreign ownership than stay 100% African-owned and unseen.' },
-  { id: 'T5', position: 1, theme_tag: null, text: 'You can only back one. Who adds more value to a cultural experience: the artists and their crew, or the host country and its hotels?' },
+  { id: 'T5', position: 1, theme_tag: null, text: 'You can only back one. Who adds more value to a cultural experience: the artists and experience makers (musicians, tour guides, event and workshop hosts), or the host country and its institutions (government, hotels, safety, the welcome)?' },
 ];
 
 // ALL verified:false until Hinda confirms (flip in /admin). Unverified facts are never shown anywhere.
