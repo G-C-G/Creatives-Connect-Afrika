@@ -38,7 +38,16 @@
   var sl = doc.querySelector('[data-soundline]');
   if (sl && SFX) {
     var slLabel = function () { sl.textContent = SFX.isOn() ? 'Sound on \u00b7 Tap here for the full experience' : 'Turn sound on \u00b7 Tap here for the full experience'; };
-    slLabel(); sl.addEventListener('click', function () { SFX.set(true); SFX.welcome(); slLabel(); });
+    slLabel(); sl.addEventListener('click', function () { SFX.set(true); if (SFX.themePlaying()) { slLabel(); return; } SFX.welcome(); slLabel(); startSong(); });
+  }
+  // the welcome song plays as soon as the link opens. Phones usually refuse sound before a touch, so if it is refused it starts on the very first touch anywhere
+  // (except the Let's go button, which ends the song). It stops when the questions begin.
+  var theme = doc.querySelector('main.landing a.go');
+  function startSong() { if (SFX && theme && SFX.isOn() && !SFX.themePlaying()) SFX.theme(theme.getAttribute('data-theme'), true); }
+  if (SFX && theme) {
+    startSong();
+    var first = function (e) { if (e.target && e.target.closest && e.target.closest('a.go')) return; startSong(); };
+    ['pointerdown', 'touchstart', 'keydown'].forEach(function (ev) { doc.addEventListener(ev, first, { once: true, capture: true }); });
   }
   // the ending: a low note as it starts, one hit as the big question lands
   if (SFX && doc.querySelector('main.cliff') && !calm) { setTimeout(function () { SFX.cliff(); }, 250); setTimeout(function () { SFX.boom(); }, 2800); }
@@ -270,7 +279,7 @@
     var href = go.getAttribute('href');
     // a fresh start: nothing is ticked, even if an earlier try left answers behind on this phone
     try { Object.keys(localStorage).filter(function (k) { return /^cca-draft:/.test(k); }).forEach(function (k) { localStorage.removeItem(k); }); } catch (x) {}
-    if (SFX) { SFX.set(true); SFX.theme(go.getAttribute('data-theme')); }   // pressing Let's go always turns the sound on (this tap also unlocks audio on phones)
+    if (SFX) { SFX.themeStop(); SFX.set(true); }   // the welcome song belongs to the opening page: it stops here. Pressing Let's go turns the sound on (this tap also unlocks audio on phones)
     fetch(href, { credentials: 'same-origin' }).then(function (r) { if (!r.ok) throw new Error('x'); return r.text(); }).then(function (t) {
       var d = new DOMParser().parseFromString(t, 'text/html'), m = d.querySelector('main'), cur = doc.querySelector('main');
       if (!m || !cur) throw new Error('x');

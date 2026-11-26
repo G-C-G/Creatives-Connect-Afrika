@@ -112,13 +112,17 @@
   function fadeTo(a, v) { var n = 0, id = setInterval(function () { n++; try { a.volume = Math.min(v, v * n / 24); } catch (e) {} if (n >= 24) clearInterval(id); }, 90); }
   var api = {
     isOn: function () { return on; },
-    theme: function (url) {
+    // soft = an attempt before any tap (the page was just opened): if the phone refuses, stay quiet and let the caller retry on the first touch
+    theme: function (url, soft) {
       if (!on || song || stage) return;
-      if (!url || typeof Audio === 'undefined') { welcomeMotif(); return; }
-      var failed = false, fb = function () { if (failed) return; failed = true; song = null; welcomeMotif(); };
+      if (!url || typeof Audio === 'undefined') { if (!soft) welcomeMotif(); return; }
+      var failed = false, fb = function () { if (failed) return; failed = true; song = null; if (!soft) welcomeMotif(); };
       try { song = new Audio(url); song.loop = true; song.volume = 0; song.addEventListener('error', fb, { once: true });
         var p = song.play(); if (p && p.then) p.then(function () { fadeTo(song, songVol); }, fb); } catch (e) { fb(); }
     },
+    // the song belongs to the opening page only: it fades out and stops when the questions begin
+    themeStop: function () { var a = song; song = null; if (!a) return; var n = 0, v = a.volume, id = setInterval(function () { n++; try { a.volume = Math.max(0, v * (1 - n / 8)); } catch (e) {} if (n >= 8) { clearInterval(id); try { a.pause(); } catch (e) {} } }, 60); },
+    themePlaying: function () { return !!song; },
     // a short clip (about 10 seconds) of the picked country's song: the welcome song steps back while it plays and returns after
     snippet: function (url) {
       this.stopSnippet(); if (!on || stage || typeof Audio === 'undefined') return;
