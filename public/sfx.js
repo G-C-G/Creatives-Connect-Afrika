@@ -131,6 +131,17 @@
     },
     // from "Let's go" the song carries on under the questions, but low enough not to distract
     themeLow: function () { if (!song) return; var a = song, from = songLevel, n = 0, id = setInterval(function () { n++; if (a !== song) { clearInterval(id); return; } setSongVol(from + (LOW - from) * Math.min(1, n / 12)); if (n >= 12) clearInterval(id); }, 80); songVol = LOW; },
+    // "Let's go": the welcome song fades out and the calmer instrumental fades in underneath the questions (low, looping)
+    themeNext: function (url) {
+      if (!on || stage) return;
+      if (!url || typeof Audio === 'undefined') { this.themeLow(); return; }
+      var old = song, og = sGain;
+      if (old) { var n = 0, v = songLevel, id = setInterval(function () { n++; var x = Math.max(0, v * (1 - n / 10)); if (og) og.gain.value = x; else { try { old.volume = x; } catch (e) {} } if (n >= 10) { clearInterval(id); try { old.pause(); } catch (e) {} } }, 70); }
+      song = null; sGain = null; songVol = LOW; songLevel = 0;
+      try { var a = new Audio(url); a.loop = true; a.volume = 0; song = a;
+        a.addEventListener('error', function () { if (song === a) song = null; }, { once: true });
+        var p = a.play(); if (p && p.then) p.then(function () { fadeTo(a, LOW); }, function () { if (song === a) song = null; }); } catch (e) { song = null; }
+    },
     themePlaying: function () { return !!song; },
     // a short clip (about 10 seconds) of the picked country's song: the welcome song steps back while it plays and returns after
     snippet: function (url) {

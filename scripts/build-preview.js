@@ -42,7 +42,7 @@ const get = async (p) => (await fetch(base + p)).text();
 
 // ---- rewrite server paths to relative file paths ----
 const rel = (html) => html
-  .replaceAll('href="/static/', 'href="static/').replaceAll('src="/static/', 'src="static/').replaceAll('data-theme="/static/', 'data-theme="static/').replaceAll('data-audio="/static/', 'data-audio="static/').replaceAll('data-fx="/static/', 'data-fx="static/')
+  .replaceAll('href="/static/', 'href="static/').replaceAll('src="/static/', 'src="static/').replaceAll('data-theme="/static/', 'data-theme="static/').replaceAll('data-next-theme="/static/', 'data-next-theme="static/').replaceAll('data-audio="/static/', 'data-audio="static/').replaceAll('data-fx="/static/', 'data-fx="static/')
   .replace('href="/start"', 'href="start.html"').replace('data-deck="/play/deck.json"', 'data-deck="deck.json"').replace('data-join="/door"', 'data-join="start.html"')
   .replace(/<script src="static\/sfx\.js" defer>/, '<script src="static/mock.js" defer></script><script src="static/sfx.js" defer>');
 
@@ -68,7 +68,7 @@ const ascii = (t) => t.replace(/[\u0080-\uffff]/g, (c) => '\\u' + c.charCodeAt(0
 for (const f of ['app.js', 'play.js', 'sfx.js']) writeFileSync(join(out, 'static', f), ascii(readFileSync(join(ROOT, 'public', f), 'utf8')));
 for (const f of ['instrument-serif-400.woff2', 'instrument-serif-400-italic.woff2', 'barlow-cond-800.woff2', 'barlow-cond-ext-800.woff2']) copyFileSync(join(ROOT, 'public/fonts', f), join(out, 'static/fonts', f));
 mkdirSync(join(out, 'static/audio'), { recursive: true });
-if (existsSync(join(ROOT, 'public/audio/welcome-home.mp3'))) copyFileSync(join(ROOT, 'public/audio/welcome-home.mp3'), join(out, 'static/audio/welcome-home.mp3'));
+for (const f of ['welcome-home.mp3', 'questions.mp3']) if (existsSync(join(ROOT, 'public/audio', f))) copyFileSync(join(ROOT, 'public/audio', f), join(out, 'static/audio', f));
 for (const f of ['gcg.png', 'cca-hero.png', 'creatives-connect-afrika.png', 'africa-accent.png', 'ghana-arms.png', 'black-star.png', 'africa-tourism-partners.png', 'afcfta.png']) copyFileSync(join(ROOT, 'public/logos', f), join(out, 'static/logos', f));
 // a plain page to LISTEN to every sound on its own (and to check the phone is not on silent)
 const names = [['tick', 'Tick (kalimba)'], ['lock', 'Lock-in (agogo + drum)'], ['rise', 'Countdown (shekere)'], ['cliff', 'Ending, start'], ['boom', 'Ending, big hit'], ['chime', 'Right answer'], ['miss', 'Wrong answer (talking drum)'], ['drum', 'Drum roll'], ['sting', 'Nollywood-style stinger'], ['pluck', 'Highlife-style pluck'], ['cassette', 'Cassette'], ['static', 'Old TV static'], ['beep', 'Beep'], ['buzzer', 'Buzzer']];

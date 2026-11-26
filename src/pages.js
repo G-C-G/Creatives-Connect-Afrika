@@ -118,7 +118,7 @@ export function landingPage(lang = 'en') {
   <section class="panel">
   <h1 class="open"><span class="sr">${t(lang, 'open.h1a')} ${t(lang, 'open.h1b')}</span><span class="cyc" aria-hidden="true"><span class="cyc-lang">English</span><span class="cyc-text">${t(lang, 'open.h1a')} ${t(lang, 'open.h1b').replace('.', '')}</span></span></h1>
   <p class="lead">${t(lang, 'open.sub')}<br>${t(lang, 'open.sub2')}</p>
-  <a class="btn big go" href="/start" data-theme="/static/audio/welcome-home.mp3">${t(lang, 'open.go')} &rarr;</a>
+  <a class="btn big go" href="/start" data-theme="/static/audio/welcome-home.mp3" data-next-theme="/static/audio/questions.mp3">${t(lang, 'open.go')} &rarr;</a>
   </section>
   <div class="band-bottom"><button type="button" class="soundline" data-soundline>${t(lang, 'open.sound.on')} &middot; ${t(lang, 'open.sound.cta')}</button></div>` });
 }

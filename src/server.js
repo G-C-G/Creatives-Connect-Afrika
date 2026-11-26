@@ -76,9 +76,9 @@ export function createApp({ db, env = process.env, now = () => new Date(), fetch
     if (lm && (lm[1] === GCG_LOGO.file || lm[1] === CCA_HERO.file || lm[1] === CCA_ACCENT.file || LOGOS.some((l) => l.file === lm[1]))) return { status: 200, type: lm[1].endsWith('.jpg') ? 'image/jpeg' : 'image/png', headers: { 'Cache-Control': 'public, max-age=86400' }, body: readFileSync(join(PUBLIC, 'logos', lm[1])) };
     // the welcome song and the ~10 second country snippets are files YOU add once they are cleared (public/audio/welcome-home.mp3, public/audio/countries/<country>.mp3).
     // Absent file = a clean 404 and the page simply plays nothing for it. Byte ranges are needed for audio on iPhones.
-    const am = /^\/static\/audio\/(welcome-home)\.mp3$/.exec(p), cm = /^\/static\/audio\/countries\/([a-z0-9-]+)\.mp3$/.exec(p), xm = /^\/static\/audio\/fx\/([a-z0-9-]+)\.mp3$/.exec(p);
+    const am = /^\/static\/audio\/(welcome-home|questions)\.mp3$/.exec(p), cm = /^\/static\/audio\/countries\/([a-z0-9-]+)\.mp3$/.exec(p), xm = /^\/static\/audio\/fx\/([a-z0-9-]+)\.mp3$/.exec(p);
     if (am || (cm && COUNTRY_SLUGS.has(cm[1])) || (xm && FX_SLOTS.has(xm[1]))) {
-      const fp = am ? join(PUBLIC, 'audio', 'welcome-home.mp3') : cm ? join(PUBLIC, 'audio', 'countries', `${cm[1]}.mp3`) : join(PUBLIC, 'audio', 'fx', `${xm[1]}.mp3`);
+      const fp = am ? join(PUBLIC, 'audio', `${am[1]}.mp3`) : cm ? join(PUBLIC, 'audio', 'countries', `${cm[1]}.mp3`) : join(PUBLIC, 'audio', 'fx', `${xm[1]}.mp3`);
       if (!existsSync(fp)) return { status: 404, type: 'text/plain', body: 'not found' };
       const buf = readFileSync(fp), rg = /^bytes=(\d*)-(\d*)$/.exec(req.headers.range || '');
       if (rg && (rg[1] || rg[2])) {

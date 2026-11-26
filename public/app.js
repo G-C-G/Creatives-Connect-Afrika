@@ -279,7 +279,7 @@
     var href = go.getAttribute('href');
     // a fresh start: nothing is ticked, even if an earlier try left answers behind on this phone
     try { Object.keys(localStorage).filter(function (k) { return /^cca-draft:/.test(k); }).forEach(function (k) { localStorage.removeItem(k); }); } catch (x) {}
-    if (SFX) { SFX.themeLow(); SFX.set(true); }   // the welcome song carries on under the questions, but low. Pressing Let's go turns the sound on (this tap also unlocks audio on phones)
+    if (SFX) { SFX.themeNext(go.getAttribute('data-next-theme')); SFX.set(true); }   // the welcome song hands over to the quieter instrumental that plays under the questions. Pressing Let's go turns the sound on (this tap also unlocks audio on phones)
     fetch(href, { credentials: 'same-origin' }).then(function (r) { if (!r.ok) throw new Error('x'); return r.text(); }).then(function (t) {
       var d = new DOMParser().parseFromString(t, 'text/html'), m = d.querySelector('main'), cur = doc.querySelector('main');
       if (!m || !cur) throw new Error('x');
