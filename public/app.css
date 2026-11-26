@@ -265,8 +265,8 @@ main.landing .btn.go{width:100%;min-height:54px;height:54px;border-radius:999px;
 .logos.top.band img{height:24px;width:auto;background:#fff;border-radius:0;padding:4px 6px;box-sizing:content-box;display:block}
 .logos.top.band .tp{display:flex;align-items:center;gap:6px}
 main.landing{width:100%;max-width:none;box-sizing:border-box;padding:0;margin:0;display:flex;flex-direction:column;min-height:calc(100vh - 50px);min-height:calc(100svh - 50px);text-align:center}
-main.landing .stage{flex:0 0 auto;display:flex;align-items:center;justify-content:center;padding:44px 8px 40px}
-main.landing .cca-hero{width:min(94vw,430px);height:auto;margin:0}
+main.landing .stage{flex:0 0 auto;display:flex;align-items:center;justify-content:center;padding:72px 8px 56px}
+main.landing .cca-hero{width:min(84vw,380px);height:auto;margin:0}
 main.landing .panel{background:#111;color:#f4f4f4;border-radius:0;width:min(70%,300px);box-sizing:border-box;margin:0 auto 36px;padding:20px 16px 20px;display:flex;flex-direction:column;align-items:center}
 main.landing h1.open{margin:0;font-size:0;line-height:0;width:100%}
 .cyc{display:flex;flex-direction:column;align-items:center;justify-content:center;gap:10px;width:100%;transition:opacity .35s ease,transform .35s ease}
@@ -284,5 +284,5 @@ main.landing .btn.go{width:82%;align-self:center;min-height:46px;height:46px;bor
 main.landing .band-bottom{background:#111;padding:14px 16px;text-align:center;margin-top:auto}
 main.landing .band-bottom .soundline{margin:0}
 /* shorter phones: the mark scales down so the box and the sound band still fit */
-@media (max-height:720px){main.landing .cca-hero{width:min(82vw,340px)}main.landing .stage{padding:24px 8px 22px}main.landing .panel{margin-bottom:18px}main.landing .band-bottom{padding:10px 16px}}
+@media (max-height:720px){main.landing .cca-hero{width:min(74vw,310px)}main.landing .stage{padding:34px 8px 28px}main.landing .panel{margin-bottom:18px}main.landing .band-bottom{padding:10px 16px}}
 @media (max-height:600px){main.landing .cca-hero{width:min(64vw,250px)}main.landing .stage{padding:14px 8px 14px}main.landing .panel{width:min(78%,300px);padding:14px 12px 14px;margin-bottom:12px}.logos.top.band img{height:22px}}
