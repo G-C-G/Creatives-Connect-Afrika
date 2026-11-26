@@ -61,10 +61,10 @@ function takeSteps(take, n, total, S, lang, phase = 'pre') {
   return [
     h`<section class="step" data-step data-auto data-ack="${t(lang, 'ack.stance')}" data-title="${kick}">${meta}<p class="opener">${opener}</p>${dt?.setup ? h`<p class="setup">${dt.setup}</p>` : ''}<h2 class="take">${shown}</h2>
       <fieldset><legend class="sr">${take.text}</legend>${pick(`${k}_stance`, dt ? [tile('agree'), tile('disagree')] : [['agree', sidesOf(take.id)?.agree ?? t(lang, 'take.agree')], ['disagree', sidesOf(take.id)?.disagree ?? t(lang, 'take.disagree')]], S, `two big serif${sidesOf(take.id) ? ' lab' : ''}${dt ? ' detail' : ''}`)}</fieldset><p class="ack" aria-live="polite"></p></section>`,
-    h`<section class="step" data-step data-auto data-ack="${t(lang, 'ack.strength')}" data-title="${kick}">${meta}<p class="echo">${shown}</p>
+    h`<section class="step" data-step data-auto data-ack="${t(lang, 'ack.strength')}" data-acks="${JSON.stringify(Object.fromEntries([1, 2, 3, 4, 5].map((i) => [String(i), t(lang, `ack.str.${i}`)])))}" data-title="${kick}">${meta}<p class="echo">${shown}</p>
       <h2 class="ask">${t(lang, 'strength.ask')}</h2>
       <fieldset><legend class="sr">${t(lang, 'strength.ask')}</legend>${pick(`${k}_strength`, [1, 2, 3, 4, 5].map((i) => [String(i), t(lang, `strength.${i}`)]), S, 'stack words')}</fieldset><p class="ack" aria-live="polite"></p></section>`,
-    h`<section class="step" data-step data-auto data-ack="${ackLevel}" data-title="${kick}">${meta}<p class="echo">${shown}</p>
+    h`<section class="step" data-step data-auto data-ack="${ackLevel}" data-acks="${JSON.stringify({ quiet: t(lang, 'ack.lvl.quiet'), aloud: t(lang, 'ack.lvl.aloud'), stage: t(lang, 'ack.lvl.stage') })}" data-last="${n === total ? t(lang, 'ack.level.last') : ''}" data-title="${kick}">${meta}<p class="echo">${shown}</p>
       <h2 class="ask">${t(lang, 'level.ask')}</h2>
       <fieldset><legend class="sr">${t(lang, 'level.ask')}</legend>${pick(`${k}_level`, [['quiet', t(lang, 'level.quiet')], ['aloud', t(lang, 'level.aloud')], ['stage', t(lang, 'level.stage')]], S2, 'stack words')}</fieldset><p class="ack" aria-live="polite"></p></section>`,
   ];
@@ -154,7 +154,7 @@ export function preForm({ takes, facts = [], S = new URLSearchParams(), E = {}, 
     <label class="check"><input type="checkbox" name="consent_aggregate" value="1" required ${S.get('consent_aggregate') === '1' ? 'checked' : ''}><span>${t(lang, 'consent.aggregate')}</span></label>${fieldErr(E, 'consent_aggregate', lang)}` }, lang);
   const byId = new Map(facts.map((f) => [f.id, f]));
   const steps = [ask({ k: t(lang, 'q.country.k'), title: t(lang, 'q.country.t'), hint: t(lang, 'q.country.h'),
-    body: h`<div class="field"><label for="f_country" class="sr">${t(lang, 'about.country')}</label>${select('country', PICKABLE_COUNTRIES, S, lang, E)}${fieldErr(E, 'country', lang)}</div>` }, lang)];
+    body: h`<div class="field"><label for="f_country" class="sr">${t(lang, 'about.country')}</label>${select('country', PICKABLE_COUNTRIES, S, lang, E)}${fieldErr(E, 'country', lang)}</div><p class="country-react" data-country-react data-line="${t(lang, 'country.react')}" aria-live="polite"></p>` }, lang)];
   takes.forEach((tk, i) => {
     steps.push(...takeSteps(tk, i + 1, takes.length, S, lang));
     const f = !short && byId.get(FACT_SLOTS[i + 1]);

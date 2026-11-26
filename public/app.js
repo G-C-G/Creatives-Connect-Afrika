@@ -84,6 +84,12 @@
   var countrySel = form.querySelector('select[name=country]'), audioBase = form.getAttribute('data-audio');
   function slug(c) { return String(c).normalize('NFD').replace(/[\u0300-\u036f]/g, '').toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, ''); }
   var AFRICAN = {"algeria":1,"angola":1,"benin":1,"botswana":1,"burkina-faso":1,"burundi":1,"cabo-verde":1,"cameroon":1,"central-african-republic":1,"chad":1,"comoros":1,"congo-republic":1,"cote-d-ivoire":1,"djibouti":1,"dr-congo":1,"egypt":1,"equatorial-guinea":1,"eritrea":1,"eswatini":1,"ethiopia":1,"gabon":1,"gambia":1,"ghana":1,"guinea":1,"guinea-bissau":1,"kenya":1,"lesotho":1,"liberia":1,"libya":1,"madagascar":1,"malawi":1,"mali":1,"mauritania":1,"mauritius":1,"morocco":1,"mozambique":1,"namibia":1,"niger":1,"nigeria":1,"rwanda":1,"sao-tome-and-principe":1,"senegal":1,"seychelles":1,"sierra-leone":1,"somalia":1,"south-africa":1,"south-sudan":1,"sudan":1,"tanzania":1,"togo":1,"tunisia":1,"uganda":1,"zambia":1,"zimbabwe":1};
+  var react = form.querySelector('[data-country-react]');
+  if (countrySel && react) countrySel.addEventListener('change', function () {
+    if (!countrySel.value) { react.textContent = ''; return; }
+    react.textContent = countrySel.value.toUpperCase() + '. ' + (AFRICAN[slug(countrySel.value)] ? react.getAttribute('data-line') : '');
+    react.classList.remove('pop'); void react.offsetWidth; react.classList.add('pop');
+  });
   if (countrySel && SFX && audioBase) countrySel.addEventListener('change', function () { if (countrySel.value) SFX.snippet(audioBase + (AFRICAN[slug(countrySel.value)] ? slug(countrySel.value) : 'ghana') + '.mp3'); else SFX.stopSnippet(); });   // non-African countries quietly get the Ghana clip
 
   // ---- values: max 3 ----
@@ -209,13 +215,18 @@
     var chosen = e.target.closest('label');
     [].slice.call(st.querySelectorAll('label.choice, label.chip')).forEach(function (l) { l.classList.toggle('fade', l !== chosen); });
     if (chosen) chosen.classList.add('locked');
-    var ack = st.querySelector('.ack'); if (ack) ack.textContent = st.getAttribute('data-ack') || '';
+    var ack = st.querySelector('.ack'), amap = {}; try { amap = JSON.parse(st.getAttribute('data-acks') || '{}'); } catch (x) {}
+    var line = amap[e.target.value] || st.getAttribute('data-ack') || '';
+    if (st.getAttribute('data-last') && amap[e.target.value]) line = amap[e.target.value] + ' ' + st.getAttribute('data-last');
+    if (ack) ack.textContent = line;
+    // a small sound for how strongly they mean it, and for saying it on the stage
+    if (SFX) { var nm0 = e.target.name; if (/_strength$/.test(nm0) && e.target.value === '5') setTimeout(function () { SFX.boom(); }, 60); if (/_level$/.test(nm0) && e.target.value === 'stage') setTimeout(function () { SFX.drum(); }, 60); }
     if (SFX) {   // a voice expression for this answer if you added one (public/audio/fx/<slot>.mp3), otherwise the synthesised lock sound
       var nm = e.target.name.replace(/^t_T\d+_/, ''), slot = /^(role|sector|goal)$/.test(nm) ? nm : nm + '-' + e.target.value, fxBase = form.getAttribute('data-fx');
       SFX.answer(fxBase ? fxBase + slot + '.mp3' : null);
     }
     try { if (navigator.vibrate) navigator.vibrate(12); } catch (x) {}
-    setTimeout(function () { st.classList.remove('locking'); if (steps[cur] === st && !valid(st)) show(cur + 1); }, calm ? 160 : 650);
+    setTimeout(function () { st.classList.remove('locking'); if (steps[cur] === st && !valid(st)) show(cur + 1); }, calm ? 160 : (/_(strength|level)$/.test(e.target.name) ? 1000 : 750));
   });
   next.addEventListener('click', function () {
     var bad = valid(steps[cur]);
