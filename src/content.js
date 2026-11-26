@@ -79,9 +79,10 @@ export const TAKE_DETAIL = {
   T3: { stem: 'A big opportunity comes, but they cannot pay for your work. Do you still do it?',
     agree: { good: 'A big audience sees your work, and doors may open', bad: 'You may not grow: clients start expecting it cheap, and it gets hard to charge more later' },
     disagree: { good: 'People respect your work and your price', bad: 'You walk away from the opportunity, and may not grow either: less work behind you, fewer referrals, a smaller network' } },
+  // Take 5 shows reasons only (no costs): both sides can be culturally relevant, and it is a matter of what each person values.
   T5: { stem: 'Which is more valuable to tourism and cultural experiences?',
-    agree: { eg: 'Artists, storytellers, guides, craftspeople, hotel and service staff', good: 'They make a place special: why visitors choose us and not any other country', bad: 'Without great spaces, visitors will not feel comfortable, and nowhere can host the culture' },
-    disagree: { eg: 'Nature, architecture, cultural spaces, venues, airports', good: 'Great spaces make a country worth visiting, and let visitors feel at ease', bad: 'Without artists and culture, visitors can find nature and hotels in any other country' } },
+    agree: { eg: 'Artists, storytellers, singers, dancers, guides, craftspeople, staff', good: ['People make a place unique: their stories, music and welcome are what visitors remember', 'Social experiences turn visitors into guests, and guests into people who return'] },
+    disagree: { eg: 'Nature, architecture, cultural spaces, venues, airports', good: ['Places carry culture too: heritage, architecture and living spaces tell a country\u2019s story', 'Great spaces draw visitors and let them enjoy it their own way, with or without the crowd'] } },
 };
 export const detailOf = (id) => TAKE_DETAIL[id] || null;
 

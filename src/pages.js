@@ -56,7 +56,7 @@ function takeSteps(take, n, total, S, lang, phase = 'pre') {
     <span class="ticks" aria-hidden="true">${Array.from({ length: total }, (_, i) => h`<i class="${i < n - 1 ? 'done' : i === n - 1 ? 'now' : ''}"></i>`)}</span></div>`;
   const opener = t(lang, `opener.${phase}.${n}`);
   const dt = detailOf(take.id), shown = dt ? dt.stem : take.text;   // two-option takes show a short question; the good and bad sit on the tiles
-  const tile = (side) => dt ? [side === 'agree' ? 'agree' : 'disagree', sidesOf(take.id)[side], h`${dt[side].eg ? h`<i class="eg">${dt[side].eg}</i>` : ''}<i class="g">${dt[side].good}</i><i class="b">${dt[side].bad}</i>`] : null;
+  const tile = (side) => dt ? [side === 'agree' ? 'agree' : 'disagree', sidesOf(take.id)[side], h`${dt[side].eg ? h`<i class="eg">${dt[side].eg}</i>` : ''}${[].concat(dt[side].good).map((g) => h`<i class="g">${g}</i>`)}${dt[side].bad ? h`<i class="b">${dt[side].bad}</i>` : ''}`] : null;
   const ackLevel = t(lang, n === total ? 'ack.level.last' : 'ack.level');
   return [
     h`<section class="step" data-step data-auto data-ack="${t(lang, 'ack.stance')}" data-title="${kick}">${meta}<p class="opener">${opener}</p>${dt?.setup ? h`<p class="setup">${dt.setup}</p>` : ''}<h2 class="take">${shown}</h2>
