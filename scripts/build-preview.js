@@ -10,10 +10,12 @@ import { registerPre } from '../src/service.js';
 import { freezeDeck } from '../src/play.js';
 import { suggestIcebreaker } from '../src/metrics.js';
 import { loadData } from '../src/db.js';
+import { teamPage, ogTags } from './team-page.js';
 import { COUNTRIES, ROLES, SECTORS } from '../src/content.js';
 
 const ROOT = join(dirname(fileURLToPath(import.meta.url)), '..');
 const out = process.argv[2];
+const SITE = ((process.argv.find((a) => a.startsWith('--site=')) || '').slice(7));   // --site=<public https address>: a normal website (full pages, link-preview tags, team page) instead of the Claude artifact fragment
 if (!out) { console.error('Usage: node scripts/build-preview.js <outDir>'); process.exit(1); }
 rmSync(out, { recursive: true, force: true }); mkdirSync(join(out, 'static', 'fonts'), { recursive: true }); mkdirSync(join(out, 'static', 'logos'), { recursive: true });
 
@@ -51,7 +53,14 @@ await page('/start', 'start.html'); await page('/play', 'play.html');
 await page(`/done?t=${dummy.magic_token}`, 'done.html', (x) => x.replace(/(<div class="cl c6 codecard">[\s\S]*?<p class="bignum"[^>]*>)\d{4}(<\/p>)/, '$1<span data-code>----</span>$2'));
 
 // landing = the artifact's main page: a fragment (the host adds the document skeleton)
-{
+if (SITE) {
+  // a real website: the full opening page, with the link-preview tags, plus the team page the shared link can open on
+  let html = rel(await get('/'));
+  html = html.replace('<meta name="robots" content="noindex">', '<meta name="robots" content="noindex">\n' + ogTags(SITE, 'index.html') + '\n<link rel="icon" href="static/logos/africa-accent.png">').replace(/<title>[^<]*<\/title>/, '<title>Creatives Connect Afrika 2026: Welcome game (team preview)</title>');
+  writeFileSync(join(out, 'index.html'), html);
+  writeFileSync(join(out, 'team.html'), teamPage(SITE));
+  copyFileSync(join(ROOT, 'public/og-card.png'), join(out, 'static/og-card.png'));
+} else {
   const html = rel(await get('/'));
   const head = html.match(/<head>([\s\S]*?)<\/head>/)[1], body = html.match(/<body[^>]*>([\s\S]*?)<\/body>/)[1];
   const links = [...head.matchAll(/<link[^>]*>|<script[^>]*><\/script>/g)].map((m) => m[0]).join('\n');

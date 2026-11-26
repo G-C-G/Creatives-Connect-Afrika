@@ -23,7 +23,7 @@ jobs:
         with:
           node-version: 22
       - run: node --disable-warning=ExperimentalWarning --test test/*.test.js
-      - run: node --disable-warning=ExperimentalWarning scripts/build-preview.js _site
+      - run: node --disable-warning=ExperimentalWarning scripts/build-preview.js _site --site=https://g-c-g.github.io/Creatives-Connect-Afrika/
       - run: touch _site/.nojekyll
       - uses: actions/configure-pages@v5
       - uses: actions/upload-pages-artifact@v3
