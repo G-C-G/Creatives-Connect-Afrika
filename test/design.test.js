@@ -159,7 +159,7 @@ test('stage final: theatre order (smallest shift first, biggest mover last), cou
   const idx = (txt) => html.indexOf(txt);
   const mover = idx('BIGGEST MOVER'), t3 = idx('Free work can be a trap');
   assert.ok(mover > 0 && t3 > 0 && mover < t3 && t3 > idx('A creative business that can'), 'biggest mover (T3) is the last statement revealed');
-  assert.ok(html.indexOf('A creative business that can') < t3 && html.indexOf('If international audiences') < t3);
+  assert.ok(html.indexOf('A creative business that can') < t3 && html.indexOf('Adapt African culture and it travels') < t3);
   assert.ok(html.includes('CCA_SFX_STAGE') && html.includes('AudioContext'));
   assert.ok(html.includes('<svg class="field flow"') && html.includes('class="a-d"'), 'the imagery: dots, with the people who crossed the room');
   assert.ok(!/https?:\/\//.test(html), 'no network references');
