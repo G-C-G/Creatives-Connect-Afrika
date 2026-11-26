@@ -1,5 +1,5 @@
 import { createServer } from 'node:http';
-import { readFileSync } from 'node:fs';
+import { readFileSync, existsSync } from 'node:fs';
 import { createHmac, timingSafeEqual } from 'node:crypto';
 import { fileURLToPath } from 'node:url';
 import { dirname, join } from 'node:path';
@@ -9,7 +9,7 @@ import * as P from './pages.js';
 import * as S from './service.js';
 import { queueNumberEmail, sendOutboxRow } from './mail.js';
 import { adminRoute } from './admin.js';
-import { LOGOS, GCG_LOGO, CCA_HERO, CCA_ACCENT } from './content.js';
+import { LOGOS, GCG_LOGO, CCA_HERO, CCA_ACCENT, COUNTRIES, countrySlug } from './content.js';
 import { latestDeck, playOpen, savePlay, checkPlayer } from './play.js';
 
 const PUBLIC = join(dirname(fileURLToPath(import.meta.url)), '..', 'public');
@@ -28,6 +28,9 @@ function limiter(max, windowMs) {
   };
 }
 
+const COUNTRY_SLUGS = new Set(COUNTRIES.map(countrySlug));
+// answer sounds (voice expressions for the taps): public/audio/fx/<slot>.mp3
+const FX_SLOTS = new Set(['stance-agree', 'stance-disagree', 'strength-1', 'strength-2', 'strength-3', 'strength-4', 'strength-5', 'level-quiet', 'level-aloud', 'level-stage', 'sector', 'goal']);
 export function createApp({ db, env = process.env, now = () => new Date(), fetchImpl = fetch } = {}) {
   P.configure({ logos: env.SHOW_PARTNER_LOGOS !== '0' });
   const secret = env.SESSION_SECRET || env.ADMIN_PASSWORD || 'dev-secret';
@@ -71,6 +74,20 @@ export function createApp({ db, env = process.env, now = () => new Date(), fetch
     if (p === '/healthz') return { status: 200, type: 'text/plain', body: 'ok' };
     const lm = /^\/static\/logos\/([a-z-]+\.(?:png|jpg))$/.exec(p);
     if (lm && (lm[1] === GCG_LOGO.file || lm[1] === CCA_HERO.file || lm[1] === CCA_ACCENT.file || LOGOS.some((l) => l.file === lm[1]))) return { status: 200, type: lm[1].endsWith('.jpg') ? 'image/jpeg' : 'image/png', headers: { 'Cache-Control': 'public, max-age=86400' }, body: readFileSync(join(PUBLIC, 'logos', lm[1])) };
+    // the welcome song and the ~10 second country snippets are files YOU add once they are cleared (public/audio/welcome-home.mp3, public/audio/countries/<country>.mp3).
+    // Absent file = a clean 404 and the page simply plays nothing for it. Byte ranges are needed for audio on iPhones.
+    const am = /^\/static\/audio\/(welcome-home)\.mp3$/.exec(p), cm = /^\/static\/audio\/countries\/([a-z0-9-]+)\.mp3$/.exec(p), xm = /^\/static\/audio\/fx\/([a-z0-9-]+)\.mp3$/.exec(p);
+    if (am || (cm && COUNTRY_SLUGS.has(cm[1])) || (xm && FX_SLOTS.has(xm[1]))) {
+      const fp = am ? join(PUBLIC, 'audio', 'welcome-home.mp3') : cm ? join(PUBLIC, 'audio', 'countries', `${cm[1]}.mp3`) : join(PUBLIC, 'audio', 'fx', `${xm[1]}.mp3`);
+      if (!existsSync(fp)) return { status: 404, type: 'text/plain', body: 'not found' };
+      const buf = readFileSync(fp), rg = /^bytes=(\d*)-(\d*)$/.exec(req.headers.range || '');
+      if (rg && (rg[1] || rg[2])) {
+        const x = rg[1] ? +rg[1] : Math.max(0, buf.length - +rg[2]), y = rg[1] && rg[2] ? Math.min(+rg[2], buf.length - 1) : buf.length - 1;
+        if (x > y || x >= buf.length) return { status: 416, type: 'text/plain', headers: { 'Content-Range': `bytes */${buf.length}` }, body: '' };
+        return { status: 206, type: 'audio/mpeg', headers: { 'Content-Range': `bytes ${x}-${y}/${buf.length}`, 'Accept-Ranges': 'bytes', 'Cache-Control': 'public, max-age=3600' }, body: buf.subarray(x, y + 1) };
+      }
+      return { status: 200, type: 'audio/mpeg', headers: { 'Accept-Ranges': 'bytes', 'Cache-Control': 'public, max-age=3600' }, body: buf };
+    }
     const fm = /^\/static\/fonts\/(instrument-serif-400(?:-italic)?\.woff2)$/.exec(p);
     if (fm) return { status: 200, type: 'font/woff2', headers: { 'Cache-Control': 'public, max-age=31536000, immutable' }, body: readFileSync(join(PUBLIC, 'fonts', fm[1])) };
     if (STATIC[p]) return { status: 200, type: STATIC[p][0], headers: { 'Cache-Control': 'public, max-age=3600' }, body: readFileSync(join(PUBLIC, STATIC[p][1])) };

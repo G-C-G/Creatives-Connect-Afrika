@@ -42,7 +42,7 @@ const get = async (p) => (await fetch(base + p)).text();
 
 // ---- rewrite server paths to relative file paths ----
 const rel = (html) => html
-  .replaceAll('href="/static/', 'href="static/').replaceAll('src="/static/', 'src="static/')
+  .replaceAll('href="/static/', 'href="static/').replaceAll('src="/static/', 'src="static/').replaceAll('data-theme="/static/', 'data-theme="static/').replaceAll('data-audio="/static/', 'data-audio="static/').replaceAll('data-fx="/static/', 'data-fx="static/')
   .replace('href="/start"', 'href="start.html"').replace('data-deck="/play/deck.json"', 'data-deck="deck.json"').replace('data-join="/door"', 'data-join="start.html"')
   .replace(/<script src="static\/sfx\.js" defer>/, '<script src="static/mock.js" defer></script><script src="static/sfx.js" defer>');
 

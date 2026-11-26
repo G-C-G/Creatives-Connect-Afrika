@@ -88,9 +88,41 @@
     cassette: function () { burst(0, 0.03, 'highpass', 3000, 1, 0.22); tone(90, 0.0, 0.05, 'sine', 0.12); burst(0.05, 0.45, 'bandpass', 700, 2, 0.1, 3200); },
     pluck: function () { pluck(196, 0, 0.45); pluck(247, 0.14, 0.4); pluck(294, 0.28, 0.4); }
   };
+  // the welcome song: starts from the opening tap, fades in, loops softly under the questions. No file yet (or not cleared): a short original welcome motif instead.
+  var song = null, clip = null, songVol = 0.35;
+  function welcomeMotif() { kalimba(392, 0, 0.1); kalimba(494, 0.22, 0.1); kalimba(587, 0.44, 0.1); kalimba(784, 0.7, 0.11); pluck(196, 0.9, 0.35); }
+  function fadeTo(a, v) { var n = 0, id = setInterval(function () { n++; try { a.volume = Math.min(v, v * n / 24); } catch (e) {} if (n >= 24) clearInterval(id); }, 90); }
   var api = {
     isOn: function () { return on; },
-    set: function (v) { on = !!v; try { if (!stage) localStorage.setItem('cca-sound', on ? '1' : '0'); } catch (e) {} if (on) { ac(); this.tick(); } },
+    theme: function (url) {
+      if (!on || song || stage) return;
+      if (!url || typeof Audio === 'undefined') { welcomeMotif(); return; }
+      var failed = false, fb = function () { if (failed) return; failed = true; song = null; welcomeMotif(); };
+      try { song = new Audio(url); song.loop = true; song.volume = 0; song.addEventListener('error', fb, { once: true });
+        var p = song.play(); if (p && p.then) p.then(function () { fadeTo(song, songVol); }, fb); } catch (e) { fb(); }
+    },
+    // a short clip (about 10 seconds) of the picked country's song: the welcome song steps back while it plays and returns after
+    snippet: function (url) {
+      this.stopSnippet(); if (!on || stage || typeof Audio === 'undefined') return;
+      var a = new Audio(url); clip = a; a.volume = 0.9;
+      var back = function () { if (clip === a) { clip = null; if (song && on) try { song.volume = songVol; } catch (e) {} } };
+      a.addEventListener('ended', back, { once: true }); a.addEventListener('error', back, { once: true });
+      if (song) { try { song.volume = 0.06; } catch (e) {} }
+      var p = a.play(); if (p && p.catch) p.catch(back);
+    },
+    // the sound for a tapped answer: a voice expression file if there is one (a short fun clip), otherwise the synthesised lock sound
+    answer: function (url) {
+      if (!on) return; var self = this;
+      if (!url || stage || typeof Audio === 'undefined') { self.lock(); return; }
+      var done = false, fb = function () { if (done) return; done = true; self.lock(); };
+      try { var a = new Audio(url); a.volume = 1; a.addEventListener('error', fb, { once: true }); a.addEventListener('playing', function () { done = true; }, { once: true });
+        var p = a.play(); if (p && p.catch) p.catch(fb); } catch (e) { fb(); }
+    },
+    stopSnippet: function () { if (clip) { var a = clip; clip = null; try { a.pause(); } catch (e) {} if (song && on) try { song.volume = songVol; } catch (e) {} } },
+    set: function (v) { on = !!v; try { if (!stage) localStorage.setItem('cca-sound', on ? '1' : '0'); } catch (e) {}
+      if (!on) this.stopSnippet();
+      if (song) { try { if (on) { var q = song.play(); if (q && q.catch) q.catch(function () {}); } else song.pause(); } catch (e) {} }
+      if (on) { ac(); this.tick(); } },
     toggle: function () { this.set(!on); return on; }
   };
   Object.keys(S).forEach(function (k) { api[k] = function (a) { play(k, function () { S[k](a); }); }; });

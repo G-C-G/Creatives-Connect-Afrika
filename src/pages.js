@@ -90,7 +90,7 @@ function factStep(f, S, lang) {
 
 function wizard({ action, id, steps, hidden = {}, lang, E = {}, extraTop = '' }) {
   const nErr = Object.keys(E).length;
-  return h`<form method="post" action="${action}" data-wizard data-draft="${id}" data-steps="${steps.length}">
+  return h`<form method="post" action="${action}" data-wizard data-draft="${id}" data-steps="${steps.length}" data-audio="/static/audio/countries/" data-fx="/static/audio/fx/">
   ${Object.entries(hidden).map(([k, v]) => h`<input type="hidden" name="${k}" value="${v}">`)}
   ${extraTop}
   ${nErr ? h`<p class="err summary" role="alert">${t(lang, 'err.summary')}</p>` : ''}
@@ -114,7 +114,7 @@ export function landingPage(lang = 'en') {
   <div class="stage"><img class="cca-hero" src="/static/logos/${CCA_HERO.file}" alt="${CCA_HERO.alt}">
   <h1 class="open">${t(lang, 'open.h1a')} ${t(lang, 'open.h1b')}</h1>
   <p class="lead">${t(lang, 'open.sub')}<br>${t(lang, 'open.sub2')}</p></div>
-  <a class="btn big go" href="/start">${t(lang, 'open.go')} &rarr;</a>` });
+  <a class="btn big go" href="/start" data-theme="/static/audio/welcome-home.mp3">${t(lang, 'open.go')} &rarr;</a>` });
 }
 
 export function preForm({ takes, facts = [], S = new URLSearchParams(), E = {}, short = false, lang = 'en' }) {
@@ -123,8 +123,7 @@ export function preForm({ takes, facts = [], S = new URLSearchParams(), E = {}, 
     // name, surname and country share one page; sector, and "why you are here", each get their own
     ask({ k: t(lang, 'who.k'), title: t(lang, 'q.name.t'), hint: t(lang, 'q.name.h'),
       body: h`${bigInput('first_name', S, E, lang, { required: true, autocomplete: 'given-name', label: t(lang, 'about.first') })}
-        ${bigInput('surname', S, E, lang, { required: true, autocomplete: 'family-name', label: t(lang, 'about.surname') })}
-        <div class="field"><label for="f_country">${t(lang, 'about.country')}</label>${select('country', COUNTRIES, S, lang, E)}${fieldErr(E, 'country', lang)}</div>` }, lang),
+        ${bigInput('surname', S, E, lang, { required: true, autocomplete: 'family-name', label: t(lang, 'about.surname') })}` }, lang),
     ask({ k: t(lang, 'q.sector.k'), title: t(lang, 'q.sector.t'), auto: true, body: h`${chipPick('sector', SECTORS, S, lang)}${fieldErr(E, 'sector', lang)}` }, lang),
     ask({ k: t(lang, 'q.goal.k'), title: t(lang, 'q.goal.t'), hint: t(lang, 'q.goal.h'), auto: true, body: chipPick('goal', GOALS, S, lang, true) }, lang),
     ask({ k: t(lang, 'q.memory.k'), title: t(lang, 'q.memory.t'), hint: t(lang, 'q.memory.h'), optional: true, body: bigInput('memory', S, E, lang, { max: 140, label: t(lang, 'about.memory') }) }, lang),
@@ -133,7 +132,8 @@ export function preForm({ takes, facts = [], S = new URLSearchParams(), E = {}, 
   const consent = ask({ k: t(lang, 'consent.k'), title: t(lang, 'consent.t'), body: h`<p class="consent">${t(lang, 'consent.text')}</p>
     <label class="check"><input type="checkbox" name="consent_aggregate" value="1" required ${S.get('consent_aggregate') === '1' ? 'checked' : ''}><span>${t(lang, 'consent.aggregate')}</span></label>${fieldErr(E, 'consent_aggregate', lang)}` }, lang);
   const byId = new Map(facts.map((f) => [f.id, f]));
-  const steps = [];
+  const steps = [ask({ k: t(lang, 'q.country.k'), title: t(lang, 'q.country.t'), hint: t(lang, 'q.country.h'),
+    body: h`<div class="field"><label for="f_country" class="sr">${t(lang, 'about.country')}</label>${select('country', COUNTRIES, S, lang, E)}${fieldErr(E, 'country', lang)}</div>` }, lang)];
   takes.forEach((tk, i) => {
     steps.push(...takeSteps(tk, i + 1, takes.length, S, lang));
     const f = !short && byId.get(FACT_SLOTS[i + 1]);

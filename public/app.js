@@ -15,6 +15,7 @@
   // the ending: a low note as it starts, one hit as the big question lands
   if (SFX && doc.querySelector('main.cliff') && !calm) { setTimeout(function () { SFX.cliff(); }, 250); setTimeout(function () { SFX.boom(); }, 2800); }
 
+  function initWizard() {
   var form = doc.querySelector('form[data-wizard]');
   if (!form) return;
   root.classList.add('js');
@@ -51,6 +52,10 @@
     } catch (e) {}
   }
   form.addEventListener('input', saveDraft); form.addEventListener('change', saveDraft);
+  // picking a country plays a short clip of its song (a file you add: public/audio/countries/<country>.mp3). No file, no sound. Moving on stops it.
+  var countrySel = form.querySelector('select[name=country]'), audioBase = form.getAttribute('data-audio');
+  function slug(c) { return String(c).normalize('NFD').replace(/[\u0300-\u036f]/g, '').toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, ''); }
+  if (countrySel && SFX && audioBase) countrySel.addEventListener('change', function () { if (countrySel.value) SFX.snippet(audioBase + slug(countrySel.value) + '.mp3'); else SFX.stopSnippet(); });
 
   // ---- values: max 3 ----
   [].slice.call(form.querySelectorAll('[data-maxcheck]')).forEach(function (g) {
@@ -94,6 +99,7 @@
     nav.classList.toggle('solo', auto && !skippable);
     refreshSkip();
     errBox.hidden = true; saveDraft();
+    if (SFX && SFX.stopSnippet) SFX.stopSnippet();   // moving on ends the country snippet
     if (steps[cur].scrollIntoView) window.scrollTo(0, 0);
   }
   // optional step: the button says Skip until something is filled in
@@ -119,7 +125,10 @@
     [].slice.call(st.querySelectorAll('label.choice, label.chip')).forEach(function (l) { l.classList.toggle('fade', l !== chosen); });
     if (chosen) chosen.classList.add('locked');
     var ack = st.querySelector('.ack'); if (ack) ack.textContent = st.getAttribute('data-ack') || '';
-    if (SFX) SFX.lock();
+    if (SFX) {   // a voice expression for this answer if you added one (public/audio/fx/<slot>.mp3), otherwise the synthesised lock sound
+      var nm = e.target.name.replace(/^t_T\d+_/, ''), slot = /^(sector|goal)$/.test(nm) ? nm : nm + '-' + e.target.value, fxBase = form.getAttribute('data-fx');
+      SFX.answer(fxBase ? fxBase + slot + '.mp3' : null);
+    }
     try { if (navigator.vibrate) navigator.vibrate(12); } catch (x) {}
     setTimeout(function () { st.classList.remove('locking'); if (steps[cur] === st && !valid(st)) show(cur + 1); }, calm ? 160 : 650);
   });
@@ -154,4 +163,23 @@
   });
 
   restore(); show(cur);
+  }
+  initWizard();
+
+  // The opening tap: start the welcome song inside this tap (phones only allow sound after a tap), then bring the questions into the SAME page
+  // so the song keeps playing. If anything fails it falls back to a normal page load.
+  var go = doc.querySelector('main.landing a.go');
+  if (go) go.addEventListener('click', function (e) {
+    e.preventDefault();
+    var href = go.getAttribute('href');
+    if (SFX) SFX.theme(go.getAttribute('data-theme'));
+    fetch(href, { credentials: 'same-origin' }).then(function (r) { if (!r.ok) throw new Error('x'); return r.text(); }).then(function (t) {
+      var d = new DOMParser().parseFromString(t, 'text/html'), m = d.querySelector('main'), cur = doc.querySelector('main');
+      if (!m || !cur) throw new Error('x');
+      cur.className = m.className; cur.innerHTML = m.innerHTML;
+      var lg = doc.querySelector('.logos.top'); if (lg) lg.remove();
+      doc.title = d.title; try { history.pushState({}, '', href); } catch (x) {}
+      window.scrollTo(0, 0); initWizard();
+    }).catch(function () { location.href = href; });
+  });
 })();

@@ -75,23 +75,23 @@ test('SHOW_PARTNER_LOGOS=0 hides the partner marks but keeps the GCG mark', asyn
   c.close();
 });
 
-test('wizard: statements first; then who (name, surname, country together), sector, why you are here, an optional memory, email; consent last', async () => {
+test('wizard: country first (a short clip of its song can play); then the statements; then who (name and surname), sector, why you are here, an optional memory, email; consent last', async () => {
   const c = await boot();
   const html = await (await c.call('/start')).text();
   const screens = html.split('<section class="step"').slice(1);
-  assert.equal(screens.length, 21, '15 statement screens + who + sector + why + memory + email + consent: nothing else');
+  assert.equal(screens.length, 22, 'country + 15 statement screens + who + sector + why + memory + email + consent: nothing else');
   const has = (re) => screens.map((x, i) => (re.test(x) ? i : -1)).filter((i) => i >= 0);
-  assert.deepEqual(has(/t_T1_stance/), [0]);
-  assert.deepEqual(has(/name="first_name"/), [15]); assert.deepEqual(has(/name="surname"/), [15]); assert.deepEqual(has(/name="country"/), [15], 'name, surname and country on one page');
-  assert.deepEqual(has(/name="sector"/), [16]); assert.deepEqual(has(/name="goal"/), [17], '"why you are here" is its own page');
-  assert.deepEqual(has(/name="memory"/), [18], 'the optional creative-past question'); assert.deepEqual(has(/name="email"/), [19]); assert.deepEqual(has(/name="consent_aggregate"/), [20]);
+  assert.deepEqual(has(/name="country"/), [0], 'country is the very first question'); assert.deepEqual(has(/t_T1_stance/), [1]);
+  assert.deepEqual(has(/name="first_name"/), [16]); assert.deepEqual(has(/name="surname"/), [16], 'name and surname on one page');
+  assert.deepEqual(has(/name="sector"/), [17]); assert.deepEqual(has(/name="goal"/), [18], '"why you are here" is its own page');
+  assert.deepEqual(has(/name="memory"/), [19], 'the optional creative-past question'); assert.deepEqual(has(/name="email"/), [20]); assert.deepEqual(has(/name="consent_aggregate"/), [21]);
   for (const gone of ['name="project"', 'name="values"', 'name="contact_opt_in"']) assert.ok(!html.includes(gone), `${gone} is no longer asked`);
-  assert.ok(/data-auto/.test(screens[17]) && !/data-skippable/.test(screens[17]) && /required/.test(screens[17]), '"why" cannot be skipped');
-  screens.forEach((x, i) => assert.ok(((x.match(/<input[^>]*type="(text|email)"|<select|<textarea/g) || []).length) <= (i === 15 ? 3 : 1), `screen ${i}`));
+  assert.ok(/data-auto/.test(screens[18]) && !/data-skippable/.test(screens[18]) && /required/.test(screens[18]), '"why" cannot be skipped');
+  screens.forEach((x, i) => assert.ok(((x.match(/<input[^>]*type="(text|email)"|<select|<textarea/g) || []).length) <= (i === 16 ? 2 : 1), `screen ${i}`));
   assert.equal((html.match(/data-auto/g) || []).length, 17, '15 statement taps + sector + why');
   assert.equal((html.match(/data-optional/g) || []).length, 2, 'only the memory and the email are skippable');
   const door = (await (await c.call('/door')).text()).split('<section class="step"').slice(1);
-  assert.equal(door.length, 21);
+  assert.equal(door.length, 22);
   c.close();
 });
 
@@ -179,5 +179,14 @@ test('the optional "creative past" answer: saved, trimmed to one line of 140, sh
   assert.match(page, /Highlife nights at the old Weija club/); assert.match(page, /Kenya \(1\)/);
   assert.doesNotMatch(page, /Kofi|Zed|a@example\.com/, 'names and emails are not on the memories page');
   assert.equal((await c.call('/admin/memories')).status, 401, 'admin only');
+  c.close();
+});
+
+test('the welcome song file is served only if present, with byte ranges (iPhones need them); the opening tap carries its path', async () => {
+  const c = await boot();
+  const landing = await (await c.call('/')).text();
+  assert.match(landing, /class="btn big go" href="\/start" data-theme="\/static\/audio\/welcome-home\.mp3"/);
+  assert.equal((await c.call('/static/audio/welcome-home.mp3')).status, 404, 'no file yet: a clean 404, and the page plays its own welcome motif');
+  assert.equal((await c.call('/static/audio/other.mp3')).status, 404, 'only the one named file is ever served');
   c.close();
 });

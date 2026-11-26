@@ -40,6 +40,7 @@ const REGION_MAP = {
   West: ['Benin', 'Burkina Faso', 'Cabo Verde', "Côte d'Ivoire", 'Gambia', 'Ghana', 'Guinea',
     'Guinea-Bissau', 'Liberia', 'Mali', 'Niger', 'Nigeria', 'Senegal', 'Sierra Leone', 'Togo'],
 };
+export const countrySlug = (c) => String(c).normalize('NFD').replace(/[\u0300-\u036f]/g, '').toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '');
 export const OUTSIDE_AFRICA = 'Outside Africa (diaspora / other)';
 export const COUNTRIES = [
   ...Object.values(REGION_MAP).flat().sort((a, b) => a.localeCompare(b)),
