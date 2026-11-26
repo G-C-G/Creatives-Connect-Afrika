@@ -283,6 +283,17 @@ main.landing .btn.go{width:82%;align-self:center;min-height:46px;height:46px;bor
 /* the bottom band holds only the sound line, so the panel above stays about the title and the button */
 main.landing .band-bottom{background:#111;padding:14px 16px;text-align:center;margin-top:auto}
 main.landing .band-bottom .soundline{margin:0}
-/* shorter phones: the mark scales down so the box and the sound band still fit */
-@media (max-height:720px){main.landing .cca-hero{width:min(74vw,310px)}main.landing .stage{padding:34px 8px 28px}main.landing .panel{margin-bottom:18px}main.landing .band-bottom{padding:10px 16px}}
-@media (max-height:600px){main.landing .cca-hero{width:min(64vw,250px)}main.landing .stage{padding:14px 8px 14px}main.landing .panel{width:min(78%,300px);padding:14px 12px 14px;margin-bottom:12px}.logos.top.band img{height:22px}}
+/* OPENING PROPORTIONS, measured from the mockup (a 390 x 657 phone): banner 41, mark 325 wide with ~50 above and ~40 below, title box 70% wide and ~148 tall,
+   ~76 of white under the box, sound band 46. On taller phones the extra height goes into the white around the mark; on shorter phones everything steps down. */
+.logos.top.band{padding:6px 16px}
+.logos.top.band img{height:21px;padding:4px 6px}
+main.landing{min-height:calc(100vh - 41px);min-height:calc(100svh - 41px)}
+main.landing .stage{flex:1 1 auto;display:flex;align-items:center;justify-content:center;padding:18px 8px 6px}
+main.landing .cca-hero{width:min(84vw,380px);height:auto;margin:0}
+main.landing .panel{width:min(70%,300px);box-sizing:border-box;margin:0 auto clamp(76px,calc(76px + (100svh - 657px) * .4),170px);padding:14px 16px}
+main.landing .lead{margin:4px 0 12px;font-size:13.5px}
+main.landing .btn.go{width:64%;box-sizing:border-box;min-height:38px;height:38px;padding:0 12px;font-size:13px}
+main.landing .band-bottom{padding:11px 16px;margin-top:auto}
+main.landing .band-bottom .soundline{padding:4px 8px}
+@media (max-height:640px){main.landing .cca-hero{width:min(66vw,260px)}main.landing .panel{width:min(84%,300px);margin-bottom:22px;padding:12px 10px}main.landing .lead{font-size:12.5px;margin:4px 0 10px}main.landing .stage{padding:6px 8px}}
+@media (min-width:700px){.logos.top.band img{height:30px}main.landing .panel{width:300px}}
