@@ -346,9 +346,9 @@ export const FACT_SLOTS = { 2: 'F1', 4: 'F3' }; // F2 is door-only. Adjust once 
 // Switch off instantly with SHOW_PARTNER_LOGOS=0.
 export const LOGOS = [
   { file: 'creatives-connect-afrika.png', alt: 'Creatives Connect Afrika' },
+  { file: 'africa-tourism-partners.png', alt: 'Africa Tourism Partners' },
   { file: 'ghana-arms.png', alt: 'Government of Ghana' },
   { file: 'black-star.png', alt: 'Black Star Experience' },
-  { file: 'africa-tourism-partners.png', alt: 'Africa Tourism Partners' },
   { file: 'afcfta.png', alt: 'AfCFTA Secretariat' },
 ];
 
