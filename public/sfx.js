@@ -107,7 +107,7 @@
     pluck: function () { pluck(196, 0, 0.45); pluck(247, 0.14, 0.4); pluck(294, 0.28, 0.4); }
   };
   // the welcome song: starts from the opening tap, fades in, loops softly under the questions. No file yet (or not cleared): a short original welcome motif instead.
-  var song = null, clip = null, songVol = 0.35;
+  var song = null, clip = null, songVol = 0.8;
   function welcomeMotif() { kalimba(392, 0, 0.1); kalimba(494, 0.22, 0.1); kalimba(587, 0.44, 0.1); kalimba(784, 0.7, 0.11); pluck(196, 0.9, 0.35); }
   function fadeTo(a, v) { var n = 0, id = setInterval(function () { n++; try { a.volume = Math.min(v, v * n / 24); } catch (e) {} if (n >= 24) clearInterval(id); }, 90); }
   var api = {
@@ -125,7 +125,7 @@
       var a = new Audio(url); clip = a; a.volume = 0.9;
       var back = function () { if (clip === a) { clip = null; if (song && on) try { song.volume = songVol; } catch (e) {} } };
       a.addEventListener('ended', back, { once: true }); a.addEventListener('error', back, { once: true });
-      if (song) { try { song.volume = 0.06; } catch (e) {} }
+      if (song) { try { song.volume = 0.12; } catch (e) {} }
       var p = a.play(); if (p && p.catch) p.catch(back);
     },
     // the sound for a tapped answer: a voice expression file if there is one (a short fun clip), otherwise the synthesised lock sound
