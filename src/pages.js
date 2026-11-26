@@ -147,7 +147,7 @@ export function preForm({ takes, facts = [], S = new URLSearchParams(), E = {}, 
   steps.push(...q, consent);
   const top = short ? h`<h1>${t(lang, 'door.title')}</h1><p class="lead">${t(lang, 'door.lead')}</p>
     ${facts.length ? h`<div class="cards"><h2>${t(lang, 'door.facts')}</h2>${facts.map((f) => h`<p class="card">${f.text}</p>`)}</div>` : ''}` : '';
-  return layout({ lang, title: 'Creatives Connect Afrika | Game', main: 'narrow wizard', body: wizard({ action, id: short ? 'door' : 'pre', steps, lang, E, extraTop: top }) });
+  return layout({ lang, bodyClass: 'q', title: 'Creatives Connect Afrika | Game', main: 'narrow wizard', body: wizard({ action, id: short ? 'door' : 'pre', steps, lang, E, extraTop: top }) });
 }
 
 export function donePage({ participant, existing = false, emailQueued = false, nextPlay = null, comeBack = null, lang = 'en' }) {
@@ -209,7 +209,7 @@ export function finalForm({ takes, ticket, postOnly, S = new URLSearchParams(), 
       ask({ k: t(lang, 'q.consent.k'), title: t(lang, 'q.consent.t'), body: h`<p class="consent">${t(lang, 'consent.text')}</p>
         <label class="check"><input type="checkbox" name="consent_aggregate" value="1" required ${S.get('consent_aggregate') === '1' ? 'checked' : ''}><span>${t(lang, 'consent.aggregate')}</span></label>${fieldErr(E, 'consent_aggregate', lang)}` }, lang));
   }
-  return layout({ lang, title: 'Day 3 | Creatives Connect Afrika', main: 'narrow wizard', body: wizard({ action: '/final', id: 'final', steps, hidden: { ticket }, lang, E }) });
+  return layout({ lang, bodyClass: 'q', title: 'Day 3 | Creatives Connect Afrika', main: 'narrow wizard', body: wizard({ action: '/final', id: 'final', steps, hidden: { ticket }, lang, E }) });
 }
 
 export function finalDonePage(lang = 'en') {

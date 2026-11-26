@@ -304,3 +304,44 @@ main.landing .band-bottom .soundline{padding:4px 8px}
 .cyc-lang{display:block;height:11px;font:700 10.5px/11px system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;letter-spacing:.22em;text-transform:uppercase;color:var(--gold);white-space:nowrap}
 .cyc-text{display:flex;align-items:center;justify-content:center;height:27px;line-height:1;overflow:visible}
 @media (min-width:700px){.cyc{height:64px}.cyc-text{height:44px}}
+
+/* QUESTION SCREENS: colour-blocked and compact, so every screen fits a phone with no scrolling.
+   Gold page, white tiles to tap, the tile you pick fills red, the others fade. Square corners, like the opening. */
+html:has(body.q){background:#E2AC4A}
+body.q{margin:0;min-height:0;background:#E2AC4A;color:#111;--ink:#111;--muted:rgba(17,17,17,.7);--line:rgba(17,17,17,.28);--red-ink:#111}
+body.q main.wizard{padding:12px 20px 14px;min-height:100svh;box-sizing:border-box}
+body.q .meta{padding-right:0;margin:0 0 2px}
+body.q .count{color:#111}body.q .count i{color:rgba(17,17,17,.6)}
+body.q .ticks i{background:rgba(17,17,17,.2)}body.q .ticks i.done{background:#111}body.q .ticks i.now{background:var(--red)}
+body.q .opener{color:#111;font-size:18px;margin:10px 0 0}
+body.q h2.take{font-size:clamp(24px,7vw,30px);line-height:1.1;margin:6px 0 12px;color:#111}
+body.q .setup{color:rgba(17,17,17,.7);font-size:13px;margin:6px 0 2px}
+body.q h2.ask{font-size:clamp(24px,7vw,30px);line-height:1.08;margin:6px 0 12px;color:#111}
+body.q .echo{font-size:16px;line-height:1.2;color:rgba(17,17,17,.7);margin:6px 0 10px}
+body.q .hint{color:rgba(17,17,17,.75);font-size:14px;margin:0 0 14px}
+body.q .kicker{color:#111}
+body.q .choice span,body.q .chip span{background:#fff;color:#111;border:0;border-radius:0;box-shadow:none}
+body.q .choice.locked span,body.q .chip.locked span{background:var(--red);color:#fff;transform:none}
+body.q .choice.fade span,body.q .chip.fade span{opacity:.3}
+body.q .choices.two.big .choice span{min-height:92px;font-size:30px}
+body.q .choices.two.big.detail{gap:8px}
+body.q .choices.two.big.detail .choice span{padding:10px 14px;gap:5px;font-size:23px;min-height:0;line-height:1.05}
+body.q .choices.detail .choice span small{gap:3px;font-size:13.5px;line-height:1.25}
+body.q .choices.detail small i.eg{font-size:12px;opacity:.65;margin:0 0 2px}
+body.q .choices.stack{gap:8px}
+body.q .choices.stack.words .choice span{min-height:44px;font:700 16px/1.2 system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;padding:10px 16px;border-radius:0}
+body.q .ack{font-size:22px;min-height:24px;margin:10px 0 0;color:#111}
+body.q .wizard .nav,body.q .nav{padding-top:12px;margin-top:auto}
+body.q .btn{border-radius:0}
+body.q .btn.ghost{background:transparent;color:#111;border:2px solid #111}
+body.q .nav .btn.ghost{min-width:84px}
+body.q .wizard input[type=text],body.q .wizard input[type=email],body.q .wizard input:not([type]){color:#111;border-bottom-color:#111;font-size:24px}
+body.q .wizard select{background:#fff;color:#111;border:0;border-radius:0;font-size:20px;min-height:54px}
+body.q label{color:#111}
+body.q .consent,body.q .check span{color:#111}
+body.q .err{color:#7a0010}
+body.q .snd{background:rgba(255,255,255,.6);color:#111;border-color:rgba(17,17,17,.4)}
+@media (max-height:620px){body.q h2.take,body.q h2.ask{font-size:24px;margin:4px 0 8px}body.q .opener{margin:6px 0 0;font-size:16px}body.q .choices.two.big .choice span{min-height:76px}body.q .choices.stack.words .choice span{min-height:40px;padding:8px 14px}}
+body.q .snd{top:9px;bottom:auto;right:12px;background:rgba(255,255,255,.6);color:#111;border-color:rgba(17,17,17,.4)}
+body.q .meta{padding-right:92px}
+body.q .choices .choice span,body.q .choices .chip span,body.q .choices.two.big .choice span{border-radius:0}

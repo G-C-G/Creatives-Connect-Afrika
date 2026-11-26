@@ -57,23 +57,23 @@ export const TAKE_SIDES = {
   T1: { agree: 'A life of meaning', disagree: 'A life of wealth' },
   T2: { agree: 'Build Africa first', disagree: 'Go global now' },
   T3: { agree: 'Do it for free', disagree: 'Stand by your price' },
-  T5: { agree: 'The artists and experience makers', disagree: 'The host country and its institutions' },
+  T5: { agree: 'Artists and experience makers', disagree: 'The host country' },
 };
 export const sidesOf = (id) => TAKE_SIDES[id] || null;
 // What a phone shows for those takes: a short question, then the good and the bad of BOTH options on the two tiles.
 export const TAKE_DETAIL = {
-  T1: { setup: 'Looking back at the end of your life.', stem: 'Which life would you rather have lived?',
-    agree: { eg: 'You made work that mattered, and lived comfortably, but never became rich', good: 'Your work changed lives, and people you never met still feel it', bad: 'You never reached the wealth you could have, had you gone commercial' },
-    disagree: { eg: 'You went commercial and became wealthy, but the work that mattered never got made', good: 'You reached a level of comfort and luxury most people never see', bad: 'The work you wanted to make never got made, and your impact stayed small' } },
+  T1: { setup: 'At the end of your life.', stem: 'Which life would you rather have lived?',
+    agree: { eg: 'Comfortable, never rich', good: 'Your work changed lives', bad: 'You never became wealthy' },
+    disagree: { eg: 'Commercial, wealthy', good: 'Comfort and luxury', bad: 'The meaningful work never got made' } },
   T2: { stem: 'One budget, one year. Where does it go?',
-    agree: { good: 'A loyal home audience nobody can take away', bad: 'Slower money, and the world may move on' },
-    disagree: { good: 'A bigger audience and bigger money', bad: 'Without a home base, you are a guest everywhere' } },
-  T3: { stem: 'A big opportunity comes, but they cannot pay for your work. Do you still do it?',
-    agree: { good: 'A big audience sees your work, and doors may open', bad: 'You may not grow: clients start expecting it cheap, and it gets hard to charge more later' },
-    disagree: { good: 'People respect your work and your price', bad: 'You walk away from a big opportunity, and may not grow either: less work behind you, fewer referrals, and a smaller network' } },
-  T5: { stem: 'You can only back one. Who adds more value to a cultural experience?',
-    agree: { eg: 'Musicians, tour guides, event and workshop hosts, kids\u2019 activities', good: 'They are the reason people come, and the reason people remember', bad: 'Without a safe, well-run country to host them, the experience falls apart' },
-    disagree: { eg: 'Government, hotels, safety, roads, the welcome and the feel of the place', good: 'A safe, welcoming, well-run place is what makes any experience possible', bad: 'Without the artists and experience makers, there is little to come for' } },
+    agree: { good: 'A loyal home audience', bad: 'Slower money' },
+    disagree: { good: 'A bigger audience, more money', bad: 'No home base' } },
+  T3: { stem: 'A big opportunity, but they cannot pay. Do you still do it?',
+    agree: { good: 'A big audience sees your work', bad: 'Clients expect it cheap after' },
+    disagree: { good: 'People respect your work', bad: 'Fewer referrals, a smaller network' } },
+  T5: { stem: 'Who adds more value to a cultural experience?',
+    agree: { eg: 'Musicians, guides, event hosts', good: 'They are why people come', bad: 'Without a safe host, it falls apart' },
+    disagree: { eg: 'Government, hotels, safety', good: 'A safe, welcoming place makes it possible', bad: 'Without artists, little to come for' } },
 };
 export const detailOf = (id) => TAKE_DETAIL[id] || null;
 

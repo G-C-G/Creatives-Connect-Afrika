@@ -204,7 +204,7 @@
     fetch(href, { credentials: 'same-origin' }).then(function (r) { if (!r.ok) throw new Error('x'); return r.text(); }).then(function (t) {
       var d = new DOMParser().parseFromString(t, 'text/html'), m = d.querySelector('main'), cur = doc.querySelector('main');
       if (!m || !cur) throw new Error('x');
-      cur.className = m.className; cur.innerHTML = m.innerHTML;
+      cur.className = m.className; cur.innerHTML = m.innerHTML; doc.body.className = d.body.className;   // the question screens bring their own page colour
       var lg = doc.querySelector('.logos.top'); if (lg) lg.remove();
       doc.title = d.title; try { history.pushState({}, '', href); } catch (x) {}
       window.scrollTo(0, 0); initWizard(); ensurePill();

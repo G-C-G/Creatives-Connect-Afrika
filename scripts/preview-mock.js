@@ -60,7 +60,7 @@
     var line = document.createElement('p');
     line.style.cssText = 'text-align:center;font:600 12px/1.4 system-ui,sans-serif;color:#888;margin:0;padding:6px 16px 22px';
     line.innerHTML = 'Preview, nothing saved &middot; <a href="start.html" id="pv-restart" style="color:#B71C25">Restart</a> &middot; <a href="sounds.html" style="color:#B71C25">Sound test</a>';
-    if (document.querySelector('main.landing')) { return; }
+    if (document.querySelector('main.landing, main.wizard')) { return; }
     if (false) line.style.cssText = 'position:fixed;left:24px;bottom:18px;margin:0;padding:0;text-align:left;font:600 11px/1.4 system-ui,sans-serif;color:#888';
     document.body.appendChild(line);
     document.getElementById('pv-restart').addEventListener('click', function () {
