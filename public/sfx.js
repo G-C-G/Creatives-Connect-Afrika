@@ -128,8 +128,8 @@
     theme: function (url, soft) {
       if (!on || song || stage) return;
       if (!url || typeof Audio === 'undefined') { if (!soft) welcomeMotif(); return; }
-      var failed = false, fb = function () { if (failed) return; failed = true; song = null; if (!soft) welcomeMotif(); };
-      try { song = getEl(url); song.volume = 0; song.addEventListener('error', fb, { once: true });
+      var failed = false, el = null, fb = function () { if (failed) return; failed = true; if (el) ready[url] = el; song = null; if (!soft) welcomeMotif(); };   // a refused element is kept (already downloading) for the next try
+      try { el = song = getEl(url); song.volume = 0; song.addEventListener('error', fb, { once: true });
         var p = song.play(); if (p && p.then) p.then(function () { fadeTo(song, songVol); }, fb); } catch (e) { fb(); }
     },
     // from "Let's go" the song carries on under the questions, but low enough not to distract

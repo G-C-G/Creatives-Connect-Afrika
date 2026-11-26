@@ -47,8 +47,9 @@
   if (SFX && theme) {
     SFX.prepare(theme.getAttribute('data-theme')); SFX.prepare(theme.getAttribute('data-next-theme'));
     startSong();
-    var first = function (e) { if (e.target && e.target.closest && e.target.closest('a.go')) return; startSong(); };
-    ['pointerdown', 'touchstart', 'keydown'].forEach(function (ev) { doc.addEventListener(ev, first, { once: true, capture: true }); });
+    // phones only count a finger LIFTING (touchend / pointerup / click) or a key as permission for sound, not the finger going down; keep trying until it is playing
+    var first = function (e) { if (e.target && e.target.closest && e.target.closest('a.go')) return; startSong(); if (SFX.themePlaying()) ['touchend', 'pointerup', 'click', 'keydown'].forEach(function (ev) { doc.removeEventListener(ev, first, true); }); };
+    ['touchend', 'pointerup', 'click', 'keydown'].forEach(function (ev) { doc.addEventListener(ev, first, true); });
   }
   // the ending: a low note as it starts, one hit as the big question lands
   if (SFX && doc.querySelector('main.cliff') && !calm) { setTimeout(function () { SFX.cliff(); }, 250); setTimeout(function () { SFX.boom(); }, 2800); }
