@@ -186,7 +186,8 @@ test('the welcome song file is served only if present, with byte ranges (iPhones
   const c = await boot();
   const landing = await (await c.call('/')).text();
   assert.match(landing, /class="btn big go" href="\/start" data-theme="\/static\/audio\/welcome-home\.mp3"/);
-  assert.equal((await c.call('/static/audio/welcome-home.mp3')).status, 404, 'no file yet: a clean 404, and the page plays its own welcome motif');
+  const song = await c.call('/static/audio/welcome-home.mp3'); assert.equal(song.status, 200, 'the welcome song is in place');
+  const part = await fetch(c.base + '/static/audio/welcome-home.mp3', { headers: { Range: 'bytes=0-99' } }); assert.equal(part.status, 206, 'byte ranges work (iPhones need them)');
   assert.equal((await c.call('/static/audio/other.mp3')).status, 404, 'only the one named file is ever served');
   c.close();
 });
