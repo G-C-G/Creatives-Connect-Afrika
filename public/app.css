@@ -259,8 +259,8 @@ main.landing .btn.go{width:100%;min-height:54px;height:54px;border-radius:999px;
 
 /* OPENING: three colour-blocked zones.  1 a black banner with every logo on a white chip.  2 the CCA mark alone on white.  3 a black panel: the title, the line, the button.
    The eye goes banner (who) -> big mark (what) -> panel (what to read and do). */
-@font-face{font-family:"Barlow Condensed";font-weight:800;font-style:normal;font-display:swap;src:url(/static/fonts/barlow-cond-800.woff2) format("woff2");unicode-range:U+0000-00FF,U+0131,U+0152-0153,U+02BB-02BC,U+02C6,U+02DA,U+02DC,U+2000-206F,U+2074,U+20AC,U+2122,U+2191,U+2193,U+2212,U+2215,U+FEFF,U+FFFD}
-@font-face{font-family:"Barlow Condensed";font-weight:800;font-style:normal;font-display:swap;src:url(/static/fonts/barlow-cond-ext-800.woff2) format("woff2");unicode-range:U+0100-02BA,U+02BD-02C5,U+02C7-02CC,U+02CE-02D7,U+02DD-02FF,U+0304,U+0308,U+0329,U+1D00-1DBF,U+1E00-1E9F,U+1EF2-1EFF,U+2020,U+20A0-20AB,U+20AD-20C0,U+2113,U+2C60-2C7F,U+A720-A7FF}
+@font-face{font-family:"Barlow Condensed";font-weight:800;font-style:normal;font-display:block;src:url(/static/fonts/barlow-cond-800.woff2) format("woff2");unicode-range:U+0000-00FF,U+0131,U+0152-0153,U+02BB-02BC,U+02C6,U+02DA,U+02DC,U+2000-206F,U+2074,U+20AC,U+2122,U+2191,U+2193,U+2212,U+2215,U+FEFF,U+FFFD}
+@font-face{font-family:"Barlow Condensed";font-weight:800;font-style:normal;font-display:block;src:url(/static/fonts/barlow-cond-ext-800.woff2) format("woff2");unicode-range:U+0100-02BA,U+02BD-02C5,U+02C7-02CC,U+02CE-02D7,U+02DD-02FF,U+0304,U+0308,U+0329,U+1D00-1DBF,U+1E00-1E9F,U+1EF2-1EFF,U+2020,U+20A0-20AB,U+20AD-20C0,U+2113,U+2C60-2C7F,U+A720-A7FF}
 .logos.top.band{background:#111;padding:9px 16px;max-width:none;width:auto;margin:0;gap:10px;align-items:center;justify-content:space-between;border-radius:0}
 .logos.top.band img{height:24px;width:auto;background:#fff;border-radius:0;padding:4px 6px;box-sizing:content-box;display:block}
 .logos.top.band .tp{display:flex;align-items:center;gap:6px}
@@ -450,3 +450,9 @@ body.q .goals{max-height:calc(100svh - 268px);overflow-y:auto;-webkit-overflow-s
 body.q .goals{position:relative}
 body.q .goal-other{margin-top:8px}body.q .goal-other input{width:100%;box-sizing:border-box;font:600 16px/1.2 system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;padding:12px 14px;border:0;border-radius:0;background:#fff;color:#111;border-bottom:3px solid #111}
 body.q .country-react{font:italic 400 clamp(26px,7.4vw,34px)/1.1 var(--display);color:#111;margin:14px 0 0;min-height:1.2em}body.q .country-react.pop{animation:fadein .35s ease-out}
+
+/* opening: the page appears in one piece (logo and fonts ready), with a short fade, instead of painting in strips */
+main.landing{transition:opacity .35s ease}
+main.landing.hold{opacity:0;animation:rvl .35s ease 3s forwards}
+@keyframes rvl{to{opacity:1}}   /* safety: if the script never runs, the page still appears after 3 s */
+@media (prefers-reduced-motion:reduce){main.landing{transition:none}}
