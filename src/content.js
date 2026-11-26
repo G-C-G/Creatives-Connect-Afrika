@@ -70,18 +70,18 @@ export const TAKE_SIDES = {
 export const sidesOf = (id) => TAKE_SIDES[id] || null;
 // What a phone shows for those takes: a short question, then the good and the bad of BOTH options on the two tiles.
 export const TAKE_DETAIL = {
-  T1: { setup: 'At the end of your life.', stem: 'Which life would you rather have lived?',
-    agree: { eg: 'Comfortable, never rich', good: 'Your work changed lives', bad: 'You never became wealthy' },
-    disagree: { eg: 'Commercial, wealthy', good: 'Comfort and luxury', bad: 'The meaningful work never got made' } },
+  T1: { setup: 'Looking back at the end of your life.', stem: 'Which life would you rather have lived?',
+    agree: { eg: 'You made meaningful work that touched many lives, and lived comfortably, but never became rich', good: 'Your work mattered, and reached people for generations', bad: 'You never reached the wealth you could have had by going commercial' },
+    disagree: { eg: 'You built the business side, and made real money for a very good life', good: 'You reached a comfort and luxury most people never see', bad: 'The meaningful work you wanted to make never got made, and your impact stayed small' } },
   T2: { stem: 'One budget, one year. Where does it go?',
-    agree: { good: 'A loyal home audience', bad: 'Slower money' },
-    disagree: { good: 'A bigger audience, more money', bad: 'No home base' } },
-  T3: { stem: 'A big opportunity, but they cannot pay. Do you still do it?',
-    agree: { good: 'A big audience sees your work', bad: 'Clients expect it cheap after' },
-    disagree: { good: 'People respect your work', bad: 'Fewer referrals, a smaller network' } },
+    agree: { eg: 'Win your home market before the world', good: 'A loyal home audience nobody can take away', bad: 'Slower money, and the world may move on without you' },
+    disagree: { eg: 'Take the work to the world now', good: 'A bigger audience and bigger money', bad: 'Without a home base, you are a guest everywhere' } },
+  T3: { stem: 'A big opportunity comes, but they cannot pay for your work. Do you still do it?',
+    agree: { good: 'A big audience sees your work, and doors may open', bad: 'You may not grow: clients start expecting it cheap, and it gets hard to charge more later' },
+    disagree: { good: 'People respect your work and your price', bad: 'You walk away from the opportunity, and may not grow either: less work behind you, fewer referrals, a smaller network' } },
   T5: { stem: 'Which is more valuable to tourism and cultural experiences?',
-    agree: { eg: 'Artists, storytellers, guides, craftspeople, staff', good: 'They make a place special and worth choosing', bad: 'Without good spaces, nowhere to host them' },
-    disagree: { eg: 'Nature, architecture, cultural spaces, venues, airports', good: 'Great spaces give visitors a reason to come and room to enjoy it', bad: 'Without culture, visitors can go anywhere else' } },
+    agree: { eg: 'Artists, storytellers, guides, craftspeople, hotel and service staff', good: 'They make a place special: why visitors choose us and not any other country', bad: 'Without great spaces, visitors will not feel comfortable, and nowhere can host the culture' },
+    disagree: { eg: 'Nature, architecture, cultural spaces, venues, airports', good: 'Great spaces make a country worth visiting, and let visitors feel at ease', bad: 'Without artists and culture, visitors can find nature and hotels in any other country' } },
 };
 export const detailOf = (id) => TAKE_DETAIL[id] || null;
 
