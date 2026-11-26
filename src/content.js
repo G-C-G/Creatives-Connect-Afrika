@@ -57,7 +57,7 @@ export const TAKE_SIDES = {
   T1: { agree: 'A life of meaning', disagree: 'A life of wealth' },
   T2: { agree: 'Build Africa first', disagree: 'Go global now' },
   T3: { agree: 'Do it for free', disagree: 'Stand by your price' },
-  T5: { agree: 'The people and service', disagree: 'The place and its ambiance' },
+  T5: { agree: 'People and social experiences', disagree: 'Place and natural surroundings' },
 };
 export const sidesOf = (id) => TAKE_SIDES[id] || null;
 // What a phone shows for those takes: a short question, then the good and the bad of BOTH options on the two tiles.
@@ -71,9 +71,9 @@ export const TAKE_DETAIL = {
   T3: { stem: 'A big opportunity, but they cannot pay. Do you still do it?',
     agree: { good: 'A big audience sees your work', bad: 'Clients expect it cheap after' },
     disagree: { good: 'People respect your work', bad: 'Fewer referrals, a smaller network' } },
-  T5: { stem: 'Who adds more value to a cultural experience?',
-    agree: { eg: 'Artists, guides, craftspeople, hotel and service staff', good: 'People are why visitors come back', bad: 'Great service in a poor place falls flat' },
-    disagree: { eg: 'The country, safety, roads, the feel of the place', good: 'A great place makes any experience possible', bad: 'A great place with no people is empty' } },
+  T5: { stem: 'What is worth more to tourism and cultural experiences?',
+    agree: { eg: 'Artists, guides, craftspeople, hotel staff, the social buzz', good: 'People are why visitors come back', bad: 'A great crowd in a poor place falls flat' },
+    disagree: { eg: 'Natural beauty, living spaces, good entertainment venues', good: 'A great place draws visitors by itself', bad: 'A great place with no people is empty' } },
 };
 export const detailOf = (id) => TAKE_DETAIL[id] || null;
 
@@ -83,7 +83,7 @@ export const TAKES = [
   { id: 'T2', position: 5, theme_tag: null, text: 'One budget, one year. Where does it go? Build Africa first for a loyal home audience nobody can take away, but slower money and the world may move on. Go global now for a bigger audience and bigger money, but without a home base you are a guest everywhere.' },
   { id: 'T3', position: 2, theme_tag: null, text: 'A big opportunity comes, but they cannot pay for your work. Do it free and a big audience sees your work, but you may not grow, as clients start expecting it cheap. Stand by your price and your work is respected, but you walk away from the opportunity, and may not grow either, with less work behind you, fewer referrals and a smaller network. What should creatives do?' },
   { id: 'T4', position: 3, theme_tag: null, text: 'I\u2019d rather see African work go global under foreign ownership than stay 100% African-owned and unseen.' },
-  { id: 'T5', position: 1, theme_tag: null, text: 'Who adds more value to a cultural experience: the people and service (artists, guides, craftspeople, hotel and service staff), or the place and its ambiance (the country, safety, roads, the feel of the place)?' },
+  { id: 'T5', position: 1, theme_tag: null, text: 'What is worth more to tourism and cultural experiences: the people and social experiences (artists, guides, craftspeople, hotel staff, the social buzz), or the place and natural surroundings (natural beauty, living spaces, good entertainment venues)?' },
 ];
 
 // ALL verified:false until Hinda confirms (flip in /admin). Unverified facts are never shown anywhere.
