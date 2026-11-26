@@ -155,7 +155,7 @@ export function preForm({ takes, facts = [], S = new URLSearchParams(), E = {}, 
     <label class="check"><input type="checkbox" name="consent_aggregate" value="1" required ${S.get('consent_aggregate') === '1' ? 'checked' : ''}><span>${t(lang, 'consent.aggregate')}</span></label>${fieldErr(E, 'consent_aggregate', lang)}` }, lang);
   const byId = new Map(facts.map((f) => [f.id, f]));
   const steps = [ask({ k: t(lang, 'q.country.k'), title: t(lang, 'q.country.t'), hint: t(lang, 'q.country.h'),
-    body: h`<div class="field"><label for="f_country" class="sr">${t(lang, 'about.country')}</label>${select('country', PICKABLE_COUNTRIES, S, lang, E)}${fieldErr(E, 'country', lang)}</div><p class="country-react" data-country-react data-line="${t(lang, 'country.react')}" aria-live="polite"></p>` }, lang)];
+    body: h`<div class="field"><label for="f_country" class="sr">${t(lang, 'about.country')}</label>${select('country', PICKABLE_COUNTRIES, S, lang, E)}${fieldErr(E, 'country', lang)}</div>` }, lang)];
   takes.forEach((tk, i) => {
     steps.push(...takeSteps(tk, i + 1, takes.length, S, lang));
     const f = !short && byId.get(FACT_SLOTS[i + 1]);

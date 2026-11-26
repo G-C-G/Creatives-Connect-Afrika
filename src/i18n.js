@@ -115,7 +115,6 @@ export const en = {
   'ack.stance': 'Locked.', 'ack.strength': 'Interesting.', 'ack.level': 'On to the next.', 'ack.level.last': 'Five answers. One version of you.',
   'ack.str.1': 'Noted. Gently held.', 'ack.str.2': 'Not too bothered. Fair.', 'ack.str.3': 'Strongly. Noted.', 'ack.str.4': 'Very strongly. Noted.', 'ack.str.5': 'Oh. You mean it.',
   'ack.lvl.quiet': 'Noted. Just between us.', 'ack.lvl.aloud': 'Good. Say it loud.', 'ack.lvl.stage': 'Noted. We may genuinely call on you to speak.',
-  'country.react': 'Let\u2019s see what you brought with you.',
   'strength.ask': 'How strongly do you feel about it?',
   'strength.1': 'Barely', 'strength.2': 'Not too bothered', 'strength.3': 'I feel strongly', 'strength.4': 'I feel very strongly', 'strength.5': 'I\u2019d fight you on this',
   'level.ask': 'Would you say that out loud in this room?',

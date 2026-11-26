@@ -98,12 +98,6 @@
   var countrySel = form.querySelector('select[name=country]'), audioBase = form.getAttribute('data-audio');
   function slug(c) { return String(c).normalize('NFD').replace(/[\u0300-\u036f]/g, '').toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, ''); }
   var AFRICAN = {"algeria":1,"angola":1,"benin":1,"botswana":1,"burkina-faso":1,"burundi":1,"cabo-verde":1,"cameroon":1,"central-african-republic":1,"chad":1,"comoros":1,"congo-republic":1,"cote-d-ivoire":1,"djibouti":1,"dr-congo":1,"egypt":1,"equatorial-guinea":1,"eritrea":1,"eswatini":1,"ethiopia":1,"gabon":1,"gambia":1,"ghana":1,"guinea":1,"guinea-bissau":1,"kenya":1,"lesotho":1,"liberia":1,"libya":1,"madagascar":1,"malawi":1,"mali":1,"mauritania":1,"mauritius":1,"morocco":1,"mozambique":1,"namibia":1,"niger":1,"nigeria":1,"rwanda":1,"sao-tome-and-principe":1,"senegal":1,"seychelles":1,"sierra-leone":1,"somalia":1,"south-africa":1,"south-sudan":1,"sudan":1,"tanzania":1,"togo":1,"tunisia":1,"uganda":1,"zambia":1,"zimbabwe":1};
-  var react = form.querySelector('[data-country-react]');
-  if (countrySel && react) countrySel.addEventListener('change', function () {
-    if (!countrySel.value) { react.textContent = ''; return; }
-    react.textContent = countrySel.value.toUpperCase() + '. ' + (AFRICAN[slug(countrySel.value)] ? react.getAttribute('data-line') : '');
-    react.classList.remove('pop'); void react.offsetWidth; react.classList.add('pop');
-  });
   if (countrySel && SFX && audioBase) countrySel.addEventListener('change', function () { if (countrySel.value) SFX.snippet(audioBase + (AFRICAN[slug(countrySel.value)] ? slug(countrySel.value) : 'ghana') + '.mp3'); else SFX.stopSnippet(); });   // non-African countries quietly get the Ghana clip
 
   // ---- values: max 3 ----
