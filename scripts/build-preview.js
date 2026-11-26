@@ -1,7 +1,7 @@
 // Builds a self-contained PREVIEW of the onboarding + welcome game: static pages and a tiny in-browser stand-in for the server.
 // Nothing is saved or sent. Sample room data. Usage: node scripts/build-preview.js <outDir>
 import { createServer } from 'node:http';
-import { mkdirSync, writeFileSync, readFileSync, copyFileSync, rmSync } from 'node:fs';
+import { mkdirSync, writeFileSync, readFileSync, copyFileSync, rmSync, existsSync } from 'node:fs';
 import { join, dirname } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { openDb, setSetting } from '../src/db.js';
@@ -67,6 +67,8 @@ writeFileSync(join(out, 'static/app.css'), '@charset "utf-8";\n' + css);
 const ascii = (t) => t.replace(/[\u0080-\uffff]/g, (c) => '\\u' + c.charCodeAt(0).toString(16).padStart(4, '0'));
 for (const f of ['app.js', 'play.js', 'sfx.js']) writeFileSync(join(out, 'static', f), ascii(readFileSync(join(ROOT, 'public', f), 'utf8')));
 for (const f of ['instrument-serif-400.woff2', 'instrument-serif-400-italic.woff2', 'barlow-cond-800.woff2', 'barlow-cond-ext-800.woff2']) copyFileSync(join(ROOT, 'public/fonts', f), join(out, 'static/fonts', f));
+mkdirSync(join(out, 'static/audio'), { recursive: true });
+if (existsSync(join(ROOT, 'public/audio/welcome-home.mp3'))) copyFileSync(join(ROOT, 'public/audio/welcome-home.mp3'), join(out, 'static/audio/welcome-home.mp3'));
 for (const f of ['gcg.png', 'cca-hero.png', 'creatives-connect-afrika.png', 'africa-accent.png', 'ghana-arms.png', 'black-star.png', 'africa-tourism-partners.png', 'afcfta.png']) copyFileSync(join(ROOT, 'public/logos', f), join(out, 'static/logos', f));
 // a plain page to LISTEN to every sound on its own (and to check the phone is not on silent)
 const names = [['tick', 'Tick (kalimba)'], ['lock', 'Lock-in (agogo + drum)'], ['rise', 'Countdown (shekere)'], ['cliff', 'Ending, start'], ['boom', 'Ending, big hit'], ['chime', 'Right answer'], ['miss', 'Wrong answer (talking drum)'], ['drum', 'Drum roll'], ['sting', 'Nollywood-style stinger'], ['pluck', 'Highlife-style pluck'], ['cassette', 'Cassette'], ['static', 'Old TV static'], ['beep', 'Beep'], ['buzzer', 'Buzzer']];
