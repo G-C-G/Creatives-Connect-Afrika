@@ -56,7 +56,7 @@ test('logos: first page is CCA only, game screens are clean, and the ending repe
   assert.match(done, /class="logos top band"/, 'the ending carries the same logo banner as the opening'); assert.match(done, /class="end-mark"/, 'and the CCA mark');
   assert.ok(done.indexOf('gcg.png') < done.indexOf('end-mark'), 'GCG sits in the top banner of the ending, never in a footer');
   const text = done.replace(/<[^>]*>/g, ' ').replace(/\s+/g, ' ');
-  for (const line of ['That’s all.', 'For now.', 'You just told us what you think.', 'What does everyone else think?', 'Come back Monday.', 'Keep it.', 'See you Monday.']) assert.ok(text.includes(line.replace('’', '&#39;')) || text.includes(line), `ending says: ${line}`);
+  for (const line of ['That’s all.', 'For now.', 'What does everyone else think?', 'Come back Monday.', 'Keep it.']) assert.ok(text.includes(line.replace('’', '&#39;')) || text.includes(line), `ending says: ${line}`);
   assert.ok(!/thank you for completing/i.test(text), 'never a thank-you-for-completing page');
   c.close();
 });
