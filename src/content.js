@@ -58,7 +58,7 @@ export const sidesOf = (id) => TAKE_SIDES[id] || null;
 // What a phone shows for those takes: a short question, then the good and the bad of BOTH options on the two tiles.
 export const TAKE_DETAIL = {
   T3: { stem: 'Someone wants your work but cannot pay. Do you still do it?',
-    agree: { good: 'More people get to see your work', bad: 'They may expect it cheap, and it gets hard to charge more later' },
+    agree: { good: 'More people get to see your work', bad: 'You may not grow: clients start expecting it cheap, and it gets hard to charge more later' },
     disagree: { good: 'People respect your work and your price', bad: 'You may not grow either: less work behind you, and few clients who can afford you' } },
   T5: { stem: 'Shape it for the world, or keep it authentic and pure?',
     agree: { good: 'More people buy it and get to know it', bad: 'Part of the real thing gets lost' },
@@ -70,7 +70,7 @@ export const detailOf = (id) => TAKE_DETAIL[id] || null;
 export const TAKES = [
   { id: 'T1', position: 1, theme_tag: null, text: 'A creative business that can\u2019t make money isn\u2019t a successful creative business.' },
   { id: 'T2', position: 2, theme_tag: null, text: 'African creatives should win Africa before they go after the world.' },
-  { id: 'T3', position: 3, theme_tag: null, text: 'Someone wants your work but cannot pay. Do it free and more people see your work, but they may expect cheap from you after that. Stand by your price and your work is respected, but you may not grow either, with less work behind you and few clients who can afford you. What should creatives do?' },
+  { id: 'T3', position: 3, theme_tag: null, text: 'Someone wants your work but cannot pay. Do it free and more people see your work, but you may not grow, as clients start expecting it cheap. Stand by your price and your work is respected, but you may not grow either, with less work behind you and few clients who can afford you. What should creatives do?' },
   { id: 'T4', position: 4, theme_tag: null, text: 'I\u2019d rather see African work go global under foreign ownership than stay 100% African-owned and unseen.' },
   { id: 'T5', position: 5, theme_tag: null, text: 'Shape African culture for the world and more people buy it, but part of the real thing is lost. Keep it authentic and pure and it stays true, but fewer people will ever find it. What should creatives do?' },
 ];
