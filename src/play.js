@@ -2,7 +2,7 @@
 // A "deck" is frozen from verified facts + the two icebreaker statements. Devices fetch it once.
 import { loadData, getSetting } from './db.js';
 import { takeSplit, shareLabel } from './metrics.js';
-import { GAME_QUESTIONS } from './content.js';
+import { GAME_QUESTIONS, sidesOf } from './content.js';
 import { lookupByNameNumber } from './service.js';
 
 export const POINTS = 10;
@@ -20,7 +20,7 @@ export function buildDeck(db, now = new Date()) {
   const predictRounds = picks.map((id) => {
     const tk = data.takes.find((t) => t.id === id), s = takeSplit(data, id, 'pre');
     if (!tk || !s.n) return null;
-    return { type: 'predict', id, statement: tk.text, n: s.n, agree: s.agree, disagree: s.disagree, label: shareLabel(s.agree, s.n), answer: classify(s.agreeShare) };
+    return { type: 'predict', id, sideA: sidesOf(id)?.agree, sideD: sidesOf(id)?.disagree, statement: tk.text, n: s.n, agree: s.agree, disagree: s.disagree, label: shareLabel(s.agree, s.n), answer: classify(s.agreeShare) };
   }).filter(Boolean);
   // Story arc: the verified facts in the order of GAME_QUESTIONS, then "predict the room" as the payoff.
   const rounds = [...factRounds, ...predictRounds];

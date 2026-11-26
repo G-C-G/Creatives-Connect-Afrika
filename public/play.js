@@ -23,6 +23,13 @@
   sb.addEventListener('click', function () { SFX.toggle(); sbLabel(); }); sbLabel(); document.body.appendChild(sb);
   function buzz(p) { try { if (navigator.vibrate) navigator.vibrate(p); } catch (e) {} }
   var LABEL = { agree: ['Mostly agree', '60% or more agreed'], split: ['Split', 'between 40% and 60% agreed'], disagree: ['Mostly disagree', '60% or more disagreed'] };
+  // either-or statements carry their own side names ("Take the free work" / "Stand by your rate") instead of agree / disagree
+  function labelOf(R, k) {
+    if (k === 'agree' && R.sideA) return ['Mostly: ' + R.sideA.toLowerCase(), '60% or more chose it'];
+    if (k === 'disagree' && R.sideD) return ['Mostly: ' + R.sideD.toLowerCase(), '60% or more chose it'];
+    if (k === 'split' && (R.sideA || R.sideD)) return ['Split', 'between 40% and 60% each way'];
+    return LABEL[k];
+  }
   // Draft wit: one little wink per moment, never a joke on every screen.
   var WIN = ['You know your stuff.', 'That was clean.', 'Nobody taught you that in a panel.', 'Okay, show-off.'];
   var MISS_ROOM = ['The room had other plans.', 'The room keeps its secrets.'];
@@ -94,7 +101,7 @@
     } else {
       qcol.appendChild(el('p', 'q', '“' + R.statement + '”'));
       qcol.appendChild(el('p', 'lead', 'We asked ' + R.n + ' delegates. Did most of them agree?'));
-      opts = ['agree', 'split', 'disagree'].map(function (k) { return { value: k, text: LABEL[k][0], hint: LABEL[k][1] }; });
+      opts = ['agree', 'split', 'disagree'].map(function (k) { var l = labelOf(R, k); return { value: k, text: l[0], hint: l[1] }; });
     }
     var box = ocol;
     var btns = opts.map(function (o) {
@@ -126,9 +133,9 @@
       hero.appendChild(el('p', 'kicker', 'The room said'));
       var st = el('p', 'stat pop', '0'); hero.appendChild(st);
       if (small) countUp(st, R.agree, 700, '', ' of ' + R.n, true); else countUp(st, Math.round(100 * R.agree / R.n), 800, '', '%', true);
-      hero.appendChild(el('p', 'answer d1', 'agreed' + (small ? '' : ' (' + R.agree + ' of ' + R.n + ')')));
+      hero.appendChild(el('p', 'answer d1', (R.sideA ? 'chose \u201c' + R.sideA.toLowerCase() + '\u201d' : 'agreed') + (small ? '' : ' (' + R.agree + ' of ' + R.n + ')')));
       rest.appendChild(el('h2', 'verdict d2', ok ? 'You read the room. +' + deck.points : MISS_ROOM[(S.i >> 1) % MISS_ROOM.length]));
-      rest.appendChild(el('p', 'explain d3', 'That makes it “' + LABEL[R.answer][0] + '”. These are delegates who chose to answer, so it is directional only.'));
+      rest.appendChild(el('p', 'explain d3', 'That makes it “' + labelOf(R, R.answer)[0] + '”. These are delegates who chose to answer, so it is directional only.'));
     }
     var last = S.i + 1 >= deck.rounds.length;
     var nb = el('button', 'btn big d3', last ? 'See my score →' : 'Next →'); nb.type = 'button';

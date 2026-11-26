@@ -3,7 +3,7 @@
 import { h, str, raw } from './html.js';
 import { readFileSync } from 'node:fs';
 import { fileURLToPath } from 'node:url';
-import { LOGOS, GCG_LOGO } from './content.js';
+import { LOGOS, GCG_LOGO, sidesOf } from './content.js';
 const SFX = readFileSync(fileURLToPath(new URL('../public/sfx.js', import.meta.url)), 'utf8');
 import { loadData, getSetting } from './db.js';
 import { participation, takeSplit, takeChange, biggestMover, stillSplit, shareLabel, headline, movedStatements, flipSummary, conferenceStats, byDivisiveness, roomVerdict } from './metrics.js';
@@ -29,7 +29,7 @@ export function buildStageData(db, kind, now = new Date(), { logos = true } = {}
       takes: picks.map((id) => {
         const tk = data.takes.find((x) => x.id === id); const s = takeSplit(data, id, 'pre');
         return { id, text: tk.text, n: s.n, agree: s.agree, disagree: s.disagree, verdict: roomVerdict(s.agreeShare),
-          agreeLabel: shareLabel(s.agree, s.n), disagreeLabel: shareLabel(s.disagree, s.n) };
+          agreeLabel: shareLabel(s.agree, s.n), disagreeLabel: shareLabel(s.disagree, s.n), sideA: sidesOf(id)?.agree, sideD: sidesOf(id)?.disagree };
       }),
     };
   }
@@ -38,7 +38,7 @@ export function buildStageData(db, kind, now = new Date(), { logos = true } = {}
     return {
       ...base, kind, takenAt, n: participation(data).preCompleters,
       statements: stats.map((x) => ({
-        id: x.takeId, text: x.text, n: x.n, agree: x.agree, disagree: x.disagree, verdict: roomVerdict(x.agreeShare), agreeLabel: shareLabel(x.agree, x.n), disagreeLabel: shareLabel(x.disagree, x.n),
+        id: x.takeId, sideA: sidesOf(x.takeId)?.agree, sideD: sidesOf(x.takeId)?.disagree, text: x.text, n: x.n, agree: x.agree, disagree: x.disagree, verdict: roomVerdict(x.agreeShare), agreeLabel: shareLabel(x.agree, x.n), disagreeLabel: shareLabel(x.disagree, x.n),
         micAgree: x.sides.agree.levels.stage, micDisagree: x.sides.disagree.levels.stage, fightAgree: x.sides.agree.fighters, fightDisagree: x.sides.disagree.fighters,
       })),
     };
@@ -206,18 +206,18 @@ export function renderStageHtml(d) {
   const logos = d.logos ? LOGOS.map((l) => h`<img src="${raw(logoUri(l.file))}" alt="${l.alt}">`) : '';
   const foot = h`<div class="foot"><span class="lg">${logos}</span><span class="mid">Snapshot ${when(d.takenAt)} · In partnership with Creatives Connect Afrika · <span id="snd"></span></span><img class="gcg" src="${raw(logoUri(GCG_LOGO.file))}" alt="${GCG_LOGO.alt}"></div>`;
   // the split as the hero: two giant numbers and a meter
-  const splitBlock = (x) => h`<div class="rv"><div class="split"><div class="a"><span class="num">${x.agree}</span><span class="lab">agreed</span><span class="cap">${x.agreeLabel}</span></div>
-      <div class="d"><span class="num">${x.disagree}</span><span class="lab">disagreed</span><span class="cap">${x.disagreeLabel}</span></div></div>
+  const splitBlock = (x) => h`<div class="rv"><div class="split"><div class="a"><span class="num">${x.agree}</span><span class="lab">${x.sideA ?? 'agreed'}</span><span class="cap">${x.agreeLabel}</span></div>
+      <div class="d"><span class="num">${x.disagree}</span><span class="lab">${x.sideD ?? 'disagreed'}</span><span class="cap">${x.disagreeLabel}</span></div></div>
       <div class="meter"><i style="width:${x.n ? Math.round((100 * x.agree) / x.n) : 0}%"></i></div></div>`;
   let slides;
   if (d.kind === 'conference') {
     const open = h`<section class="slide"><p class="kick">The conference game</p><p class="huge">What did the room <em>say</em>?</p>
       <p class="sub">${d.n} delegates answered before the event. Predict first. Then we look.</p></section>`;
     const per = d.statements.map((x, i) => h`<section class="slide" data-cards><div class="round"><b>Round ${i + 1}</b> of ${d.statements.length}</div><p class="take ${takeSize(x.text)}">${x.text}</p>
-      <div class="topcell"><div class="prompt"><p class="ask">Cards up. What did the room say?</p><div class="pills"><span>Mostly agree</span><span>Split</span><span>Mostly disagree</span></div></div>
+      <div class="topcell"><div class="prompt"><p class="ask">Cards up. What did the room say?</p><div class="pills"><span>${x.sideA ? 'Mostly: ' + x.sideA.toLowerCase() : 'Mostly agree'}</span><span>Split</span><span>${x.sideD ? 'Mostly: ' + x.sideD.toLowerCase() : 'Mostly disagree'}</span></div></div>
         <div class="cd" aria-hidden="true"><span class="cdn"></span></div>
-        <div class="heads rv" data-drum="1300" data-sting><div class="a"><span class="num">${x.agree}</span><span class="lab">agreed</span><span class="cap">${x.agreeLabel}</span></div><div class="d"><span class="num">${x.disagree}</span><span class="lab">disagreed</span><span class="cap">${x.disagreeLabel}</span></div><div class="stamp">${x.verdict}.</div></div></div>
-      ${field({ mode: 'split', a: x.agree, d: x.disagree, micA: x.micAgree, micD: x.micDisagree, label: `${x.agree} agreed and ${x.disagree} disagreed` })}
+        <div class="heads rv" data-drum="1300" data-sting><div class="a"><span class="num">${x.agree}</span><span class="lab">${x.sideA ?? 'agreed'}</span><span class="cap">${x.agreeLabel}</span></div><div class="d"><span class="num">${x.disagree}</span><span class="lab">${x.sideD ?? 'disagreed'}</span><span class="cap">${x.disagreeLabel}</span></div><div class="stamp">${x.verdict}.</div></div></div>
+      ${field({ mode: 'split', a: x.agree, d: x.disagree, micA: x.micAgree, micD: x.micDisagree, label: `${x.agree} ${x.sideA ?? 'agreed'} and ${x.disagree} ${x.sideD ?? 'disagreed'}` })}
       <div class="facts rv"><p><b>${x.micAgree + x.micDisagree}</b>would take the microphone (ringed)<i>${x.micAgree} on the agree side · ${x.micDisagree} on the disagree side</i></p>
         <p><b>${x.fightAgree + x.fightDisagree}</b>said \u201cI\u2019d fight you on this\u201d<i>${x.fightAgree} agree · ${x.fightDisagree} disagree</i></p></div></section>`);
     const opposite = h`<section class="slide opp"><p class="kick">Find your opposite</p><div class="vs"><span class="a">Agree</span><span class="or">or</span><span class="d">Disagree</span></div>
@@ -231,8 +231,8 @@ export function renderStageHtml(d) {
     slides = d.takes.map((tk, i) => h`<section class="slide" data-cards><div class="round"><b>Round ${i + 1}</b> of ${d.takes.length}</div><p class="take ${takeSize(tk.text)}">${tk.text}</p>
       <div class="topcell"><div class="prompt"><p class="ask">Hands up first. Then we reveal the private split.</p></div>
         <div class="cd" aria-hidden="true"><span class="cdn"></span></div>
-        <div class="heads rv" data-drum="1300" data-sting><div class="a"><span class="num">${tk.agree}</span><span class="lab">agreed</span><span class="cap">${tk.agreeLabel}</span></div><div class="d"><span class="num">${tk.disagree}</span><span class="lab">disagreed</span><span class="cap">${tk.disagreeLabel}</span></div><div class="stamp">${tk.verdict}.</div></div></div>
-      ${field({ mode: 'split', a: tk.agree, d: tk.disagree, label: `${tk.agree} agreed and ${tk.disagree} disagreed` })}</section>`);
+        <div class="heads rv" data-drum="1300" data-sting><div class="a"><span class="num">${tk.agree}</span><span class="lab">${tk.sideA ?? 'agreed'}</span><span class="cap">${tk.agreeLabel}</span></div><div class="d"><span class="num">${tk.disagree}</span><span class="lab">${tk.sideD ?? 'disagreed'}</span><span class="cap">${tk.disagreeLabel}</span></div><div class="stamp">${tk.verdict}.</div></div></div>
+      ${field({ mode: 'split', a: tk.agree, d: tk.disagree, label: `${tk.agree} ${tk.sideA ?? 'agreed'} and ${tk.disagree} ${tk.sideD ?? 'disagreed'}` })}</section>`);
     if (!slides.length) slides = [h`<section class="slide"><p class="take">No statements picked yet.</p></section>`];
   } else {
     const p = d.participation, finalOnly = d.mode === 'final_only', total = d.takes.length;

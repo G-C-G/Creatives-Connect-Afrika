@@ -233,7 +233,7 @@ export { getTakes, FACT_SLOTS };
 
 // A person's own pre-event answers (for the optional "what did I say?" page).
 export function myAnswers(db, participantId) {
-  return db.prepare(`SELECT t.position, t.text, r.stance, r.strength, r.say_aloud, r.speak_on_stage FROM responses r JOIN takes t ON t.id = r.take_id
+  return db.prepare(`SELECT t.id AS take_id, t.position, t.text, r.stance, r.strength, r.say_aloud, r.speak_on_stage FROM responses r JOIN takes t ON t.id = r.take_id
     WHERE r.participant_id = ? AND r.phase = 'pre' ORDER BY t.position`).all(participantId).map((r) => ({
-    text: r.text, stance: r.stance, strength: r.strength, level: r.speak_on_stage ? 'stage' : r.say_aloud ? 'aloud' : r.say_aloud === 0 ? 'quiet' : 'unknown' }));
+    takeId: r.take_id, text: r.text, stance: r.stance, strength: r.strength, level: r.speak_on_stage ? 'stage' : r.say_aloud ? 'aloud' : r.say_aloud === 0 ? 'quiet' : 'unknown' }));
 }

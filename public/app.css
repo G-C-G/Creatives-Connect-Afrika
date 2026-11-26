@@ -240,3 +240,7 @@ main.landing .btn.go{width:100%;min-height:54px;height:54px;border-radius:999px;
 .snd{top:auto;bottom:12px;right:12px}
 @media (min-width:700px){.logos.top img{height:36px}main.landing{min-height:calc(100svh - 80px);max-width:560px}main.landing h1.open{font-size:72px}.cca-hero{width:420px}main.landing .lead{font-size:19px}}
 @media (max-width:360px){.logos.top img{height:20px}.logos.top .tp{gap:9px}}
+
+/* two-option takes: the tiles hold short phrases instead of one word */
+.choices.two.big.lab .choice span{font-size:clamp(24px,7vw,34px);line-height:1.08;text-align:center;padding:0 12px;min-height:150px}
+@media (min-width:700px){.choices.two.big.lab .choice span{font-size:44px;min-height:190px}}

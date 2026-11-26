@@ -1,6 +1,6 @@
 import { h } from './html.js';
 import { t, label } from './i18n.js';
-import { COUNTRIES, SECTORS, GOALS, VALUES, FACT_SLOTS, LOGOS, GCG_LOGO, CCA_HERO } from './content.js';
+import { COUNTRIES, SECTORS, GOALS, VALUES, FACT_SLOTS, LOGOS, GCG_LOGO, CCA_HERO, sidesOf } from './content.js';
 
 let showLogos = true;
 export const configure = ({ logos }) => { showLogos = logos; };
@@ -58,7 +58,7 @@ function takeSteps(take, n, total, S, lang, phase = 'pre') {
   const ackLevel = t(lang, n === total ? 'ack.level.last' : 'ack.level');
   return [
     h`<section class="step" data-step data-auto data-ack="${t(lang, 'ack.stance')}" data-title="${kick}">${meta}<p class="opener">${opener}</p><h2 class="take">${take.text}</h2>
-      <fieldset><legend class="sr">${take.text}</legend>${pick(`${k}_stance`, [['agree', t(lang, 'take.agree')], ['disagree', t(lang, 'take.disagree')]], S, 'two big serif')}</fieldset><p class="ack" aria-live="polite"></p></section>`,
+      <fieldset><legend class="sr">${take.text}</legend>${pick(`${k}_stance`, [['agree', sidesOf(take.id)?.agree ?? t(lang, 'take.agree')], ['disagree', sidesOf(take.id)?.disagree ?? t(lang, 'take.disagree')]], S, `two big serif${sidesOf(take.id) ? ' lab' : ''}`)}</fieldset><p class="ack" aria-live="polite"></p></section>`,
     h`<section class="step" data-step data-auto data-ack="${t(lang, 'ack.strength')}" data-title="${kick}">${meta}<p class="echo">${take.text}</p>
       <h2 class="ask">${t(lang, 'strength.ask')}</h2>
       <fieldset><legend class="sr">${t(lang, 'strength.ask')}</legend>${pick(`${k}_strength`, [1, 2, 3, 4, 5].map((i) => [String(i), t(lang, `strength.${i}`)]), S, 'stack words')}</fieldset><p class="ack" aria-live="polite"></p></section>`,
@@ -234,6 +234,6 @@ export function myIdentityPage({ error = false, lang = 'en' }) {
 export function myAnswersPage({ participant, rows, lang = 'en' }) {
   return layout({ lang, title: 'What you said', main: 'narrow mine', body: h`
   <p class="eyebrow">${participant.first_name}</p><h1>What you said</h1><p class="lead">Find someone who said the opposite.</p>
-  ${rows.map((r) => h`<div class="row"><p class="echo">${r.text}</p><p class="ask">${t(lang, r.stance === 'agree' ? 'take.agree' : 'take.disagree')}</p>
+  ${rows.map((r) => h`<div class="row"><p class="echo">${r.text}</p><p class="ask">${sidesOf(r.takeId)?.[r.stance] ?? t(lang, r.stance === 'agree' ? 'take.agree' : 'take.disagree')}</p>
     <p class="hint">${t(lang, `strength.${r.strength}`)}${r.level !== 'unknown' ? h` · ${t(lang, `level.${r.level}`)}` : ''}</p></div>`)}` });
 }
