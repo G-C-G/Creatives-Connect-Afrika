@@ -53,16 +53,26 @@ export function regionOf(country) {
 
 // Takes that are a choice between two options instead of Agree / Disagree. The answer is still stored as agree (first option) or disagree (second option);
 // only the words shown to people change (the buttons, the stage deck, the welcome game).
-export const TAKE_SIDES = { T3: { agree: 'Take the free work', disagree: 'Stand by your rate' }, T5: { agree: 'Adapt it to travel', disagree: 'Keep it as it is' } };
+export const TAKE_SIDES = { T3: { agree: 'Say yes to free work', disagree: 'Hold your price' }, T5: { agree: 'Translate it for the world', disagree: 'Keep its own voice' } };
 export const sidesOf = (id) => TAKE_SIDES[id] || null;
+// What a phone shows for those takes: a short question, then the good and the bad of BOTH options on the two tiles.
+export const TAKE_DETAIL = {
+  T3: { stem: 'The gig is unpaid. Do you take it?',
+    agree: { good: 'Your work gets seen', bad: 'Cheap can become your brand, and the ceiling stays low' },
+    disagree: { good: 'Clients learn you are worth paying', bad: 'Fewer chances to build a portfolio and prove yourself' } },
+  T5: { stem: 'Translate it for the world, or keep its own voice?',
+    agree: { good: 'Wider audiences and bigger markets', bad: 'Some of its meaning gets lost on the way' },
+    disagree: { good: 'Stays true to the people who made it', bad: 'A smaller audience and slower growth' } },
+};
+export const detailOf = (id) => TAKE_DETAIL[id] || null;
 
 // LOCKED once launched. Never reword after locked = 1. theme_tag: TBD per spec.
 export const TAKES = [
   { id: 'T1', position: 1, theme_tag: null, text: 'A creative business that can\u2019t make money isn\u2019t a successful creative business.' },
   { id: 'T2', position: 2, theme_tag: null, text: 'African creatives should win Africa before they go after the world.' },
-  { id: 'T3', position: 3, theme_tag: null, text: 'Free work can be a trap. Standing by your rate can cost you the opportunity. What should creatives do?' },
+  { id: 'T3', position: 3, theme_tag: null, text: 'An unpaid gig lands. Say yes and you gain visibility but risk getting stuck cheap. Hold your price and you protect your value but may miss the chance to prove it. What should creatives do?' },
   { id: 'T4', position: 4, theme_tag: null, text: 'I\u2019d rather see African work go global under foreign ownership than stay 100% African-owned and unseen.' },
-  { id: 'T5', position: 5, theme_tag: null, text: 'Adapt African culture and it travels, but something is lost. Keep it as it is and it stays true, but fewer will see it. What should creatives do?' },
+  { id: 'T5', position: 5, theme_tag: null, text: 'Translate African culture for the world and it travels, but some of its meaning is lost. Keep it in its own voice and it stays true, but the audience stays small. What should creatives do?' },
 ];
 
 // ALL verified:false until Hinda confirms (flip in /admin). Unverified facts are never shown anywhere.

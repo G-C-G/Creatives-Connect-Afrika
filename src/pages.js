@@ -1,6 +1,6 @@
 import { h } from './html.js';
 import { t, label } from './i18n.js';
-import { COUNTRIES, SECTORS, GOALS, VALUES, FACT_SLOTS, LOGOS, GCG_LOGO, CCA_HERO, sidesOf } from './content.js';
+import { COUNTRIES, SECTORS, GOALS, VALUES, FACT_SLOTS, LOGOS, GCG_LOGO, CCA_HERO, sidesOf, detailOf } from './content.js';
 
 let showLogos = true;
 export const configure = ({ logos }) => { showLogos = logos; };
@@ -55,14 +55,16 @@ function takeSteps(take, n, total, S, lang, phase = 'pre') {
   const meta = h`<div class="meta"><span class="count">${pad(n)}<i> / ${pad(total)}</i></span>
     <span class="ticks" aria-hidden="true">${Array.from({ length: total }, (_, i) => h`<i class="${i < n - 1 ? 'done' : i === n - 1 ? 'now' : ''}"></i>`)}</span></div>`;
   const opener = t(lang, `opener.${phase}.${n}`);
+  const dt = detailOf(take.id), shown = dt ? dt.stem : take.text;   // two-option takes show a short question; the good and bad sit on the tiles
+  const tile = (side) => dt ? [side === 'agree' ? 'agree' : 'disagree', sidesOf(take.id)[side], h`<i class="g">${dt[side].good}</i><i class="b">${dt[side].bad}</i>`] : null;
   const ackLevel = t(lang, n === total ? 'ack.level.last' : 'ack.level');
   return [
-    h`<section class="step" data-step data-auto data-ack="${t(lang, 'ack.stance')}" data-title="${kick}">${meta}<p class="opener">${opener}</p><h2 class="take">${take.text}</h2>
-      <fieldset><legend class="sr">${take.text}</legend>${pick(`${k}_stance`, [['agree', sidesOf(take.id)?.agree ?? t(lang, 'take.agree')], ['disagree', sidesOf(take.id)?.disagree ?? t(lang, 'take.disagree')]], S, `two big serif${sidesOf(take.id) ? ' lab' : ''}`)}</fieldset><p class="ack" aria-live="polite"></p></section>`,
-    h`<section class="step" data-step data-auto data-ack="${t(lang, 'ack.strength')}" data-title="${kick}">${meta}<p class="echo">${take.text}</p>
+    h`<section class="step" data-step data-auto data-ack="${t(lang, 'ack.stance')}" data-title="${kick}">${meta}<p class="opener">${opener}</p><h2 class="take">${shown}</h2>
+      <fieldset><legend class="sr">${take.text}</legend>${pick(`${k}_stance`, dt ? [tile('agree'), tile('disagree')] : [['agree', sidesOf(take.id)?.agree ?? t(lang, 'take.agree')], ['disagree', sidesOf(take.id)?.disagree ?? t(lang, 'take.disagree')]], S, `two big serif${sidesOf(take.id) ? ' lab' : ''}${dt ? ' detail' : ''}`)}</fieldset><p class="ack" aria-live="polite"></p></section>`,
+    h`<section class="step" data-step data-auto data-ack="${t(lang, 'ack.strength')}" data-title="${kick}">${meta}<p class="echo">${shown}</p>
       <h2 class="ask">${t(lang, 'strength.ask')}</h2>
       <fieldset><legend class="sr">${t(lang, 'strength.ask')}</legend>${pick(`${k}_strength`, [1, 2, 3, 4, 5].map((i) => [String(i), t(lang, `strength.${i}`)]), S, 'stack words')}</fieldset><p class="ack" aria-live="polite"></p></section>`,
-    h`<section class="step" data-step data-auto data-ack="${ackLevel}" data-title="${kick}">${meta}<p class="echo">${take.text}</p>
+    h`<section class="step" data-step data-auto data-ack="${ackLevel}" data-title="${kick}">${meta}<p class="echo">${shown}</p>
       <h2 class="ask">${t(lang, 'level.ask')}</h2>
       <fieldset><legend class="sr">${t(lang, 'level.ask')}</legend>${pick(`${k}_level`, [['quiet', t(lang, 'level.quiet')], ['aloud', t(lang, 'level.aloud')], ['stage', t(lang, 'level.stage')]], S2, 'stack words')}</fieldset><p class="ack" aria-live="polite"></p></section>`,
   ];
