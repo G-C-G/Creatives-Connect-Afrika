@@ -59,7 +59,7 @@ function takeSteps(take, n, total, S, lang, phase = 'pre') {
   const tile = (side) => dt ? [side === 'agree' ? 'agree' : 'disagree', sidesOf(take.id)[side], h`<i class="g">${dt[side].good}</i><i class="b">${dt[side].bad}</i>`] : null;
   const ackLevel = t(lang, n === total ? 'ack.level.last' : 'ack.level');
   return [
-    h`<section class="step" data-step data-auto data-ack="${t(lang, 'ack.stance')}" data-title="${kick}">${meta}<p class="opener">${opener}</p><h2 class="take">${shown}</h2>
+    h`<section class="step" data-step data-auto data-ack="${t(lang, 'ack.stance')}" data-title="${kick}">${meta}<p class="opener">${opener}</p>${dt?.setup ? h`<p class="setup">${dt.setup}</p>` : ''}<h2 class="take">${shown}</h2>
       <fieldset><legend class="sr">${take.text}</legend>${pick(`${k}_stance`, dt ? [tile('agree'), tile('disagree')] : [['agree', sidesOf(take.id)?.agree ?? t(lang, 'take.agree')], ['disagree', sidesOf(take.id)?.disagree ?? t(lang, 'take.disagree')]], S, `two big serif${sidesOf(take.id) ? ' lab' : ''}${dt ? ' detail' : ''}`)}</fieldset><p class="ack" aria-live="polite"></p></section>`,
     h`<section class="step" data-step data-auto data-ack="${t(lang, 'ack.strength')}" data-title="${kick}">${meta}<p class="echo">${shown}</p>
       <h2 class="ask">${t(lang, 'strength.ask')}</h2>

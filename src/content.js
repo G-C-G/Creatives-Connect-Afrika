@@ -60,9 +60,9 @@ export const TAKE_DETAIL = {
   T3: { stem: 'Someone wants your work but cannot pay. Do you still do it?',
     agree: { good: 'More people get to see your work', bad: 'You may not grow: clients start expecting it cheap, and it gets hard to charge more later' },
     disagree: { good: 'People respect your work and your price', bad: 'You may not grow either: less work behind you, and few clients who can afford you' } },
-  T5: { stem: 'Shape African culture for the world, or keep it authentic and pure?',
+  T5: { setup: 'Global platforms and buyers tend to back what already feels familiar to them.', stem: 'Shape African culture for the world, or keep it authentic and pure?',
     agree: { good: 'More people buy it and get to know it', bad: 'It gets watered down, losing its original form and true story' },
-    disagree: { good: 'Its authenticity stays intact', bad: 'Fewer people will ever find it' } },
+    disagree: { good: 'Its authenticity stays intact', bad: 'Gatekeepers may pass it over, so fewer people find it' } },
 };
 export const detailOf = (id) => TAKE_DETAIL[id] || null;
 
@@ -72,7 +72,7 @@ export const TAKES = [
   { id: 'T2', position: 2, theme_tag: null, text: 'African creatives should win Africa before they go after the world.' },
   { id: 'T3', position: 3, theme_tag: null, text: 'Someone wants your work but cannot pay. Do it free and more people see your work, but you may not grow, as clients start expecting it cheap. Stand by your price and your work is respected, but you may not grow either, with less work behind you and few clients who can afford you. What should creatives do?' },
   { id: 'T4', position: 4, theme_tag: null, text: 'I\u2019d rather see African work go global under foreign ownership than stay 100% African-owned and unseen.' },
-  { id: 'T5', position: 5, theme_tag: null, text: 'Shape African culture for the world and more people buy it, but it gets watered down, losing its original form and true story. Keep it authentic and pure and its authenticity stays intact, but fewer people will ever find it. What should creatives do?' },
+  { id: 'T5', position: 5, theme_tag: null, text: 'Global platforms and buyers tend to back what already feels familiar to them. Shape African culture for them and more people buy it, but it gets watered down, losing its original form and true story. Keep it authentic and pure and its authenticity stays intact, but gatekeepers may pass it over, so fewer people find it. What should creatives do?' },
 ];
 
 // ALL verified:false until Hinda confirms (flip in /admin). Unverified facts are never shown anywhere.
